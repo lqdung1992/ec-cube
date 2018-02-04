@@ -1,0 +1,78 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/04/2018
+ # Time: 10:26 PM
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block javascript %}
+{% endblock %}
+{% block main %}
+    <div class="wrapper" id="service-regist-receiver-wrapper">
+
+        <div class="farmer-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
+        </div>
+
+        <div id="service-wrapper">
+            <div id="confirm-area">
+                <div class="form-group">
+                    <label class="color888 title12">申し込み分類</label>
+                    <label class="title16">受領者</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="color888 title12">法人名・屋号</label>
+                    <label class="title16">高橋農園</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="color888 title12">登録者名</label>
+                    <label class="title16">野菜太郎</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="color888 title12">郵便番号</label>
+                    <label class="title16">123-4567</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="color888 title12">住所</label>
+                    <label class="title16">静岡県菊川市堀之内110-1</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="color888 title12">電話番号</label>
+                    <label class="title16">0312345678</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="color888 title12">メールアドレス</label>
+                    <label class="title16">yasai@vegi-bus.com</label>
+                </div>
+            </div>
+
+            <form id="service-form">
+                <div class="form-group">
+                    <label class="margin-left13">集荷先のバス停</label>
+                    <select class="select margin-left13 display-block">
+                        <option>静岡県菊川市堀之内110</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13">パスワード（英数字12文字〜30文字）</label>
+                    <input type="password" class="form-control width-full">
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13">パスワード（確認用）</label>
+                    <input type="password" class="form-control width-full"  placeholder="再入力をお願いします">
+                </div>
+                <button type="submit" class="btn btn-inactive margin-left13">プロフィール入力に進む</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/04/2018
+ # Time: 2:50 PM
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block javascript %}
+{% endblock %}
+{% block main %}
+    <div class="wrapper" id="service-regist-receiver-wrapper">
+
+        <div class="farmer-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
+        </div>
+
+        <div id="service-wrapper">
+            <p class="title12">やさいバスは現在、静岡県内の方のみ</p>
+            <p class="title12">利用申請を受け付けております</p>
+            <p class="title12">対応地域拡大までしばらくお待ちください</p>
+            <form id="service-form" method="post" action="{{ url('farm_service') }}">
+                <input type="hidden" name="mode" value="register"/>
+                {{ form_widget(form._token) }}
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <label class="">{{ form_label(form.maker) }}</label>
+                        {{ form_errors(form.maker) }}
+                        {{ form_widget(form.maker, {'attr': {'class': 'select'}}) }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13">{{ form_label(form.company_name) }}</label>
+                    {{ form_errors(form.company_name) }}
+                    {{ form_widget(form.company_name, {'attr': {'class': 'width-full', 'placeholder' : '静岡県'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13">{{ form_label(form.name) }}</label>
+                    {{ form_errors(form.name) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'width-full', 'placeholder' : '野菜太郎'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13 display-block">{{ form_label(form.zip) }}</label>
+                    {% for zip in form.zip %}
+                        {{ form_widget(zip, {'attr': {'class': 'width-half display-inline'}}) }}
+                        {% if loop.index == 1 %}―{% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13">{{ form_label(form.addr01) }}</label>
+                    {{ form_errors(form.addr01) }}
+                    {{ form_widget(form.addr01, {'attr': {'class': 'width-full', 'placeholder' : '静岡県静岡市青青水区'}}) }}
+                </div>
+
+                <div class="form-group">
+                    <label class="margin-left13">{{ form_label(form.addr02) }}</label>
+                    {{ form_errors(form.addr02) }}
+                    {{ form_widget(form.addr02, {'attr': {'class': 'width-full', 'placeholder': '123456789'}}) }}
+                </div>
+
+                {% for emailField in form.email %}
+                    <label class="margin-left13">{{ form_label(emailField) }}</label>
+                    <div class="form-group {% if emailField.vars.errors is not empty %}has-error{% endif %}">
+                        {{ form_errors(emailField) }}
+                        {{ form_widget(emailField, { type : 'email', 'attr': {'class': 'width-full'}}) }}
+                    </div>
+                {% endfor %}
+
+                <p class="title12">申し込みの際には利用規約・プライバシーポリシー</p>
+                <p class="title12">の 確認をお願いいたします</p>
+                <p class="title12">
+                    <a href="#" class="color888 margin-right15">利用規約</a>
+                    <a href="#" class="color888 margin-left13">プライバシーポリシー</a>
+                </p>
+                <button type="submit" class="btn btn-inactive margin-left13">同意して申し込みをする</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

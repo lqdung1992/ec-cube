@@ -1,0 +1,111 @@
+Eccube\Entity\Farmer:
+    type: entity
+    table: dtb_farmer
+    repositoryClass: Eccube\Repository\FarmerRepository
+    uniqueConstraints:
+        secret_key:
+            columns:
+                - secret_key
+    indexes:
+        # requires a length on MySQL
+        # dtb_customer_email_idx:
+        #     columns:
+        #         - email
+        dtb_farmer_create_date_idx:
+            columns:
+                - create_date
+        dtb_farmer_update_date_idx:
+            columns:
+                - update_date
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: farmer_id
+            generator:
+                strategy: AUTO
+    fields:
+        maker:
+            type: text
+            nullable: false
+        name:
+            type: string
+            length: 255
+            nullable: false
+        company_name:
+            type: string
+            length: 255
+            nullable: true
+        zip01:
+            type: string
+            length: 3
+            nullable: true
+        zip02:
+            type: string
+            length: 4
+            nullable: true
+        zipcode:
+            type: string
+            length: 10
+            nullable: true
+        addr01:
+            type: string
+            length: 255
+            nullable: true
+        addr02:
+            type: string
+            length: 255
+            nullable: true
+        email:
+            type: string
+            length: 120
+            nullable: false
+        tel:
+            type: string
+            length: 20
+            nullable: true
+        password:
+            type: string
+            length: 64
+            nullable: true
+        salt:
+            type: string
+            length: 64
+            nullable: true
+        secret_key:
+            type: string
+            length: 200
+            nullable: false
+        reset_key:
+            type: string
+            length: 200
+            nullable: true
+        reset_expire:
+            type: datetime
+            nullable: true
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+        del_flg:
+            type: smallint
+            nullable: false
+            unsigned: false
+            options:
+                default: '0'
+    manyToOne:
+        Status:
+            targetEntity: Eccube\Entity\Master\CustomerStatus
+            joinColumn:
+                name: status
+                referencedColumnName: id
+        Sex:
+            targetEntity: Eccube\Entity\Master\Sex
+            joinColumn:
+                name: sex
+                referencedColumnName: id
+    lifecycleCallbacks: {  }
