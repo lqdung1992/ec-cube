@@ -26,6 +26,8 @@ namespace Eccube\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Common\Constant;
+use Eccube\Entity\Master\BusStop;
+use Eccube\Entity\Master\CustomerRole;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -235,6 +237,12 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     private $Orders;
 
+    /** @var CustomerRole */
+    private $CustomerRole;
+
+    /** @var BusStop */
+    private $BusStop;
+
     /**
      * Constructor
      */
@@ -250,6 +258,38 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     }
 
     /**
+     * @return CustomerRole
+     */
+    public function getCustomerRole()
+    {
+        return $this->CustomerRole;
+    }
+
+    /**
+     * @param mixed $CustomerRole
+     */
+    public function setCustomerRole(CustomerRole $CustomerRole)
+    {
+        $this->CustomerRole = $CustomerRole;
+    }
+
+    /**
+     * @return BusStop
+     */
+    public function getBusStop()
+    {
+        return $this->BusStop;
+    }
+
+    /**
+     * @param BusStop $BusStop
+     */
+    public function setBusStop(BusStop $BusStop)
+    {
+        $this->BusStop = $BusStop;
+    }
+
+    /**
      * @return string
      */
     public function __toString()
@@ -262,6 +302,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     public function getRoles()
     {
+        // TODO: get from customer role master table
         return array('ROLE_USER');
     }
 

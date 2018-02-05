@@ -17,60 +17,68 @@
         </div>
 
         <div id="service-wrapper">
+            <form id="service-form" method="post" action="{{ url('farm_service') }}">
+                <input type="hidden" name="mode" value="complete"/>
+                {{ form_widget(form._token) }}
             <div id="confirm-area">
                 <div class="form-group">
-                    <label class="color888 title12">申し込み分類</label>
-                    <label class="title16">受領者</label>
+                    <label class="color888 title12">{{ form_label(form.customer_role) }}</label>
+                    <label class="title16">{{ form_widget(form.customer_role) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">法人名・屋号</label>
-                    <label class="title16">高橋農園</label>
+                    <label class="color888 title12">{{ form_label(form.company_name) }}</label>
+                    <label class="title16">{{ form_widget(form.company_name) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">登録者名</label>
-                    <label class="title16">野菜太郎</label>
+                    <label class="color888 title12">{{ form_label(form.name01) }}</label>
+                    <label class="title16">{{ form_widget(form.name01) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">郵便番号</label>
-                    <label class="title16">123-4567</label>
+                    <label class="color888 title12">{{ form_label(form.zip) }}</label>
+                    <label class="title16">{{ form_widget(form.zip.zip01) }}-{{ form_widget(form.zip.zip02) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">住所</label>
-                    <label class="title16">静岡県菊川市堀之内110-1</label>
+                    <label class="color888 title12">{{ form_label(form.addr01) }}</label>
+                    <label class="title16">{{ form_widget(form.addr01) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">電話番号</label>
-                    <label class="title16">0312345678</label>
+                    <label class="color888 title12">{{ form_label(form.tel01) }}</label>
+                    <label class="title16">{{ form_widget(form.tel01) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">メールアドレス</label>
-                    <label class="title16">yasai@vegi-bus.com</label>
+                    <label class="color888 title12">{{ form_label(form.email) }}</label>
+                    <label class="title16">
+                        {{ form_widget(form.email.first) }}
+                        {{ form_widget(form.email.second, {freeze_display_text: false}) }}
+                    </label>
                 </div>
             </div>
 
-            <form id="service-form">
                 <div class="form-group">
-                    <label class="margin-left13">集荷先のバス停</label>
-                    <select class="select margin-left13 display-block">
-                        <option>静岡県菊川市堀之内110</option>
-                    </select>
+                    <div class="col-xs-12">
+                    <label>{{ form_label(form2.bus_stop) }}</label>
+                    {{ form_errors(form2.bus_stop) }}
+                    {{ form_widget(form2.bus_stop, {'attr': {'class': 'select'}}) }}
+                    </div>
                 </div>
 
+                {% for passwordField in form2.password %}
                 <div class="form-group">
-                    <label class="margin-left13">パスワード（英数字12文字〜30文字）</label>
-                    <input type="password" class="form-control width-full">
+                    <div class="margin-left13">
+                    {{ form_label(form2.password) }}{% if loop.last %}（確認用）{% endif %}
+                    </div>
+                    {#<label class="margin-left13">パスワード（英数字12文字〜30文字）</label>#}
+                    {{ form_errors(passwordField) }}
+                    {{ form_widget(passwordField, { type : 'password', 'attr': {'class': 'width-full'} }) }}
                 </div>
-
-                <div class="form-group">
-                    <label class="margin-left13">パスワード（確認用）</label>
-                    <input type="password" class="form-control width-full"  placeholder="再入力をお願いします">
-                </div>
+                    {#<label class="margin-left13">パスワード（確認用）</label>#}
+                {% endfor %}
                 <button type="submit" class="btn btn-inactive margin-left13">プロフィール入力に進む</button>
             </form>
         </div>
