@@ -41,7 +41,7 @@ Eccube\Entity\Customer:
             nullable: false
         name02:
             type: text
-            nullable: false
+            nullable: true
         kana01:
             type: text
             nullable: true
@@ -146,6 +146,16 @@ Eccube\Entity\Customer:
             targetEntity: Eccube\Entity\Master\CustomerStatus
             joinColumn:
                 name: status
+                referencedColumnName: id
+        CustomerRole:
+            targetEntity: Eccube\Entity\Master\CustomerRole
+            joinColumn:
+                name: customer_role
+                referencedColumnName: id
+        BusStop:
+            targetEntity: Eccube\Entity\Master\BusStop
+            joinColumn:
+                name: bus_stop
                 referencedColumnName: id
         Sex:
             targetEntity: Eccube\Entity\Master\Sex

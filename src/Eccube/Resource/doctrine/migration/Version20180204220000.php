@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Created by PhpStorm.
+ * User: lqdung1992@gmail.com
+ * Date: 02/04/2018
+ * Time: 11:02 AM
+ */
 namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
@@ -12,15 +17,15 @@ class Version20180204220000 extends AbstractMigration
     /**
      * @var string table name
      */
-    const table = 'dtb_farmer';
+    const table = 'mtb_customer_role';
+
+    const table2 = 'mtb_bus_stop';
     /**
      * @var array plugin entity
      */
     protected $entities = array(
-        'Eccube\Entity\Farmer',
-    );
-    protected $sequence = array(
-        'dtb_farmer_farmer_id_seq',
+        'Eccube\Entity\Master\CustomerRole',
+        'Eccube\Entity\Master\BusStop',
     );
 
     /**
@@ -29,7 +34,7 @@ class Version20180204220000 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
-        $this->createFarmerTable($schema);
+        $this->createTable($schema);
     }
     /**
      * Down method
@@ -45,20 +50,28 @@ class Version20180204220000 extends AbstractMigration
      * @return bool
      * @throws \Doctrine\ORM\Tools\ToolsException
      */
-    protected function createFarmerTable(Schema $schema)
+    protected function createTable(Schema $schema)
     {
-        if ($schema->hasTable(self::table)) {
-            return true;
-        }
         $app = \Eccube\Application::getInstance();
         /** @var EntityManagerInterface $em */
         $em = $app['orm.em'];
-        $classes = array(
-            $em->getClassMetadata($this->entities[0]),
-        );
-        /** @var  $tool */
-        $tool = new SchemaTool($em);
-        $tool->createSchema($classes);
+        if (!$schema->hasTable(self::table)) {
+            $classes = array(
+                $em->getClassMetadata($this->entities[0]),
+            );
+            /** @var  $tool */
+            $tool = new SchemaTool($em);
+            $tool->createSchema($classes);
+        }
+
+        if (!$schema->hasTable(self::table2)) {
+            $classes = array(
+                $em->getClassMetadata($this->entities[1]),
+            );
+            /** @var  $tool */
+            $tool = new SchemaTool($em);
+            $tool->createSchema($classes);
+        }
 
         return true;
     }
