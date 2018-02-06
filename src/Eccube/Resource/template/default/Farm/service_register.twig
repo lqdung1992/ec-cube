@@ -61,7 +61,7 @@
             </div>
 
                 <div class="form-group">
-                    <div class="col-xs-12">
+                    <div>
                     <label>{{ form_label(form2.bus_stop) }}</label>
                     {{ form_errors(form2.bus_stop) }}
                     {{ form_widget(form2.bus_stop, {'attr': {'class': 'select'}}) }}
@@ -70,7 +70,7 @@
 
                 {% for passwordField in form2.password %}
                 <div class="form-group">
-                    <div class="margin-left13">
+                    <div>
                     {{ form_label(form2.password) }}{% if loop.last %}（確認用）{% endif %}
                     </div>
                     {#<label class="margin-left13">パスワード（英数字12文字〜30文字）</label>#}
@@ -79,7 +79,7 @@
                 </div>
                     {#<label class="margin-left13">パスワード（確認用）</label>#}
                 {% endfor %}
-                <button type="submit" class="btn btn-inactive margin-left13">プロフィール入力に進む</button>
+                <button type="submit" class="btn btn-inactive">プロフィール入力に進む</button>
             </form>
         </div>
     </div>

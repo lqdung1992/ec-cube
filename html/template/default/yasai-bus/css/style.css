@@ -29,15 +29,6 @@ body {
     transform: rotate(45deg) translate(-8px, -8px);
 }
 
-.wrapper, .menu-wrapper {
-    width: 375px;
-    height: 934px;
-    /*background-color: #f7f7f7;*/
-    background-color: #ffffff;
-    margin: auto;
-    border: 1px solid #cccccc;
-}
-
 #reicever-wrapper {
     background-color: #ffffff;
     height: 980px;
@@ -1439,10 +1430,7 @@ img {
 
 
 
-.width-full {
-    width: 92% !important;
-    margin: 0 13px;
-}
+
 
 
 .width-small {
@@ -1629,24 +1617,6 @@ img {
 .padding-top25 {
     padding-top: 25px;
 }
-
-
-
-#confirm-area {
-    width: 345px;
-    height: 521px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 0.5px #cccccc;
-    margin: auto;
-    padding: 13px;
-}
-
-#confirm-area label {
-    display: block;
-    line-height: 25px;
-}
-
 
 .has-error {
     color: #d0021b;
@@ -2095,18 +2065,16 @@ img {
     border: solid 1px #c9c9c9;
     font-size: 15px;
     color: #222222;
-    margin: auto;
-    width: 92% !important;
+    /*width: 92% !important;*/
 }
 
 #service-wrapper {
     background-color: #f7f7f7;
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding: 30px 0;
 }
 
 .btn-inactive {
-    width: 92%;
+    width: 100%;
     height: 44px;
     background-color: #cccccc !important;
     font-weight: bold !important;
@@ -2115,9 +2083,20 @@ img {
     margin: 10px auto;
 }
 
-#service-regist-receiver-wrapper {
-    height: 1110px;
+#confirm-area {
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: solid 0.5px #cccccc;
+    margin: auto;
+    margin-bottom: 20px;
+    padding: 13px;
 }
+
+#confirm-area label {
+    display: block;
+    line-height: 25px;
+}
+
 
 /******************************
 	Media Query for smart phone
@@ -2127,6 +2106,7 @@ img {
         width: 100%;
         background-color: #ffffff;
         border: 1px solid #cccccc;
+        margin: auto;
     }
 
     .farmer-header {
@@ -2154,9 +2134,15 @@ img {
     }
 
     .width-half {
-        width: 39% !important;
-        margin: 0 13px;
+        width: 46% !important;
+        /*margin: 0 13px;*/
     }
+
+    #service-wrapper {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
 }
 
 /******************************
@@ -2167,6 +2153,7 @@ img {
         width: 90%;
         background-color: #ffffff;
         border: 1px solid #cccccc;
+        margin: auto;
     }
 
     .farmer-header {
@@ -2197,8 +2184,20 @@ img {
     }
 
     .width-half {
-        width: 41% !important;
-        margin: 0 13px;
+        width: 46% !important;
+        /*margin: 0 13px;*/
+    }
+
+    .width-full {
+        width: 96% !important;
+    }
+
+    .select {
+        width: 96% !important;
+    }
+
+    .btn-inactive {
+        width: 96% !important;
     }
 }
 

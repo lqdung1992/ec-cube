@@ -23,25 +23,25 @@
                 <input type="hidden" name="mode" value="register"/>
                 {{ form_widget(form._token) }}
                 <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.customer_role) }}</label>
+                    <label>{{ form_label(form.customer_role) }}</label>
                     {{ form_errors(form.customer_role) }}
-                    {{ form_widget(form.customer_role, {'attr': {'class': 'select margin-left13'}}) }}
+                    {{ form_widget(form.customer_role, {'attr': {'class': 'select'}}) }}
                 </div>
 
                 <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.company_name) }}</label>
+                    <label>{{ form_label(form.company_name) }}</label>
                     {{ form_errors(form.company_name) }}
                     {{ form_widget(form.company_name, {'attr': {'class': 'width-full', 'placeholder' : '静岡県'}}) }}
                 </div>
 
                 <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.name01) }}</label>
+                    <label>{{ form_label(form.name01) }}</label>
                     {{ form_errors(form.name01) }}
                     {{ form_widget(form.name01, {'attr': {'class': 'width-full', 'placeholder' : '野菜太郎'}}) }}
                 </div>
 
                 <div class="form-group">
-                    <label class="margin-left13 display-block">{{ form_label(form.zip) }}</label>
+                    <label class="display-block">{{ form_label(form.zip) }}</label>
                     {{ form_errors(form.zip.zip01) }}
                     {{ form_errors(form.zip.zip02) }}
                     {% for zip in form.zip %}
@@ -51,19 +51,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.addr01) }}</label>
+                    <label>{{ form_label(form.addr01) }}</label>
                     {{ form_errors(form.addr01) }}
                     {{ form_widget(form.addr01, {'attr': {'class': 'width-full', 'placeholder' : '静岡県静岡市青青水区'}}) }}
                 </div>
 
                 <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.tel01) }}</label>
+                    <label>{{ form_label(form.tel01) }}</label>
                     {{ form_errors(form.tel01) }}
                     {{ form_widget(form.tel01, {'attr': {'class': 'width-full', 'placeholder': '123456789'}}) }}
                 </div>
 
                 {% for emailField in form.email %}
-                    <label class="margin-left13">{{ form_label(form.email) }}{% if loop.last %}（確認用）{% endif %}</label>
+                    <label>{{ form_label(form.email) }}{% if loop.last %}（確認用）{% endif %}</label>
                     <div class="form-group {% if emailField.vars.errors is not empty %}has-error{% endif %}">
                         {{ form_errors(emailField) }}
                         {{ form_widget(emailField, { type : 'email', 'attr': {'class': 'width-full'}}) }}
@@ -76,7 +76,7 @@
                     <a href="#" class="color888 margin-right15">利用規約</a>
                     <a href="#" class="color888 margin-left13">プライバシーポリシー</a>
                 </p>
-                <button type="submit" class="btn btn-inactive margin-left13">同意して申し込みをする</button>
+                <button type="submit" class="btn btn-inactive">同意して申し込みをする</button>
             </form>
         </div>
     </div>
