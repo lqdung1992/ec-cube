@@ -1,0 +1,92 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/06/2018
+ # Time: 04:26 PM
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block javascript %}
+    <script type="text/javascript">
+        function setImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#upload-image').attr('src', e.target.result).width(60).height(60);
+                };
+                reader.readAsDataURL(input.files[0]);
+                return true;
+            }
+        }
+        $(function () {
+            $('#upload-image').click(function () {
+                $('#farmer_profile_profile_image').click();
+            });
+
+            $('#farmer_profile_profile_image').change(function () {
+                if (!this.value) {
+                    return false;
+                }
+                //restrict upload file type
+                var ext = this.value.match(/\.(.+)$/)[1];
+                switch (ext) {
+                    case 'jpg':
+                    case 'jpeg':
+                    case 'png':
+                    case 'gif':
+                        setImage(this);
+                        return true;
+                        break;
+                    default:
+                        alert('Only image file type please!!');
+                        this.value = '';
+                        $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
+
+                        return false;
+                }
+
+                if ((this.files[0].size)/1024 > '{{ app.config.image_size }}') {
+                    alert("Please check upload image not over 1MB");
+                    this.value = '';
+                    $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
+                }
+
+                return false;
+            });
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div class="wrapper" id="service-regist-receiver-wrapper">
+
+        <div class="farmer-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
+        </div>
+
+        <div class="backgroundf7f7f7" id="service-regist">
+            <form id="service-form" method="post" action="{{ url('farm_service_profile', {'id': Customer.id}) }}" enctype="multipart/form-data">
+                {#<input type="hidden" name="mode" value="complete"/>#}
+                {{ form_widget(form._token) }}
+                <p class="padding-top25">プロフィール写真と紹介文を登録すると</p>
+                <p>やさいバスがご利用になれます</p>
+                <div id="receiver-profile" class="clearfix">
+                    {% set img = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
+                    {% if profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img|default(app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG')}}" alt="profile" class="img-circle medium-profile">
+                    {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
+                    <span class="profile-name-medium color222">{{ Customer.name01 }}農園</span>
+                    <span class="profile-address-medium">{{ Customer.addr01 }}</span>
+                </div>
+
+                <div class="col-lg-12 col-sm-12">
+                    {{ form_errors(form.note) }}
+                    {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
+                </div>
+                <button type="submit" class="btn btn-inactive margin-left13">やさいバスの利用をはじめる</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

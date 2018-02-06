@@ -243,6 +243,9 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     /** @var BusStop */
     private $BusStop;
 
+    /** @var string */
+    private $profile_image;
+
     /**
      * Constructor
      */
@@ -255,6 +258,22 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
         $this->setDelFlg(Constant::DISABLED);
+    }
+
+    /**
+     * @return string
+     */
+    public function getProfileImage()
+    {
+        return $this->profile_image;
+    }
+
+    /**
+     * @param string $profile_image
+     */
+    public function setProfileImage($profile_image)
+    {
+        $this->profile_image = $profile_image;
     }
 
     /**
@@ -302,8 +321,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     public function getRoles()
     {
-        // TODO: get from customer role master table
-        return array('ROLE_USER');
+        return array($this->getCustomerRole()->getName());
     }
 
     /**

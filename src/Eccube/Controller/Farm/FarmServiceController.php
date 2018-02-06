@@ -8,8 +8,12 @@
 namespace Eccube\Controller\Farm;
 
 use Eccube\Application;
+use Eccube\Entity\Customer;
 use Eccube\Repository\CustomerRepository;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class FarmServiceController
@@ -17,6 +21,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class FarmServiceController
 {
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function index(Application $app, Request $request)
     {
         /** @var CustomerRepository $repo */
@@ -53,6 +62,7 @@ class FarmServiceController
                 $form2 = $builder2->getForm();
                 $form2->handleRequest($request);
                 if ($form2->isSubmitted() && $form2->isValid()) {
+                    dump($Customer);
                     $Customer
                         ->setSalt(
                             $repo->createSalt(5)
@@ -77,23 +87,82 @@ class FarmServiceController
                     if ($activateFlg) {
                         // メール送信
                         $app['eccube.service.mail']->sendCustomerConfirmMail($Customer, $activateUrl);
-                        return $app->redirect($app->url('farm_service'));
+
+                        return $app->redirect($app->url('farm_service_profile', array('id' => $Customer->getId())));
+//                        return $app->redirect($app->url('farm_service'));
                     } else {
                         return $app->redirect($activateUrl);
                     }
                 }
 
-                $builder->setAttribute('freeze', true);
-                $form = $builder->getForm();
-                $form->handleRequest($request);
-                return $app->render('Farm/service_register.twig', array(
-                    'form' => $form->createView(),
-                    'form2' => $form2->createView(),
-                ));
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $builder->setAttribute('freeze', true);
+                    $form = $builder->getForm();
+                    $form->handleRequest($request);
+                    return $app->render('Farm/service_register.twig', array(
+                        'form' => $form->createView(),
+                        'form2' => $form2->createView(),
+                    ));
+                }
         }
 
         return $app->render('Farm/service_signup.twig', array(
             'subtitle' => 'Farm service',
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function profile(Application $app, Request $request, $id)
+    {
+        /** @var CustomerRepository $repo */
+        $repo = $app['eccube.repository.customer'];
+        /** @var Customer $Customer */
+        $Customer = $repo->find($id);
+        // load image
+        $profileImage = null;
+        if ($Customer->getProfileImage()) {
+            $profileImage = $Customer->getProfileImage();
+            $Customer->setProfileImage(
+                new File($app['config']['image_save_realdir'].'/'. $Customer->getProfileImage())
+            );
+        }
+        if (!$Customer) {
+            throw new NotFoundHttpException();
+        }
+        /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
+        $builder = $app['form.factory']->createBuilder('farmer_profile', $Customer);
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $image */
+            $image = $Customer->getProfileImage();
+            $filename = $profileImage;
+            if ($image) {
+                if (file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
+                    unlink($old);
+                }
+                $extension = $image->getClientOriginalExtension();
+                $filename = date('mdHis').uniqid('_').'.'.$extension;
+                $image->move($app['config']['image_save_realdir'], $filename);
+            }
+
+            $Customer->setProfileImage($filename);
+            $app['orm.em']->persist($Customer);
+            $app['orm.em']->flush();
+
+            return $app->redirect($app->url('farm_service_profile', array('id' => $Customer->getId())));
+        }
+
+        return $app->render('Farm/service_profile.twig', array(
+            'subtitle' => 'Farm service profile',
+            'profile_image' => $profileImage,
+            'Customer' => $Customer,
             'form' => $form->createView(),
         ));
     }

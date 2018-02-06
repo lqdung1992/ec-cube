@@ -104,8 +104,12 @@ class FrontControllerProvider implements ControllerProviderInterface
 
         // products
         $c->match('/products/list', '\Eccube\Controller\ProductController::index')->bind('product_list');
-        $c->match('/farm/service', '\Eccube\Controller\Farm\FarmServiceController::index')->bind('farm_service');
         $c->match('/products/detail/{id}', '\Eccube\Controller\ProductController::detail')->bind('product_detail')->assert('id', '\d+');
+
+        // farm
+        $c->match('/farm/service', '\Eccube\Controller\Farm\FarmServiceController::index')->bind('farm_service');
+        $c->match('/farm/service/profile/{id}', '\Eccube\Controller\Farm\FarmServiceController::profile')->bind('farm_service_profile')->assert('id', '\d+');
+//        $c->post('/farm/service/image/add', '\Eccube\Controller\Farm\FarmServiceController::addImage')->bind('farm_service_profile_image_add');
 
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');

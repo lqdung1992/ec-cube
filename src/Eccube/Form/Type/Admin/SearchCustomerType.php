@@ -24,6 +24,7 @@
 
 namespace Eccube\Form\Type\Admin;
 
+use Eccube\Entity\Master\CustomerRole;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -212,6 +213,7 @@ class SearchCustomerType extends AbstractType
             ->add('customer_role', 'entity', array(
                 'label' => '顧客の役割',
                 'required' => false,
+                'property' => 'name_jp',
                 'class' => 'Eccube\Entity\Master\CustomerRole',
             ))
             ->add('bus_stop', 'entity', array(

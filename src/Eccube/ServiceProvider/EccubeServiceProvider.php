@@ -115,6 +115,13 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.csv_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
+        // Farm
+        $app['eccube.repository.master.customer_role'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\CustomerRole');
+        });
+        $app['eccube.repository.master.bus_stop'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\BusStop');
+        });
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Delivery');
@@ -142,10 +149,6 @@ class EccubeServiceProvider implements ServiceProviderInterface
         });
         $app['eccube.repository.customer'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Customer');
-        });
-
-        $app['eccube.repository.farmer'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Eccube\Entity\Farmer');
         });
 
         $app['eccube.repository.news'] = $app->share(function () use ($app) {
@@ -343,13 +346,16 @@ class EccubeServiceProvider implements ServiceProviderInterface
 
             // front
             $types[] = new \Eccube\Form\Type\Front\EntryType($app['config']);
-            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ContactType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\NonMemberType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ShoppingShippingType();
             $types[] = new \Eccube\Form\Type\Front\CustomerAddressType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ForgotType();
             $types[] = new \Eccube\Form\Type\Front\CustomerLoginType($app['session']);
+
+            // Farm
+            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceProfileType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);
