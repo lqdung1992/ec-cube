@@ -1,0 +1,51 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/06/2018
+ # Time: 04:26 PM
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $('#upload-image').click(function () {
+                $('#farmer_profile_profile_image').click(function () {
+                    var imgpath = $(this).attr('dir');
+
+                    $('#upload-image').attr('src', imgpath);
+                });
+            });
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div class="wrapper" id="service-regist-receiver-wrapper">
+
+        <div class="farmer-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
+        </div>
+
+        <div class="backgroundf7f7f7" id="service-regist">
+            <form id="service-form" method="post" action="{{ url('farm_service_profile', {'id': Customer.id}) }}">
+                {#<input type="hidden" name="mode" value="complete"/>#}
+                {{ form_widget(form._token) }}
+                <p class="padding-top25">プロフィール写真と紹介文を登録すると</p>
+                <p>やさいバスがご利用になれます</p>
+                <div id="receiver-profile" class="clearfix">
+                    <img id="upload-image" src="{{ app.config.front_urlpath }}/yasai-bus/img/camera.PNG" alt="profile" class="img-circle medium-profile">
+                    {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
+                    <span class="profile-name-medium color222">{{ Customer.name01 }}農園</span>
+                    <span class="profile-address-medium">{{ Customer.addr01 }}</span>
+                </div>
+
+                <div class="col-lg-12 col-sm-12">
+                    {{ form_errors(form.note) }}
+                    {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
+                </div>
+                <button type="submit" class="btn btn-inactive margin-left13">やさいバスの利用をはじめる</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

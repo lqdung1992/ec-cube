@@ -343,13 +343,16 @@ class EccubeServiceProvider implements ServiceProviderInterface
 
             // front
             $types[] = new \Eccube\Form\Type\Front\EntryType($app['config']);
-            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ContactType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\NonMemberType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ShoppingShippingType();
             $types[] = new \Eccube\Form\Type\Front\CustomerAddressType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ForgotType();
             $types[] = new \Eccube\Form\Type\Front\CustomerLoginType($app['session']);
+
+            // Farm
+            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceProfileType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);
