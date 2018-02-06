@@ -1,9 +1,4 @@
 body {
-    width: 615px;
-    height: 1067px;
-    background-image: linear-gradient(transparent 0px, transparent 2px, rgb(255, 255, 255) 2px, rgb(255, 255, 255) 20px), linear-gradient(to right, rgb(200, 195, 199) 0px, rgb(200, 195, 199) 2px, rgb(255, 255, 255) 2px, rgb(255, 255, 255) 20px);
-    background-position: 301.5px -2px;
-    background-size: 20px 20px;
     font-weight: bold;
     font-style: normal;
     font-stretch: normal;
@@ -60,15 +55,6 @@ body {
     border-bottom: 1px solid #cccccc;
 }
 
-.farmer-header {
-    width: 375px;
-    height: 54px;
-    border-top: 1px solid #a3a3a3;
-    border-bottom: 1px solid #cccccc;
-    padding-top: 10px;
-    padding-left: 35%;
-}
-
 .float-left {
     float: left;
 }
@@ -89,10 +75,6 @@ body {
 .header .logo {
     margin-left: 21%;
     margin-top: 7px;
-}
-
-.farmer-header img {
-    margin-right: 18%;
 }
 
 .header .float-right {
@@ -1250,15 +1232,7 @@ img {
     margin-top: 15px;
 }
 
-.btn-inactive {
-    width: 345px;
-    height: 44px;
-    background-color: #cccccc !important;
-    font-weight: bold !important;
-    font-size: 16px !important;
-    color: white;
-    margin: 10px auto;
-}
+
 
 .qr-camera {
     margin-right: 5px;
@@ -1462,12 +1436,7 @@ img {
     border: solid 1px #c9c9c9;
 }
 
-#service-form input{
-    height: 50px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 1px #c9c9c9;
-}
+
 
 
 .width-full {
@@ -1475,10 +1444,6 @@ img {
     margin: 0 13px;
 }
 
-.width-half {
-    width: 40% !important;
-    margin: 0 13px;
-}
 
 .width-small {
     width: 25% !important;
@@ -1497,12 +1462,7 @@ img {
     padding-top: 15px;
 }
 
-#service-form {
-    width: 373px;
-    height: 550px;
-    background-color: #f7f7f7;
-    padding-top: 15px;
-}
+
 
 .display-block {
     display: block !important;
@@ -1670,16 +1630,7 @@ img {
     padding-top: 25px;
 }
 
-.select {
-    width: 345px;
-    height: 50px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 1px #c9c9c9;
-    font-size: 15px;
-    color: #222222;
-    margin: auto;
-}
+
 
 #confirm-area {
     width: 345px;
@@ -1696,15 +1647,6 @@ img {
     line-height: 25px;
 }
 
-#service-wrapper {
-    height: 951px;
-    background-color: #f7f7f7;
-    padding-top: 30px;
-}
-
-#service-regist-receiver-wrapper {
-    height: 1234px;
-}
 
 .has-error {
     color: #d0021b;
@@ -2143,3 +2085,121 @@ img {
 .pc-marin-left40 {
     margin-left: 40% !important;
 }
+/******************************
+	Commont css
+*******************************/
+.select {
+    height: 50px !important;
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: solid 1px #c9c9c9;
+    font-size: 15px;
+    color: #222222;
+    margin: auto;
+    width: 92% !important;
+}
+
+#service-wrapper {
+    background-color: #f7f7f7;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.btn-inactive {
+    width: 92%;
+    height: 44px;
+    background-color: #cccccc !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    color: white;
+    margin: 10px auto;
+}
+
+#service-regist-receiver-wrapper {
+    height: 1110px;
+}
+
+/******************************
+	Media Query for smart phone
+*******************************/
+@media only screen and (max-width: 767px) {
+    .wrapper, .menu-wrapper {
+        width: 100%;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+    }
+
+    .farmer-header {
+        height: 54px;
+        border-bottom: 1px solid #cccccc;
+        padding-top: 10px;
+        padding-left: 35%;
+    }
+
+    .farmer-header img {
+        position: absolute;
+        left: 39%;
+    }
+
+    #service-form {
+        background-color: #f7f7f7;
+        padding-top: 15px;
+    }
+
+    #service-form input{
+        height: 50px;
+        border-radius: 3px;
+        background-color: #ffffff;
+        border: solid 1px #c9c9c9;
+    }
+
+    .width-half {
+        width: 39% !important;
+        margin: 0 13px;
+    }
+}
+
+/******************************
+	Media Query for tablet, PC...
+*******************************/
+@media only screen and (min-width: 768px) {
+    .wrapper {
+        width: 90%;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+    }
+
+    .farmer-header {
+        height: 54px;
+        border-bottom: 1px solid #cccccc;
+        padding-top: 10px;
+        padding-left: 35%;
+    }
+
+    .farmer-header img {
+        position: absolute;
+        left: 45%;
+    }
+
+    #service-form {
+        background-color: #f7f7f7;
+        padding-top: 15px;
+        margin-left: 20%;
+        margin-right: 20%;
+    }
+
+    #service-form input{
+        height: 50px;
+        width: 50%;
+        border-radius: 3px;
+        background-color: #ffffff;
+        border: solid 1px #c9c9c9;
+    }
+
+    .width-half {
+        width: 41% !important;
+        margin: 0 13px;
+    }
+}
+
+
