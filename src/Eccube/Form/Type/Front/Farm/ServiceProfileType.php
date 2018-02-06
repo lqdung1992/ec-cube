@@ -39,7 +39,15 @@ class ServiceProfileType extends AbstractType
                     )
                 )
             ))
-            ->add('profile_image', 'file');
+            ->add('profile_image', 'file', array(
+                'required' => false,
+                'constraints' => array(
+                    new Assert\File(array(
+                        'maxSize' => $this->config['image_size'].'k',
+                        'mimeTypes' => 'image/*'
+                    ))
+                )
+            ));
     }
 
     /**

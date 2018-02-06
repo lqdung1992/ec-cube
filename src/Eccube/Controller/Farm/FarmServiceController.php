@@ -10,6 +10,7 @@ namespace Eccube\Controller\Farm;
 use Eccube\Application;
 use Eccube\Entity\Customer;
 use Eccube\Repository\CustomerRepository;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -123,18 +124,37 @@ class FarmServiceController
     {
         /** @var CustomerRepository $repo */
         $repo = $app['eccube.repository.customer'];
+        /** @var Customer $Customer */
         $Customer = $repo->find($id);
-
+        // load image
+        $profileImage = null;
+        if ($Customer->getProfileImage()) {
+            $profileImage = $Customer->getProfileImage();
+            $Customer->setProfileImage(
+                new File($app['config']['image_save_realdir'].'/'. $Customer->getProfileImage())
+            );
+        }
         if (!$Customer) {
             throw new NotFoundHttpException();
         }
-
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
         $builder = $app['form.factory']->createBuilder('farmer_profile', $Customer);
         $form = $builder->getForm();
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $image */
+            $image = $Customer->getProfileImage();
+            $filename = $profileImage;
+            if ($image) {
+                if (file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
+                    unlink($old);
+                }
+                $extension = $image->getClientOriginalExtension();
+                $filename = date('mdHis').uniqid('_').'.'.$extension;
+                $image->move($app['config']['image_save_realdir'], $filename);
+            }
+
+            $Customer->setProfileImage($filename);
             $app['orm.em']->persist($Customer);
             $app['orm.em']->flush();
 
@@ -143,36 +163,9 @@ class FarmServiceController
 
         return $app->render('Farm/service_profile.twig', array(
             'subtitle' => 'Farm service profile',
+            'profile_image' => $profileImage,
             'Customer' => $Customer,
             'form' => $form->createView(),
         ));
     }
-
-//    public function addImage(Application $app, Request $request)
-//    {
-//        if (!$request->isXmlHttpRequest()) {
-//            throw new BadRequestHttpException('リクエストが不正です');
-//        }
-//
-//        $images = $request->files->get('farmer_profile');
-//
-//        $files = array();
-//        if (count($images) > 0) {
-//            /** @var UploadedFile[] $images */
-//            foreach ($images as $img) {
-//                //ファイルフォーマット検証
-//                $mimeType = $img->getMimeType();
-//                if (0 !== strpos($mimeType, 'image')) {
-//                    throw new UnsupportedMediaTypeHttpException('ファイル形式が不正です');
-//                }
-//
-//                $extension = $img->getClientOriginalExtension();
-//                $filename = date('mdHis').uniqid('_').'.'.$extension;
-//                $img->move($app['config']['image_temp_realdir'], $filename);
-//                $files[] = $filename;
-//            }
-//        }
-//
-//        return $app->json(array('files' => $files), 200);
-//    }
 }
