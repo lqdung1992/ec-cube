@@ -209,6 +209,16 @@ class SearchCustomerType extends AbstractType
                 'multiple' => true,
                 'empty_value' => false,
             ))
+            ->add('customer_role', 'entity', array(
+                'label' => '顧客の役割',
+                'required' => false,
+                'class' => 'Eccube\Entity\Master\CustomerRole',
+            ))
+            ->add('bus_stop', 'entity', array(
+                'label' => 'バス停',
+                'required' => false,
+                'class' => 'Eccube\Entity\Master\BusStop',
+            ))
         ;
     }
 
