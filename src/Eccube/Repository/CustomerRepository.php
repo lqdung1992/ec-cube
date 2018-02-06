@@ -302,6 +302,20 @@ class CustomerRepository extends EntityRepository implements UserProviderInterfa
                 ->setParameter('buy_product_name', '%' . $searchData['buy_product_code'] . '%');
         }
 
+        // CustomerRole
+        if (!empty($searchData['customer_role']) && count($searchData['customer_role']) > 0) {
+            $qb
+                ->andWhere($qb->expr()->in('c.CustomerRole', ':CustomerRole'))
+                ->setParameter('CustomerRole', $searchData['customer_role']);
+        }
+
+        // BusStop
+        if (!empty($searchData['bus_stop']) && count($searchData['bus_stop']) > 0) {
+            $qb
+                ->andWhere($qb->expr()->in('c.BusStop', ':BusStop'))
+                ->setParameter('BusStop', $searchData['bus_stop']);
+        }
+
         // Order By
         $qb->addOrderBy('c.update_date', 'DESC');
 

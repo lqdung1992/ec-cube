@@ -42,6 +42,8 @@
 
                 <div class="form-group">
                     <label class="margin-left13 display-block">{{ form_label(form.zip) }}</label>
+                    {{ form_errors(form.zip.zip01) }}
+                    {{ form_errors(form.zip.zip02) }}
                     {% for zip in form.zip %}
                         {{ form_widget(zip, {'attr': {'class': 'width-half display-inline'}}) }}
                         {% if loop.index == 1 %}―{% endif %}
