@@ -28,10 +28,13 @@ class ServiceSignUpType extends AbstractType
     {
         $builder
             ->add('customer_role', 'entity', array(
-                'required' => false,
+                'required' => true,
                 'class' => 'Eccube\Entity\Master\CustomerRole',
                 'empty_value' => '----------',
-                'label' => '申し込み分類'
+                'label' => '申し込み分類',
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                )
             ))
             ->add('name01', 'text', array(
                 'required' => true,
@@ -72,6 +75,7 @@ class ServiceSignUpType extends AbstractType
                 'label' => '電話番号',
                 'constraints' => array(
                     new Assert\NotBlank(),
+                    new Assert\Type(array('type' => 'numeric', 'message' => 'form.type.numeric.invalid')),
                     new Assert\Length(array(
                         'max' => 15,
                         'min' => 5,
