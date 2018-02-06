@@ -12,6 +12,10 @@ Eccube\Entity\Master\CustomerRole:
         name:
             type: text
             nullable: true
+        name_jp:
+            type: string
+            length: 100
+            nullable: true
         rank:
             type: smallint
             nullable: false

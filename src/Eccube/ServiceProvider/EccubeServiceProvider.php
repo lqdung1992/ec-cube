@@ -115,6 +115,13 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.csv_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
+        // Farm
+        $app['eccube.repository.master.customer_role'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\CustomerRole');
+        });
+        $app['eccube.repository.master.bus_stop'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\BusStop');
+        });
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Delivery');
@@ -142,10 +149,6 @@ class EccubeServiceProvider implements ServiceProviderInterface
         });
         $app['eccube.repository.customer'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Customer');
-        });
-
-        $app['eccube.repository.farmer'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Eccube\Entity\Farmer');
         });
 
         $app['eccube.repository.news'] = $app->share(function () use ($app) {

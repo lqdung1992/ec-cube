@@ -26,6 +26,11 @@ class CustomerRole extends \Eccube\Entity\AbstractEntity
     private $name;
 
     /**
+     * @var string
+     */
+    private $name_jp;
+
+    /**
      * @var integer
      */
     private $rank;
@@ -97,5 +102,21 @@ class CustomerRole extends \Eccube\Entity\AbstractEntity
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNameJp()
+    {
+        return $this->name_jp;
+    }
+
+    /**
+     * @param string $name_jp
+     */
+    public function setNameJp($name_jp)
+    {
+        $this->name_jp = $name_jp;
     }
 }
