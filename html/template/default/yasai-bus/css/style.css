@@ -397,10 +397,6 @@ img {
     margin-bottom: 15px;
 }
 
-#receiver-profile {
-    margin: 25px 0 25px 13px;
-    position: relative;
-}
 
 #profile-description {
     width: 345px;
@@ -1604,15 +1600,7 @@ img {
     font-weight: bold;
 }
 
-#service-regist {
-    height: 600px;
-    position: relative;
-}
 
-#service-regist p {
-    text-align: center;
-    font-size: 13px;
-}
 
 .padding-top25 {
     padding-top: 25px;
@@ -2097,6 +2085,16 @@ img {
     line-height: 25px;
 }
 
+#service-regist {
+    position: relative;
+    margin : 0 5px;
+    padding-bottom: 50px;
+}
+
+#service-regist p {
+    text-align: center;
+    font-size: 13px;
+}
 
 /******************************
 	Media Query for smart phone
@@ -2141,6 +2139,16 @@ img {
     #service-wrapper {
         padding-left: 5px;
         padding-right: 5px;
+    }
+
+    #service-form textarea {
+        height: 120px;
+        border-radius: 3px;
+    }
+
+    #receiver-profile {
+        margin: 25px 0;
+        position: relative;
     }
 
 }
@@ -2197,6 +2205,17 @@ img {
     }
 
     .btn-inactive {
+        width: 96% !important;
+    }
+
+    #receiver-profile {
+        margin: 25px 0;
+        position: relative;
+    }
+
+    #service-form textarea {
+        height: 120px;
+        border-radius: 3px;
         width: 96% !important;
     }
 }
