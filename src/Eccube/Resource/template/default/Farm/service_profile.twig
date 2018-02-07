@@ -66,7 +66,6 @@
 
         <div class="backgroundf7f7f7" id="service-regist">
             <form id="service-form" method="post" action="{{ url('farm_service_profile', {'id': Customer.id}) }}" enctype="multipart/form-data">
-                {#<input type="hidden" name="mode" value="complete"/>#}
                 {{ form_widget(form._token) }}
                 <p class="padding-top25">プロフィール写真と紹介文を登録すると</p>
                 <p>やさいバスがご利用になれます</p>
@@ -77,6 +76,7 @@
                     {% endif %}
                     <img id="upload-image" src="{{ img|default(app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG')}}" alt="profile" class="img-circle medium-profile">
                     {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
+                    {{ form_errors(form.profile_image) }}
                     <span class="profile-name-medium color222">{{ Customer.name01 }}農園</span>
                     <span class="profile-address-medium">{{ Customer.addr01 }}</span>
                 </div>
