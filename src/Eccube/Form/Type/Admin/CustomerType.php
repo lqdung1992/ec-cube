@@ -130,6 +130,7 @@ class CustomerType extends AbstractType
             ))
             ->add('profile_image', 'file', array(
                 'required' => false,
+                'label' => 'プロフィール画像',
                 'constraints' => array(
                     new Assert\File(array(
                         'maxSize' => $config['image_size'].'k',
