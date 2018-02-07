@@ -69,8 +69,6 @@ class CustomerEditController extends AbstractController
             $Customer->setBuyTimes(0);
             $Customer->setBuyTotal(0);
         }
-//        dump($Customer);
-//        die();
 
         // 会員登録フォーム
         /** @var FormBuilder $builder */
