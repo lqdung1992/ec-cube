@@ -127,7 +127,16 @@ class CustomerType extends AbstractType
                         'max' => $config['ltext_len'],
                     )),
                 ),
-            ));
+            ))
+            ->add('profile_image', 'file', array(
+                'required' => false,
+                'constraints' => array(
+                    new Assert\File(array(
+                        'maxSize' => $config['image_size'].'k',
+                        'mimeTypes' => 'image/*'
+                    ))
+                )
+            ));;
     }
 
     /**

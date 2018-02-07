@@ -33,18 +33,62 @@
 
 {% block javascript %}
 <script src="//ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
-<script>
-    $(function() {
-        $('#zip-search').click(function() {
-            AjaxZip3.zip2addr('admin_customer[zip][zip01]', 'admin_customer[zip][zip02]', 'admin_customer[address][pref]', 'admin_customer[address][addr01]');
+    <script type="text/javascript">
+        function setImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#upload-image').attr('src', e.target.result).width(60).height(60);
+                };
+                reader.readAsDataURL(input.files[0]);
+                return true;
+            }
+        }
+        $(function () {
+            $('#zip-search').click(function() {
+                AjaxZip3.zip2addr('admin_customer[zip][zip01]', 'admin_customer[zip][zip02]', 'admin_customer[address][pref]', 'admin_customer[address][addr01]');
+            });
+            $('#upload-image').click(function () {
+                $('#admin_customer_profile_image').click();
+            });
+
+            $('#admin_customer_profile_image').change(function () {
+                if (!this.value) {
+                    return false;
+                }
+                //restrict upload file type
+                var ext = this.value.match(/\.(.+)$/)[1];
+                switch (ext) {
+                    case 'jpg':
+                    case 'jpeg':
+                    case 'png':
+                    case 'gif':
+                        setImage(this);
+                        return true;
+                        break;
+                    default:
+                        alert('Only image file type please!!');
+                        this.value = '';
+                        $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
+
+                        return false;
+                }
+
+                if ((this.files[0].size)/1024 > '{{ app.config.image_size }}') {
+                    alert("Please check upload image not over 1MB");
+                    this.value = '';
+                    $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
+                }
+
+                return false;
+            });
         });
-    });
-</script>
+    </script>
 {% endblock javascript %}
 
 {% block main %}
 <div class="row" id="aside_wrap">
-    <form name="customer_form" role="form" id="customer_form" method="post" action="{%- if Customer.id %}{{ url('admin_customer_edit', { id : Customer.id }) }}{% else %}{{ url('admin_customer_new') }}{% endif -%}">
+    <form name="customer_form" role="form" id="customer_form" method="post" action="{%- if Customer.id %}{{ url('admin_customer_edit', { id : Customer.id }) }}{% else %}{{ url('admin_customer_new') }}{% endif -%}" enctype="multipart/form-data">
         {{ form_widget(form._token) }}
         <div id="detail_wrap" class="col-md-9">
             <div id="detail_box" class="box accordion">
@@ -60,6 +104,18 @@
                             <div class="col-sm-9 col-lg-10">{{ Customer.id }}</div>
                         </div>
                         {% endif %}
+                        <div id="detail_box__profile" class="form-group">
+                            {{ form_label(form.profile_image) }}
+                            <div class="col-sm-9 col-lg-10 input_name form-inline">
+                                {% set img = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
+                                {% if profile_image %}
+                                    {% set img = app.config.image_save_urlpath ~'/'~ profile_image %}
+                                {% endif %}
+                                <img id="upload-image" src="{{ img|default(app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG')}}" alt="profile" class="img-circle medium-profile" style="width: 60px; height: 60px">
+                                {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
+                                {{ form_errors(form.profile_image) }}
+                            </div>
+                        </div>
                         {# 名前 #}
                         <div id="detail_box__name" class="form-group">
                             {{ form_label(form.name) }}
