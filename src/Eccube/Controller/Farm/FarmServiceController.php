@@ -62,7 +62,6 @@ class FarmServiceController
                 $form2 = $builder2->getForm();
                 $form2->handleRequest($request);
                 if ($form2->isSubmitted() && $form2->isValid()) {
-                    dump($Customer);
                     $Customer
                         ->setSalt(
                             $repo->createSalt(5)
