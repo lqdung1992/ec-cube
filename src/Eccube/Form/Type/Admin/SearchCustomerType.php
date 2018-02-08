@@ -211,7 +211,7 @@ class SearchCustomerType extends AbstractType
                 'empty_value' => false,
             ))
             ->add('customer_role', 'entity', array(
-                'label' => '顧客の役割',
+                'label' => '会員ロール',
                 'required' => false,
                 'property' => 'name_jp',
                 'class' => 'Eccube\Entity\Master\CustomerRole',

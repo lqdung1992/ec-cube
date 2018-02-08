@@ -1,9 +1,4 @@
 body {
-    width: 615px;
-    height: 1067px;
-    background-image: linear-gradient(transparent 0px, transparent 2px, rgb(255, 255, 255) 2px, rgb(255, 255, 255) 20px), linear-gradient(to right, rgb(200, 195, 199) 0px, rgb(200, 195, 199) 2px, rgb(255, 255, 255) 2px, rgb(255, 255, 255) 20px);
-    background-position: 301.5px -2px;
-    background-size: 20px 20px;
     font-weight: bold;
     font-style: normal;
     font-stretch: normal;
@@ -34,15 +29,6 @@ body {
     transform: rotate(45deg) translate(-8px, -8px);
 }
 
-.wrapper, .menu-wrapper {
-    width: 375px;
-    height: 934px;
-    /*background-color: #f7f7f7;*/
-    background-color: #ffffff;
-    margin: auto;
-    border: 1px solid #cccccc;
-}
-
 #reicever-wrapper {
     background-color: #ffffff;
     height: 980px;
@@ -58,15 +44,6 @@ body {
     height: 54px;
     border-top: 1px solid #a3a3a3;
     border-bottom: 1px solid #cccccc;
-}
-
-.farmer-header {
-    width: 375px;
-    height: 54px;
-    border-top: 1px solid #a3a3a3;
-    border-bottom: 1px solid #cccccc;
-    padding-top: 10px;
-    padding-left: 35%;
 }
 
 .float-left {
@@ -89,10 +66,6 @@ body {
 .header .logo {
     margin-left: 21%;
     margin-top: 7px;
-}
-
-.farmer-header img {
-    margin-right: 18%;
 }
 
 .header .float-right {
@@ -424,10 +397,6 @@ img {
     margin-bottom: 15px;
 }
 
-#receiver-profile {
-    margin: 25px 0 25px 13px;
-    position: relative;
-}
 
 #profile-description {
     width: 345px;
@@ -1250,15 +1219,7 @@ img {
     margin-top: 15px;
 }
 
-.btn-inactive {
-    width: 345px;
-    height: 44px;
-    background-color: #cccccc !important;
-    font-weight: bold !important;
-    font-size: 16px !important;
-    color: white;
-    margin: 10px auto;
-}
+
 
 .qr-camera {
     margin-right: 5px;
@@ -1462,23 +1423,11 @@ img {
     border: solid 1px #c9c9c9;
 }
 
-#service-form input{
-    height: 50px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 1px #c9c9c9;
-}
 
 
-.width-full {
-    width: 92% !important;
-    margin: 0 13px;
-}
 
-.width-half {
-    width: 40% !important;
-    margin: 0 13px;
-}
+
+
 
 .width-small {
     width: 25% !important;
@@ -1497,12 +1446,7 @@ img {
     padding-top: 15px;
 }
 
-#service-form {
-    width: 373px;
-    height: 550px;
-    background-color: #f7f7f7;
-    padding-top: 15px;
-}
+
 
 .display-block {
     display: block !important;
@@ -1656,15 +1600,7 @@ img {
     font-weight: bold;
 }
 
-#service-regist {
-    height: 600px;
-    position: relative;
-}
 
-#service-regist p {
-    text-align: center;
-    font-size: 13px;
-}
 
 .padding-top25 {
     padding-top: 25px;
@@ -2143,3 +2079,181 @@ img {
 .pc-marin-left40 {
     margin-left: 40% !important;
 }
+/******************************
+	Commont css
+*******************************/
+.select {
+    height: 50px !important;
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: solid 1px #c9c9c9;
+    font-size: 15px;
+    color: #222222;
+    /*width: 92% !important;*/
+}
+
+#service-wrapper {
+    background-color: #f7f7f7;
+    padding: 30px 0;
+}
+
+.btn-inactive {
+    width: 100%;
+    height: 44px;
+    background-color: #cccccc !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    color: white;
+    margin: 10px auto;
+}
+
+#confirm-area {
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: solid 0.5px #cccccc;
+    margin: auto;
+    margin-bottom: 20px;
+    padding: 13px;
+}
+
+#confirm-area label {
+    display: block;
+    line-height: 25px;
+}
+
+#service-regist {
+    position: relative;
+    margin : 0 5px;
+    padding-bottom: 50px;
+}
+
+#service-regist p {
+    text-align: center;
+    font-size: 13px;
+}
+
+/******************************
+	Media Query for smart phone
+*******************************/
+@media only screen and (max-width: 767px) {
+    .wrapper, .menu-wrapper {
+        width: 100%;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        margin: auto;
+    }
+
+    .farmer-header {
+        height: 54px;
+        border-bottom: 1px solid #cccccc;
+        padding-top: 10px;
+        padding-left: 35%;
+    }
+
+    .farmer-header img {
+        position: absolute;
+        left: 39%;
+    }
+
+    #service-form {
+        background-color: #f7f7f7;
+        padding-top: 15px;
+    }
+
+    #service-form input{
+        height: 50px;
+        border-radius: 3px;
+        background-color: #ffffff;
+        border: solid 1px #c9c9c9;
+    }
+
+    .width-half {
+        width: 46% !important;
+        /*margin: 0 13px;*/
+    }
+
+    #service-wrapper {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    #service-form textarea {
+        height: 120px;
+        border-radius: 3px;
+    }
+
+    #receiver-profile {
+        margin: 25px 0;
+        position: relative;
+    }
+
+}
+
+/******************************
+	Media Query for tablet, PC...
+*******************************/
+@media only screen and (min-width: 768px) {
+    .wrapper {
+        width: 90%;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        margin: auto;
+    }
+
+    .farmer-header {
+        height: 54px;
+        border-bottom: 1px solid #cccccc;
+        padding-top: 10px;
+        padding-left: 35%;
+    }
+
+    .farmer-header img {
+        position: absolute;
+        left: 45%;
+    }
+
+    #service-form {
+        background-color: #f7f7f7;
+        padding-top: 15px;
+        margin-left: 20%;
+        margin-right: 20%;
+    }
+
+    #service-form input{
+        height: 50px;
+        width: 50%;
+        border-radius: 3px;
+        background-color: #ffffff;
+        border: solid 1px #c9c9c9;
+    }
+
+    .width-half {
+        width: 46% !important;
+        /*margin: 0 13px;*/
+    }
+
+    .width-full {
+        width: 96% !important;
+    }
+
+    .select {
+        width: 96% !important;
+    }
+
+    .btn-inactive {
+        width: 96% !important;
+    }
+
+    #receiver-profile {
+        margin: 25px 0;
+        position: relative;
+    }
+
+    #service-form textarea {
+        height: 120px;
+        border-radius: 3px;
+        width: 96% !important;
+    }
+}
+
+

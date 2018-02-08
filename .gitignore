@@ -14,6 +14,7 @@ composer.phar
 !/app/template/admin
 !/app/template/default
 /html/plugin/*
+/html/install.php
 !/html/plugin/.gitkeep
 /html/install/temp/*
 /html/upload/save_image/*
