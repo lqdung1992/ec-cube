@@ -210,6 +210,14 @@ class SearchCustomerType extends AbstractType
                 'multiple' => true,
                 'empty_value' => false,
             ))
+            ->add('approval_status', 'entity', array(
+                'label' => '承認状況',
+                'required' => false,
+                'expanded' => true,
+                'multiple' => true,
+                'empty_value' => false,
+                'class' => 'Eccube\Entity\Master\ApprovalStatus',
+            ))
             ->add('customer_role', 'entity', array(
                 'label' => '会員ロール',
                 'required' => false,

@@ -114,7 +114,17 @@ class CustomerType extends AbstractType
                 ),
             ))
             ->add('status', 'customer_status', array(
+                'label' => 'お客様のステータス',
                 'required' => true,
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
+            ->add('approval_status', 'entity', array(
+                'label' => '承認状況',
+                'required' => true,
+                'expanded' => true,
+                'class' => 'Eccube\Entity\Master\ApprovalStatus',
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),

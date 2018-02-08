@@ -121,6 +121,9 @@ class FarmServiceController
         $repo = $app['eccube.repository.customer'];
         /** @var Customer $Customer */
         $Customer = $repo->find($id);
+        if (!$Customer) {
+            throw new NotFoundHttpException();
+        }
         // load image
         $profileImage = null;
         if ($Customer->getProfileImage()) {
@@ -128,9 +131,6 @@ class FarmServiceController
             $Customer->setProfileImage(
                 new File($app['config']['image_save_realdir'].'/'. $Customer->getProfileImage())
             );
-        }
-        if (!$Customer) {
-            throw new NotFoundHttpException();
         }
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
         $builder = $app['form.factory']->createBuilder('farmer_profile', $Customer);

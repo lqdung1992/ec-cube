@@ -151,6 +151,13 @@ Eccube\Entity\Customer:
             joinColumn:
                 name: status
                 referencedColumnName: id
+        ApprovalStatus:
+            targetEntity: Eccube\Entity\Master\ApprovalStatus
+            joinColumn:
+                name: approval_status
+                referencedColumnName: id
+            options:
+                default: '1'
         CustomerRole:
             targetEntity: Eccube\Entity\Master\CustomerRole
             joinColumn:

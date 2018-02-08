@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Created by PhpStorm.
+ * User: lqdung
+ * Date: 2/5/2018
+ * Time: 3:19 PM
+ */
 namespace Eccube\Entity\Master;
 
 /**

@@ -2,15 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: lqdung
- * Date: 2/5/2018
+ * Date: 2/8/2018
  * Time: 3:19 PM
  */
 namespace Eccube\Entity\Master;
 
 /**
- * BusStop
+ * ApprovalStatus for customer
  */
-class BusStop extends \Eccube\Entity\AbstractEntity
+class ApprovalStatus extends \Eccube\Entity\AbstractEntity
 {
     /**
      * @return string
@@ -49,7 +49,7 @@ class BusStop extends \Eccube\Entity\AbstractEntity
      * Set name
      *
      * @param  string $name
-     * @return BusStop
+     * @return $this
      */
     public function setName($name)
     {
@@ -72,7 +72,7 @@ class BusStop extends \Eccube\Entity\AbstractEntity
      * Set rank
      *
      * @param  integer $rank
-     * @return BusStop
+     * @return $this
      */
     public function setRank($rank)
     {
@@ -95,7 +95,7 @@ class BusStop extends \Eccube\Entity\AbstractEntity
      * Set id
      *
      * @param integer $id
-     * @return BusStop
+     * @return $this
      */
     public function setId($id)
     {

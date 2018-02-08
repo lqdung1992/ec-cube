@@ -24,8 +24,8 @@
 
 namespace Eccube\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Eccube\Common\Constant;
+use Eccube\Entity\Master\ApprovalStatus;
 use Eccube\Entity\Master\BusStop;
 use Eccube\Entity\Master\CustomerRole;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -246,6 +246,9 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     /** @var string */
     private $profile_image;
 
+    /** @var  ApprovalStatus */
+    private $ApprovalStatus;
+
     /**
      * Constructor
      */
@@ -258,6 +261,22 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
         $this->setDelFlg(Constant::DISABLED);
+    }
+
+    /**
+     * @return ApprovalStatus
+     */
+    public function getApprovalStatus()
+    {
+        return $this->ApprovalStatus;
+    }
+
+    /**
+     * @param ApprovalStatus $ApprovalStatus
+     */
+    public function setApprovalStatus(ApprovalStatus $ApprovalStatus)
+    {
+        $this->ApprovalStatus = $ApprovalStatus;
     }
 
     /**
