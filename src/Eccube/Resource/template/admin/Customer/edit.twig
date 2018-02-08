@@ -321,11 +321,25 @@
                     <div id="button_box__body" class="box-body">
                         <div class="row">
                             <div class="col-xs-12">
+                                <label>{{ form.status.vars.label }}</label>
+                            </div>
+                            <div class="col-xs-12">
                                 <div id="button_box__status" class="form-group">
                                     {{ form_widget(form.status) }}
                                     {{ form_errors(form.status) }}
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <label>{{ form.approval_status.vars.label }}</label>
+                            </div>
+                            {#<div class="">#}
+                                <div id="button_box__status" class="form-group">
+                                    {{ form_widget(form.approval_status) }}
+                                    {{ form_errors(form.approval_status) }}
+                                </div>
+                            {#</div>#}
                         </div>
                         <div id="button_box__insert_button" class="row text-center">
                             <div class="col-sm-6 col-sm-offset-3 col-md-12 col-md-offset-0">
