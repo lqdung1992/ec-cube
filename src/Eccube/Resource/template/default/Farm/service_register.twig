@@ -32,8 +32,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">{{ form_label(form.name01) }}</label>
-                    <label class="title16">{{ form_widget(form.name01) }}</label>
+                    <label class="color888 title12">{{ form_label(form.name) }}</label>
+                    <label class="title16">{{ form_widget(form.name) }}</label>
                 </div>
 
                 <div class="form-group">
@@ -42,13 +42,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">{{ form_label(form.addr01) }}</label>
-                    <label class="title16">{{ form_widget(form.addr01) }}</label>
+                    <label class="color888 title12">{{ form_label(form.address) }}</label>
+                    <label class="title16">{{ form_widget(form.address) }}</label>
                 </div>
 
                 <div class="form-group">
-                    <label class="color888 title12">{{ form_label(form.tel01) }}</label>
-                    <label class="title16">{{ form_widget(form.tel01) }}</label>
+                    <label class="color888 title12">{{ form_label(form.tel) }}</label>
+                    <label class="title16">{{ form_widget(form.tel) }}</label>
                 </div>
 
                 <div class="form-group">
@@ -59,27 +59,26 @@
                     </label>
                 </div>
             </div>
-
-                <div class="form-group">
-                    <div>
+                <div class="col-sm-12">
+                    <div class="form-group">
                     <label>{{ form_label(form2.bus_stop) }}</label>
                     {{ form_errors(form2.bus_stop) }}
                     {{ form_widget(form2.bus_stop, {'attr': {'class': 'select'}}) }}
                     </div>
                 </div>
 
+                <div class="col-sm-12">
                 {% for passwordField in form2.password %}
                 <div class="form-group">
-                    <div>
                     {{ form_label(form2.password) }}{% if loop.last %}（確認用）{% endif %}
-                    </div>
                     {#<label class="margin-left13">パスワード（英数字12文字〜30文字）</label>#}
                     {{ form_errors(passwordField) }}
-                    {{ form_widget(passwordField, { type : 'password', 'attr': {'class': 'width-full'} }) }}
+                    {{ form_widget(passwordField, {type : 'password'}) }}
                 </div>
                     {#<label class="margin-left13">パスワード（確認用）</label>#}
                 {% endfor %}
-                <button type="submit" class="btn btn-inactive">プロフィール入力に進む</button>
+                </div>
+                <button type="submit" class="btn btn-inactive margin-left13">プロフィール入力に進む</button>
             </form>
         </div>
     </div>

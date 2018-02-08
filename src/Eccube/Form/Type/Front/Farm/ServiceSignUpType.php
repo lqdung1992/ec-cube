@@ -37,15 +37,18 @@ class ServiceSignUpType extends AbstractType
                     new Assert\NotBlank(),
                 )
             ))
-            ->add('name01', 'text', array(
+//            ->add('name01', 'text', array(
+//                'required' => true,
+//                'label' => '登録者名',
+//                'constraints' => array(
+//                    new Assert\NotBlank(),
+//                    new Assert\Length(array(
+//                        'max' => $this->config['stext_len'],
+//                    )),
+//                ),
+//            ))
+            ->add('name', 'name', array(
                 'required' => true,
-                'label' => '登録者名',
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                    new Assert\Length(array(
-                        'max' => $this->config['stext_len'],
-                    )),
-                ),
             ))
             ->add('company_name', 'text', array(
                 'required' => true,
@@ -60,29 +63,32 @@ class ServiceSignUpType extends AbstractType
             ->add('zip', 'zip', array(
 //                'label' => '郵便番号'
             ))
-//            ->add('address', 'address')
-            ->add('addr01', 'text', array(
+            ->add('address', 'address')
+//            ->add('addr01', 'text', array(
+//                'required' => true,
+//                'label' => '住所',
+//                'constraints' => array(
+//                    new Assert\NotBlank(),
+//                    new Assert\Length(array(
+//                        'max' => $this->config['stext_len'],
+//                    )),
+//                ),
+//            ))
+            ->add('tel', 'tel', array(
                 'required' => true,
-                'label' => '住所',
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                    new Assert\Length(array(
-                        'max' => $this->config['stext_len'],
-                    )),
-                ),
             ))
-            ->add('tel01', 'text', array(
-                'required' => true,
-                'label' => '電話番号',
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                    new Assert\Type(array('type' => 'numeric', 'message' => 'form.type.numeric.invalid')),
-                    new Assert\Length(array(
-                        'max' => 15,
-                        'min' => 5,
-                    )),
-                ),
-            ))
+//            ->add('tel01', 'text', array(
+//                'required' => true,
+//                'label' => '電話番号',
+//                'constraints' => array(
+//                    new Assert\NotBlank(),
+//                    new Assert\Type(array('type' => 'numeric', 'message' => 'form.type.numeric.invalid')),
+//                    new Assert\Length(array(
+//                        'max' => 15,
+//                        'min' => 5,
+//                    )),
+//                ),
+//            ))
             ->add('email', 'repeated_email')
             ->add('password', 'repeated_password')
             ->add('bus_stop', 'entity', array(

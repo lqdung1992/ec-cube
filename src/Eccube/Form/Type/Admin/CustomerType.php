@@ -50,7 +50,7 @@ class CustomerType extends AbstractType
                 'required' => true,
             ))
             ->add('kana', 'kana', array(
-                'required' => true,
+                'required' => false,
             ))
             ->add('company_name', 'text', array(
                 'required' => false,
