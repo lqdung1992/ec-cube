@@ -1683,11 +1683,11 @@ img {
 
 #confirm-area {
     width: 345px;
-    height: 521px;
     border-radius: 3px;
     background-color: #ffffff;
     border: solid 0.5px #cccccc;
     margin: auto;
+    margin-bottom: 10px;
     padding: 13px;
 }
 

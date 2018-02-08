@@ -36,8 +36,7 @@ class FarmServiceController
         $builder2 = $app['form.factory']->createBuilder('farmer_regist', $Customer);
 
         $builder = clone $builder2;
-        $builder->remove('password')
-            ->remove('bus_stop');
+        $builder->remove('password')->remove('bus_stop');
 
         /* @var $form \Symfony\Component\Form\FormInterface */
         $form = $builder->getForm();
@@ -62,7 +61,6 @@ class FarmServiceController
                 $form2 = $builder2->getForm();
                 $form2->handleRequest($request);
                 if ($form2->isSubmitted() && $form2->isValid()) {
-                    dump($Customer);
                     $Customer
                         ->setSalt(
                             $repo->createSalt(5)
@@ -89,20 +87,19 @@ class FarmServiceController
                         $app['eccube.service.mail']->sendCustomerConfirmMail($Customer, $activateUrl);
 
                         return $app->redirect($app->url('farm_service_profile', array('id' => $Customer->getId())));
-//                        return $app->redirect($app->url('farm_service'));
                     } else {
                         return $app->redirect($activateUrl);
                     }
                 }
 
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $builder->setAttribute('freeze', true);
-                    $form = $builder->getForm();
-                    $form->handleRequest($request);
-                    return $app->render('Farm/service_register.twig', array(
-                        'form' => $form->createView(),
-                        'form2' => $form2->createView(),
-                    ));
+                if ($form->isSubmitted()) {
+                $builder->setAttribute('freeze', true);
+                $form = $builder->getForm();
+                $form->handleRequest($request);
+                return $app->render('Farm/service_register.twig', array(
+                    'form' => $form->createView(),
+                    'form2' => $form2->createView(),
+                ));
                 }
         }
 
