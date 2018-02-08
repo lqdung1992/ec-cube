@@ -114,7 +114,7 @@ class CustomerType extends AbstractType
                 ),
             ))
             ->add('status', 'customer_status', array(
-                'label' => 'お客様のステータス',
+                'label' => '会員種別',
                 'required' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
