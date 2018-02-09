@@ -1606,42 +1606,6 @@ img {
     padding-top: 25px;
 }
 
-.select {
-    width: 345px;
-    height: 50px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 1px #c9c9c9;
-    font-size: 15px;
-    color: #222222;
-    margin: auto;
-}
-
-#confirm-area {
-    width: 345px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 0.5px #cccccc;
-    margin: auto;
-    margin-bottom: 10px;
-    padding: 13px;
-}
-
-#confirm-area label {
-    display: block;
-    line-height: 25px;
-}
-
-#service-wrapper {
-    height: 951px;
-    background-color: #f7f7f7;
-    padding-top: 30px;
-}
-
-#service-regist-receiver-wrapper {
-    height: 1234px;
-}
-
 .has-error {
     color: #d0021b;
     font-size: 12px;
@@ -2221,7 +2185,7 @@ img {
 
     #service-form input{
         height: 50px;
-        width: 50%;
+        /*width: 50%;*/
         border-radius: 3px;
         background-color: #ffffff;
         border: solid 1px #c9c9c9;
@@ -2237,7 +2201,7 @@ img {
     }
 
     .select {
-        width: 96% !important;
+        /*width: 96% !important;*/
     }
 
     .btn-inactive {

@@ -10,6 +10,11 @@
 {% block javascript %}
 {% endblock %}
 {% block main %}
+    <style type="text/css">
+        .input_zip select {
+            height: 50px !important;
+        }
+    </style>
     <div class="wrapper" id="service-regist-receiver-wrapper">
         <div class="farmer-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
@@ -22,71 +27,84 @@
             <form id="service-form" method="post" action="{{ url('farm_service') }}">
                 <input type="hidden" name="mode" value="register"/>
                 {{ form_widget(form._token) }}
-                <div class="form-group">
-                    <label>{{ form_label(form.customer_role) }}</label>
-                    {{ form_errors(form.customer_role) }}
-                    {{ form_widget(form.customer_role, {'attr': {'class': 'select'}}) }}
+                <div class="col-lg-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        <label>{{ form_label(form.customer_role) }}</label>
+                        {{ form_errors(form.customer_role) }}
+                        {{ form_widget(form.customer_role, {'attr': {'class': 'select'}}) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>{{ form_label(form.company_name) }}</label>
-                    {{ form_errors(form.company_name) }}
-                    {{ form_widget(form.company_name, {'attr': {'class': 'width-full', 'placeholder' : '静岡県'}}) }}
+                <div class="col-lg-12 col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        <label>{{ form_label(form.company_name) }}</label>
+                        {{ form_errors(form.company_name) }}
+                        {{ form_widget(form.company_name, {'attr': {'placeholder' : '静岡県'}}) }}
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.name) }}</label>
-                    <div class="col-sm-12 inline-block" >
-                        <div class="row">
+                <div class="col-lg-12 col-sm-12 col-xs-12 inline-block" >
+                    <div class="form-group">
+                        <label>{{ form_label(form.name) }}</label>
                         {{ form_errors(form.name.name01) }}
                         {{ form_errors(form.name.name02) }}
-                        <p class="col-sm-6">
-                        {{ form_widget(form.name.name01) }}
-                        </p>
-                        <p class="col-sm-6">
-                        {{ form_widget(form.name.name02) }}
-                        </p>
+                        <div class="row">
+                            <p class="col-sm-6 col-xs-6">
+                                {{ form_widget(form.name.name01) }}
+                            </p>
+                            <p class="col-sm-6 col-xs-6">
+                                {{ form_widget(form.name.name02) }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="display-block">{{ form_label(form.zip) }}</label>
-                    {{ form_errors(form.zip.zip01) }}
-                    {{ form_errors(form.zip.zip02) }}
-                    {% for zip in form.zip %}
-                        {{ form_widget(zip, {'attr': {'class': 'width-half display-inline'}}) }}
-                        {% if loop.index == 1 %}―{% endif %}
+                <div class="col-lg-12 col-sm-12 col-xs-12 inline-block" >
+                    <div class="form-group">
+                        <label class="display-block">{{ form_label(form.zip) }}</label>
+                        {{ form_errors(form.zip.zip01) }}
+                        {{ form_errors(form.zip.zip02) }}
+                        <div class="row">
+                        {% for zip in form.zip %}
+                            <p class="col-sm-6 col-xs-6">
+                            {{ form_widget(zip) }}
+                            </p>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-sm-12 col-xs-12 inline-block" >
+                    <div class="form-group">
+                        <label>{{ form_label(form.address) }}</label>
+                        {{ form_errors(form.address) }}
+                        {{ form_widget(form.address) }}
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-sm-12 col-xs-12 inline-block" >
+                    <div class="form-group">
+                        <label>{{ form_label(form.tel) }}</label>
+                        {{ form_errors(form.tel.tel01) }}
+                        {{ form_errors(form.tel.tel02) }}
+                        {{ form_errors(form.tel.tel03) }}
+                        <div class="row">
+                            <p class="col-sm-4 col-xs-4">{{ form_widget(form.tel.tel01, {'attr': {'class': 'short'}}) }}</p>
+                            <p class="col-sm-4 col-xs-4">{{ form_widget(form.tel.tel02, {'attr': {'class': 'short'}}) }}</p>
+                            <p class="col-sm-4 col-xs-4">{{ form_widget(form.tel.tel03, {'attr': {'class': 'short'}}) }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-sm-12 col-xs-12">
+                    {% for emailField in form.email %}
+                        <label>{{ form_label(form.email) }}{% if loop.last %}（確認用）{% endif %}</label>
+                        <div class="form-group {% if emailField.vars.errors is not empty %}has-error{% endif %}">
+                            {{ form_errors(emailField) }}
+                            {{ form_widget(emailField, { type : 'email'}) }}
+                        </div>
                     {% endfor %}
                 </div>
-
-                <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.address) }}</label>
-                    <div class="col-sm-12">
-                    {{ form_errors(form.address) }}
-                    {{ form_widget(form.address) }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="margin-left13">{{ form_label(form.tel) }}</label>
-                    <div class="col-sm-12 inline-block" >
-                        <div class="row">
-                        {{ form_errors(form.tel) }}
-                        <p class="col-sm-4">{{ form_widget(form.tel.tel01) }}</p>
-                        <p class="col-sm-4">{{ form_widget(form.tel.tel02) }}</p>
-                        <p class="col-sm-4">{{ form_widget(form.tel.tel03) }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {% for emailField in form.email %}
-                    <label>{{ form_label(form.email) }}{% if loop.last %}（確認用）{% endif %}</label>
-                    <div class="form-group {% if emailField.vars.errors is not empty %}has-error{% endif %}">
-                        {{ form_errors(emailField) }}
-                        {{ form_widget(emailField, { type : 'email', 'attr': {'class': 'width-full'}}) }}
-                    </div>
-                {% endfor %}
 
                 <p class="title12">申し込みの際には利用規約・プライバシーポリシー</p>
                 <p class="title12">の 確認をお願いいたします</p>

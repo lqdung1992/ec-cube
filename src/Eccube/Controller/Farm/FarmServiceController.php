@@ -141,7 +141,7 @@ class FarmServiceController
             $image = $Customer->getProfileImage();
             $filename = $profileImage;
             if ($image) {
-                if (file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
+                if ($filename && file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
                     unlink($old);
                 }
                 $extension = $image->getClientOriginalExtension();

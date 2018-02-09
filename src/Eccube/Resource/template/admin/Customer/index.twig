@@ -301,7 +301,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         <thead>
                         <tr id="result_list_main__header">
                             <th id="result_list_main__header_id">会員ID</th>
+                            <th id="result_list_main__header_profile">プロフィール画像</th>
                             <th id="result_list_main__header_name">会員名</th>
+                            <th id="result_list_main__header_approval_status">承認状況</th>
                             <th id="result_list_main__header_tel">電話番号</th>
                             <th id="result_list_main__header_mail">メールアドレス</th>
                             <th id="result_list_main__header_menu_box">&nbsp;</th>
@@ -311,7 +313,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         {% for Customer in pagination %}
                         <tr id="result_list_main__item--{{ Customer.id }}">
                             <td id="result_list_main__id--{{ Customer.id }}" class="member_id">{{ Customer.id }}</td>
+                            <td id="result_list_main__profile--{{ Customer.id }}" class="member_profile">
+                                {% if Customer.profile_image %}
+                                    <img src="{{ app.config.image_save_urlpath }}/{{ Customer.profile_image }}" style="width: 60px; height: 60px;">
+                                {% else %}
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/camera.PNG" style="width: 60px; height: 60px;">
+                                {% endif %}
+                            </td>
                             <td id="result_list_main__name--{{ Customer.id }}" class="member_name"><a href="{{ url('admin_customer_edit', { 'id': Customer.id}) }}">{{ Customer.name01 }}&nbsp;{{ Customer.name02 }}</a></td>
+                            <td id="result_list_main__approval_status--{{ Customer.id }}" class="member_approval_status">
+                                {{ Customer.ApprovalStatus.name }}
+                            </td>
                             <td id="result_list_main__tel--{{ Customer.id }}" class="member_tel">{{ Customer.tel01 }}-{{ Customer.tel02 }}-{{ Customer.tel03 }}</td>
                             <td id="result_list_main__mail--{{ Customer.id }}" class="member_mail">{{ Customer.email }}</td>
                             <td id="result_list_main__menu_box--{{ Customer.id }}" class="icon_edit">
