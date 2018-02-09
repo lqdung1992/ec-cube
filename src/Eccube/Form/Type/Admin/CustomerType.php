@@ -130,11 +130,11 @@ class CustomerType extends AbstractType
                 ),
             ))
             ->add('note', 'textarea', array(
-                'label' => 'SHOP用メモ',
+                'label' => '説明文',
                 'required' => false,
                 'constraints' => array(
                     new Assert\Length(array(
-                        'max' => $config['ltext_len'],
+                        'max' => $config['smtext_len'],
                     )),
                 ),
             ))
