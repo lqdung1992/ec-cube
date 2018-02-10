@@ -1031,8 +1031,8 @@ img {
 }
 
 .margin-left10 {
-     margin-left: 10px;
- }
+    margin-left: 10px;
+}
 
 .margin-left15 {
     margin-left: 15px;
@@ -1087,7 +1087,7 @@ img {
 }
 
 .margin-bottom10 {
-     margin-bottom: 10px !important;
+    margin-bottom: 10px !important;
 }
 
 .padding-bottom10 {
@@ -1482,11 +1482,6 @@ img {
     border-top: 0 !important;
 }
 
-#product-list {
-    height: 850px;
-    background-color: #f7f7f7;
-}
-
 #product-list .thumbnail {
     margin: 5px;
 }
@@ -1504,103 +1499,6 @@ img {
     color: white !important;
     font-weight: bold !important;
 }
-
-#service-top-img {
-    position: relative;
-}
-
-#service-top-img img{
-    width: 373px;
-}
-
-#service-top-img button{
-    position: absolute;
-    top:68%;
-    left: 0.68%;
-}
-
-#service-bus-icon ul li {
-    list-style: none;
-    margin-left: 20px;
-}
-
-.primary-square {
-    font-size: 25px;
-    border-radius: 1px;
-    color: #00c42b;
-    margin-right: 10px;
-}
-
-#service-top {
-    height: 3000px;
-}
-
-.bus-icon {
-    margin: 25px 0 25px 25%;
-}
-
-.seller-icon {
-    margin: 25px 0 25px 35%;
-}
-.buyer-icon {
-    margin: 25px 0 25px 36%;
-}
-
-
-#service-map {
-    position: relative;
-    margin: 25px 0;
-}
-
-#service-map img{
-    width: 373px;
-}
-
-#service-map button{
-    position: absolute;
-    top:77.5%;
-    left: 0.775%;
-}
-
-#service-org-chat {
-    margin: 25px 0;
-}
-
-.product-list-title {
-    margin-bottom: 20px;
-    padding-top: 25px;
-    text-align: center;
-}
-
-#footer {
-    background-color: #344250;
-    margin-top: 80px;
-    padding-bottom: 30px;
-}
-
-#footer li {
-    float: left;
-    width: 50%;
-    padding: 15px 0;
-    color: white;
-    list-style: none;
-    font-size: 13px;
-}
-
-#footer li a {
-    color: white !important;
-}
-#footer p {
-    color: white;
-    opacity: 0.5;
-    clear: both;
-    text-align: center;
-    padding-top: 20px;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-
 
 .padding-top25 {
     padding-top: 25px;
@@ -1679,15 +1577,15 @@ img {
 }
 
 .button-344250 {
-     width: 345px;
-     height: 44px;
-     margin-top: 30px;
-     margin-left: 10px;
-     background-color: #344250 !important;
-     color: white;
-     font-weight: bold !important;
-     border: 1px solid #344250 !important;
- }
+    width: 345px;
+    height: 44px;
+    margin-top: 30px;
+    margin-left: 10px;
+    background-color: #344250 !important;
+    color: white;
+    font-weight: bold !important;
+    border: 1px solid #344250 !important;
+}
 
 #farmer-qr-code {
     width: 325px !important;
@@ -2029,16 +1927,7 @@ img {
     padding-top: 20px;
 }
 
-.pc-thumbnail {
-    float: left;
-    margin-left: 10px;
-    margin-bottom: 10px;
-    width: 266px;
-    height: 361.5px;
-    border-radius: 4.5px;
-    border: solid 0.8px #e6e6e6;
-    background-color: #ffffff;
-}
+
 
 .pc-marin-left40 {
     margin-left: 40% !important;
@@ -2096,6 +1985,17 @@ img {
     font-size: 13px;
 }
 
+#product-list {
+    background-color: #f7f7f7;
+    padding-bottom: 30px;
+}
+
+.product-list-title {
+    margin-bottom: 20px;
+    padding-top: 25px;
+    text-align: center;
+}
+
 /******************************
 	Media Query for smart phone
 *******************************/
@@ -2151,6 +2051,77 @@ img {
         position: relative;
     }
 
+
+    .primary-square {
+        font-size: 25px;
+        border-radius: 1px;
+        color: #00c42b;
+        margin-right: 10px;
+    }
+
+    .bus-icon {
+        margin: 25px 0 25px 25%;
+    }
+
+    .seller-icon {
+        margin: 25px 0 25px 35%;
+    }
+    .buyer-icon {
+        margin: 25px 0 25px 36%;
+    }
+
+
+    #service-map {
+        position: relative;
+        margin: 25px 0;
+    }
+
+    #service-map img{
+        width: 373px;
+    }
+
+    #service-map button{
+        position: absolute;
+        top:77.5%;
+        left: 0.775%;
+    }
+
+    #service-org-chat {
+        margin: 25px 0;
+    }
+
+    #footer {
+        background-color: #344250;
+        margin-top: 80px;
+        padding-bottom: 30px;
+    }
+
+    #footer li {
+        float: left;
+        width: 50%;
+        padding: 15px 0;
+        color: white;
+        list-style: none;
+        font-size: 13px;
+    }
+
+    #footer li a {
+        color: white !important;
+    }
+    #footer p {
+        color: white;
+        opacity: 0.5;
+        clear: both;
+        text-align: center;
+        padding-top: 20px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    #service-bus-icon ul li {
+        list-style: none;
+        margin-left: 20px;
+    }
 }
 
 /******************************
@@ -2185,7 +2156,7 @@ img {
 
     #service-form input{
         height: 50px;
-        width: 50%;
+        /*width: 50%;*/
         border-radius: 3px;
         background-color: #ffffff;
         border: solid 1px #c9c9c9;
@@ -2201,7 +2172,7 @@ img {
     }
 
     .select {
-        width: 96% !important;
+        /*width: 96% !important;*/
     }
 
     .btn-inactive {
@@ -2217,6 +2188,133 @@ img {
         height: 120px;
         border-radius: 3px;
         width: 96% !important;
+    }
+
+    #service-top-img {
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    #service-top-img img{
+        margin: 0 4px;
+        width: 99.5%;
+    }
+
+    #service-top-img button{
+        position: absolute;
+        width: 50%;
+        top:75%;
+        left: 23%;
+        font-size: 18px;
+    }
+
+    .primary-square {
+        text-decoration: none !important;
+        font-size: 25px;
+        border-radius: 1px;
+        color: #00c42b;
+        margin-right: 10px;
+    }
+
+    #service-bus-icon ul li {
+        list-style: none;
+        margin-left: 40%;
+        font-size: 18px;
+    }
+
+    .bus-icon {
+        margin: 25px 0 25px 43%;
+    }
+
+    .seller-icon {
+        margin: 25px 0 25px 46%;
+    }
+    .buyer-icon {
+        margin: 25px 0 25px 46%;
+    }
+
+    #service-map {
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    #service-map img {
+        margin: 20px 4px;
+        width: 99.5%;
+    }
+
+    #service-map button{
+        position: absolute;
+        width: 50%;
+        top:75%;
+        left: 23%;
+        font-size: 18px;
+    }
+
+    #service-org-chat {
+        margin: 25px 0;
+    }
+
+    .org-chat-icon {
+        margin-left: 35%;
+    }
+
+    #service-org-chat button {
+        width: 50%;
+        margin-left: 23%;
+    }
+
+    #footer {
+        background-color: #344250;
+        padding-bottom: 30px;
+        text-align: left;
+    }
+
+    #footer ul {
+        margin-left: 28%;
+    }
+
+    #footer li {
+        float: left;
+        width: 40%;
+        padding: 15px 0;
+        color: white;
+        list-style: none;
+        font-size: 13px;
+    }
+
+    #footer li a {
+        color: white !important;
+    }
+    #footer p {
+        color: white;
+        opacity: 0.5;
+        clear: both;
+        text-align: center;
+        padding-top: 20px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .pc-thumbnail {
+        float: left;
+        margin-left: 10px;
+        margin-bottom: 10px;
+        width: 266px;
+        height: 361.5px;
+        border-radius: 4.5px;
+        border: solid 0.8px #e6e6e6;
+        background-color: #ffffff;
+    }
+
+    #thumbnail-panel {
+        margin-left: 6%;
+    }
+
+    #product-list button {
+        width: 50%;
+        margin-left: 23%;
+        font-size: 18px;
     }
 }
 
