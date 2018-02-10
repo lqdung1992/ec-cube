@@ -360,6 +360,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
             // Farm
             $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\Farm\ServiceProfileType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ChangePasswordType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);

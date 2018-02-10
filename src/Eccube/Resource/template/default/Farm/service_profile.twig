@@ -65,7 +65,7 @@
         </div>
 
         <div class="backgroundf7f7f7" id="service-regist">
-            <form id="service-form" method="post" action="{{ url('farm_service_profile', {'id': Customer.id}) }}" enctype="multipart/form-data">
+            <form id="service-form" method="post" action="{{ url('farm_service_profile') }}" enctype="multipart/form-data">
                 {{ form_widget(form._token) }}
                 <p class="padding-top25">プロフィール写真と紹介文を登録すると</p>
                 <p>やさいバスがご利用になれます</p>

@@ -36,11 +36,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class MypageController extends AbstractController
 {
     /**
-     * ログイン画面.
+     * Login
      *
      * @param Application $app
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function login(Application $app, Request $request)
     {
