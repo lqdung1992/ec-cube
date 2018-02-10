@@ -110,6 +110,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/service', '\Eccube\Controller\Farm\FarmServiceController::index')->bind('farm_service');
         $c->match('/farm/service/profile', '\Eccube\Controller\Farm\FarmServiceController::profile')->bind('farm_service_profile');
         $c->match('/farm/service/profile/setting', '\Eccube\Controller\Farm\FarmServiceController::settingProfile')->bind('farm_service_profile_setting');
+        $c->match('/farm/farmer/password/change', '\Eccube\Controller\Farm\FarmerController::changePassword')->bind('farm_farmer_password_change');
 
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');

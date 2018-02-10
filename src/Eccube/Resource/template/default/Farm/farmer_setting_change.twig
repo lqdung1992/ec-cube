@@ -1,0 +1,53 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/10/2018
+ # Time: 5:37 PM
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block javascript %}
+{% endblock %}
+{% block main %}
+    <div class="wrapper" id="service-regist-receiver-wrapper">
+        <div class="farmer-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
+        </div>
+
+        <div id="service-wrapper">
+            <form id="service-form" method="post" action="{{ url('farm_farmer_password_change') }}">
+                {{ form_widget(form._token) }}
+                <div class="row">
+                    <div class="col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            {{ form_label(form.email) }}
+                            {{ form_errors(form.email) }}
+                            {{ form_widget(form.email) }}
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            {{ form_label(form.old_password) }}
+                            {{ form_errors(form.old_password) }}
+                            {{ form_widget(form.old_password) }}
+                        </div>
+                    </div>
+                    <p class="text-align-right title12 margin-bottom15 margin-right10"><a href="{{ url('forgot') }}" class="color888">パスワードを忘れた場合 </a></p>
+
+                    <div class="col-sm-12 col-xs-12">
+                        {% for passwordField in form.new_password %}
+                            <div class="form-group">
+                                {{ form_label(passwordField) }}
+                                {{ form_errors(passwordField) }}
+                                {{ form_widget(passwordField, {type : 'password'}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-inactive margin-left13">変更する</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
