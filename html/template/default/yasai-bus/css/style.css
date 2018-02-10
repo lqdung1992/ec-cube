@@ -1461,7 +1461,7 @@ img {
 }
 
 .setting-btn {
-    width: 345px;
+    width: 96% !important;
     height: 44px;
     background-color: #344250 !important;
     color: white !important;
