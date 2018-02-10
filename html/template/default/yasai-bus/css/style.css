@@ -2010,13 +2010,24 @@ img {
     .farmer-header {
         height: 54px;
         border-bottom: 1px solid #cccccc;
-        padding-top: 10px;
         padding-left: 35%;
+        position: relative;
     }
 
     .farmer-header img {
         position: absolute;
         left: 39%;
+        padding-top: 20px;
+    }
+
+    .farmer-header button {
+        position: absolute;
+        left: 79%;
+        margin-top: 10px;
+    }
+
+    .sp-top-img {
+        width: 100%;
     }
 
     #service-form {
@@ -2033,7 +2044,6 @@ img {
 
     .width-half {
         width: 46% !important;
-        /*margin: 0 13px;*/
     }
 
     #service-wrapper {
@@ -2050,7 +2060,6 @@ img {
         margin: 25px 0;
         position: relative;
     }
-
 
     .primary-square {
         font-size: 25px;
@@ -2070,14 +2079,9 @@ img {
         margin: 25px 0 25px 36%;
     }
 
-
     #service-map {
         position: relative;
         margin: 25px 0;
-    }
-
-    #service-map img{
-        width: 373px;
     }
 
     #service-map button{
@@ -2108,6 +2112,7 @@ img {
     #footer li a {
         color: white !important;
     }
+
     #footer p {
         color: white;
         opacity: 0.5;
@@ -2138,13 +2143,20 @@ img {
     .farmer-header {
         height: 54px;
         border-bottom: 1px solid #cccccc;
-        padding-top: 10px;
         padding-left: 35%;
+        position: relative;
     }
 
     .farmer-header img {
         position: absolute;
         left: 45%;
+        padding-top: 20px;
+    }
+
+    .farmer-header button {
+        position: absolute;
+        left: 94%;
+        margin-top: 14px;
     }
 
     #service-form {
