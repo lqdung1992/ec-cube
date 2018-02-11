@@ -8,21 +8,38 @@
 namespace Eccube\Controller\Farm;
 
 use Eccube\Application;
+use Eccube\Common\Constant;
 use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
-use Eccube\Entity\Master\CustomerRole;
+use Eccube\Entity\CustomerVoice;
+use Eccube\Repository\CustomerRepository;
+use Eccube\Repository\CustomerVoiceRepository;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
+/**
+ * Class FarmerController
+ * @package Eccube\Controller\Farm
+ */
 class FarmerController
 {
-    public function index(Application $app, Request $request)
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function index(Application $app, Request $request, $id = null)
     {
+        $isOwner = false;
         /** @var Customer $Customer */
         $Customer = $app->user();
         // Todo: check is farmer
@@ -30,10 +47,89 @@ class FarmerController
         if (!($Customer instanceof Customer)) {
             return $app->redirect($app->url('mypage_login'));
         }
+        if ($id) {
+            /** @var CustomerRepository $repo */
+            $repo = $app['eccube.repository.customer'];
+            /** @var Customer $TargetCustomer */
+            $TargetCustomer = $repo->find($id);
+            if (!$TargetCustomer) {
+                throw new NotFoundHttpException();
+            }
+            if ($TargetCustomer->getId() == $Customer->getId()) {
+                $isOwner = true;
+            }
+        } else {
+            $isOwner = true;
+            $TargetCustomer = $Customer;
+        }
+
+        $voice = new CustomerVoice();
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createBuilder('farm_voice', $voice);
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $image */
+            $image = $form['file_name']->getData();
+            if ($image) {
+                $extension = $image->getClientOriginalExtension();
+                $fileName = date('mdHis').uniqid('_').'.'.$extension;
+                $image->move($app['config']['image_save_realdir'], $fileName);
+                $voice->setFileName($fileName);
+            }
+            $voice->setCustomer($Customer);
+            $voice->setTargetCustomer($TargetCustomer);
+            $app['orm.em']->persist($voice);
+            $app['orm.em']->flush();
+
+            return $app->redirect($app->url('farm_profile', array('id' => $TargetCustomer->getId(), 'voice' => 1)));
+        }
+        /** @var CustomerVoiceRepository $voiceRepo */
+        $voiceRepo = $app['eccube.repository.customer_voice'];
+        $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer), array('create_date' => 'ASC'));
 
         return $app->render('Farm/farm_profile.twig', array(
-            'Customer' => $Customer,
+            'TargetCustomer' => $TargetCustomer,
+            'CustomerVoice' => $CustomerVoice,
+            'form' => $form->createView(),
+            'is_owner' => $isOwner,
         ));
+    }
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteVoice(Application $app, Request $request, $id)
+    {
+        if (!$id) {
+            throw new NotFoundHttpException();
+        }
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+        // Todo: check is farmer
+        // || !$app->isGranted(CustomerRole::FARMER)
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+        /** @var CustomerVoiceRepository $repo */
+        $repo = $app['eccube.repository.customer_voice'];
+        /** @var CustomerVoice $voice */
+        $voice = $repo->find($id);
+        if (!$voice) {
+            throw new NotFoundHttpException();
+        }
+        if ($voice->getCustomer()->getId() != $voice->getTargetCustomer()->getId()) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $voice->setDelFlg(Constant::ENABLED);
+        $app['orm.em']->persist($voice);
+        $app['orm.em']->flush();
+
+        return $app->redirect($app->url('farm_profile', array('id' => $Customer->getId(), 'voice' => 1)));
     }
 
     /**
@@ -78,7 +174,7 @@ class FarmerController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function uploadCover(Application $app, Request $request)
+    public function editProfile(Application $app, Request $request)
     {
         /** @var Customer $Customer */
         $Customer = $app->user();

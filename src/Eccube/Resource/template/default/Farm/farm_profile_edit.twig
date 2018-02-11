@@ -347,7 +347,7 @@
                     {% if profile_image %}
                         {% set img = app.config.image_save_urlpath ~'/'~ profile_image %}
                     {% endif %}
-                    <img id="upload-image" src="{{ img|default(app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG')}}" alt="profile" class="img-circle medium-profile">
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle medium-profile">
                     {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
                     {{ form_errors(form.profile_image) }}
                     <span class="profile-name-medium color222 title16">{{ Customer.__toString }}農園</span>
@@ -358,7 +358,9 @@
                     {{ form_errors(form.note) }}
                     {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
                 </div>
-                <button type="submit" class="btn btn-inactive margin-left13">やさいバスの利用をはじめる</button>
+                <div class="col-sm-12 col-xs-12">
+                <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
+                </div>
             </div>
         </form>
     </div>

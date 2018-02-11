@@ -346,7 +346,12 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     public function getRoles()
     {
-        return array($this->getCustomerRole()->getName());
+        // default role
+        $role = 'ROLE_USER';
+        if ($this->getCustomerRole() instanceof CustomerRole) {
+            $role = $this->getCustomerRole()->getName();
+        }
+        return array($role);
     }
 
     /**
