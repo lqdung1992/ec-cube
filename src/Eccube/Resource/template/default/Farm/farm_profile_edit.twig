@@ -350,8 +350,8 @@
                     <img id="upload-image" src="{{ img|default(app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG')}}" alt="profile" class="img-circle medium-profile">
                     {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
                     {{ form_errors(form.profile_image) }}
-                    <span class="profile-name-medium color222">{{ Customer.name01 }}農園</span>
-                    <span class="profile-address-medium">{{ Customer.addr01 }}</span>
+                    <span class="profile-name-medium color222 title16">{{ Customer.__toString }}農園</span>
+                    <span class="profile-address-medium">{{ Customer.Pref.name }}{{ Customer.addr01 }}{{ Customer.addr02 }}</span>
                 </div>
 
                 <div class="col-sm-12 col-xs-12">

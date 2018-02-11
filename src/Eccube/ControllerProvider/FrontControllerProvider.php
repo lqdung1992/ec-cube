@@ -112,6 +112,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/service/profile/setting', '\Eccube\Controller\Farm\FarmServiceController::settingProfile')->bind('farm_service_profile_setting');
         $c->match('/farm/farmer/password/change', '\Eccube\Controller\Farm\FarmerController::changePassword')->bind('farm_farmer_password_change');
         $c->match('/farm/profile/edit', '\Eccube\Controller\Farm\FarmerController::uploadCover')->bind('farm_profile_edit');
+        $c->match('/farm/profile', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile');
         // Add image ajax
         $c->post('/farm/cover/add', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_cover_add');
 

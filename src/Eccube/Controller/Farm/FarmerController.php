@@ -21,6 +21,21 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class FarmerController
 {
+    public function index(Application $app, Request $request)
+    {
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+        // Todo: check is farmer
+        // || !$app->isGranted(CustomerRole::FARMER)
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
+        return $app->render('Farm/farm_profile.twig', array(
+            'Customer' => $Customer,
+        ));
+    }
+
     /**
      * Farmer change password
      *

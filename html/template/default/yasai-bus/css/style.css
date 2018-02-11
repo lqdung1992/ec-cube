@@ -135,48 +135,6 @@ body {
     text-align: right !important;
 }
 
-.Rectangle {
-    width: 375px;
-    height: 30px;
-}
-
-.left_disable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: normal;
-    text-align: center;
-    color: #888888;
-}
-.left_enable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    color: #00c42b;
-    border-bottom: #00c42b solid 2px;
-}
-
-.right_disable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: normal;
-    text-align: center;
-    color: #888888;
-}
-
-.right_enable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    color: #00c42b;
-    border-bottom: #00c42b solid 2px;
-}
-
 .list-2item {
     width: 49% !important;
 }
@@ -196,8 +154,6 @@ body {
 }
 
 .thumbnail {
-    width: 175px;
-    height: 241px;
     border: none !important;
     float: left;
     position: relative;
@@ -2198,4 +2154,26 @@ img {
     }
 }
 
+/*farm profile*/
+.exhibition {
+    margin-bottom: 10px;
+}
+.exhibition ul li:hover {
+    cursor: pointer;
+}
 
+.exhibition .enable {
+    font-size: 14px;
+    font-weight: bold;
+    color: #00c42b;
+    padding-bottom: 10px;
+    border-bottom: #00c42b solid 2px;
+}
+
+.exhibition .disable {
+    color: #888888;
+}
+
+.exhibition .text-alight-center {
+    text-align: center !important;
+}
