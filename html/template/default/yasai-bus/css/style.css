@@ -1792,28 +1792,6 @@ img {
     background-color: #000000 !important;
 }
 
-#upload-zone {
-    height: 211px;
-    background-color: #e6e6e6;
-    position: relative;
-}
-
-.upload-zone-camera {
-    position: absolute;
-    top: 40%;
-    left: 47%;
-}
-
-#upload-zone p {
-    position: absolute;
-    top: 59%;
-    left: 37%;
-}
-
-#cover-zone {
-    width: 373px;
-}
-
 .tag-done {
     position: absolute;
     top: 1.4%;
@@ -2216,7 +2194,7 @@ img {
     #service-form textarea {
         height: 120px;
         border-radius: 3px;
-        width: 96% !important;
+        /*width: 96% !important;*/
     }
 }
 

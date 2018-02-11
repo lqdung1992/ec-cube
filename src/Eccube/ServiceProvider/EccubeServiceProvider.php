@@ -125,6 +125,9 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.approval_status'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\ApprovalStatus');
         });
+        $app['eccube.repository.customer_image'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\CustomerImage');
+        });
 
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
@@ -360,6 +363,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
             // Farm
             $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\Farm\ServiceProfileType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\FarmProfileEditType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\Farm\ChangePasswordType($app['config']);
 
             // admin
