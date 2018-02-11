@@ -250,6 +250,11 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     private $ApprovalStatus;
 
     /**
+     * @var CustomerImage[]
+     */
+    private $CustomerImage;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -257,6 +262,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->CustomerFavoriteProducts = new \Doctrine\Common\Collections\ArrayCollection();
         $this->CustomerAddresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->Orders = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->CustomerImage = new \Doctrine\Common\Collections\ArrayCollection();
 
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
@@ -340,7 +346,12 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     public function getRoles()
     {
-        return array($this->getCustomerRole()->getName());
+        // default role
+        $role = 'ROLE_USER';
+        if ($this->getCustomerRole() instanceof CustomerRole) {
+            $role = $this->getCustomerRole()->getName();
+        }
+        return array($role);
     }
 
     /**
@@ -1315,6 +1326,34 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     {
         $this->CustomerAddresses[] = $customerAddresses;
 
+        return $this;
+    }
+
+    /**
+     * @return CustomerImage[]
+     */
+    public function getCustomerImage()
+    {
+        return $this->CustomerImage;
+    }
+
+    /**
+     * @param CustomerImage $CustomerImage
+     * @return $this
+     */
+    public function addCustomerImage(CustomerImage $CustomerImage)
+    {
+        $this->CustomerImage->add($CustomerImage);
+        return $this;
+    }
+
+    /**
+     * @param CustomerImage $customerImage
+     * @return $this
+     */
+    public function removeCustomerImage(CustomerImage $customerImage)
+    {
+        $this->CustomerImage->removeElement($customerImage);
         return $this;
     }
 }

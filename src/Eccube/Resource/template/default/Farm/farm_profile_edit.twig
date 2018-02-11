@@ -1,0 +1,367 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/11/2018
+ # Time: 11:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <style type="text/css">
+        #upload-zone .cover .cover-image {
+            width: 100%;
+            height: 211px;
+            display: none;
+        }
+        .ui-state-highlight {
+            height: 148px;
+            border: dashed 1px #ccc;
+            background: #fff;
+        }
+        #thumb {
+            position: absolute;
+            right: 5px;
+            top: 67%;
+        }
+
+        ul#thumb li {
+            list-style: none;
+            display: inline-block;
+            position: relative;
+            margin-right: 5px;
+            border-radius: 2.3px;
+        }
+
+        ul#thumb li img {
+            width: 60px;
+            height: 60px;
+            border-radius: 2.3px;
+        }
+
+        /*ul#thumb li#upload-camera img.upload-list-camera {*/
+            /*width: 24px;*/
+            /*height: 22px;*/
+            /*top: 34%;*/
+            /*left: 29%;*/
+            /*position: absolute;*/
+        /*}*/
+
+        ul#thumb li#upload-camera {
+            background-color: #FFFFFF;
+            /*!*position: relative;*!*/
+            /*border-radius: 3px;*/
+            /*background-color: #344250;*/
+            /*width: 60px;*/
+            /*height: 60px;*/
+            /*!*top: -17%;*!*/
+        }
+
+        ul#thumb li.ui-state-default .delete-image {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 60px;
+            height: 17px;
+            opacity: 0.8;
+            border-radius: 2.3px;
+            background-color: #ffffff;
+        }
+        ul#thumb li.ui-state-default .delete-image .close {
+            width: 16px;
+            height: 11px;
+            font-size: 7.6px;
+            font-weight: bold;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: normal;
+            letter-spacing: normal;
+            text-align: center;
+            color: #222222;
+            opacity: inherit;
+            float: none;
+            top: 30%;
+            left: 39%;
+            position: absolute;
+        }
+
+        #upload-zone .fixed {
+            position: absolute;
+            top: 40%;
+            left: 40%;
+        }
+
+        #upload-zone {
+            height: 211px;
+            background-color: #e6e6e6;
+            position: relative;
+        }
+
+        .upload-zone-camera {
+            position: relative;
+            left: 35%;
+        }
+
+        #upload-zone p {
+            position: relative;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/vendor/jquery.ui.widget.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.iframe-transport.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-process.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-validate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+        var max_cover_image = 5;
+        function setImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#upload-image').attr('src', e.target.result).width(60).height(60);
+                };
+                reader.readAsDataURL(input.files[0]);
+                return true;
+            }
+        }
+        $(function () {
+            $('#upload-image').click(function () {
+                $('#farm_profile_cover_profile_image').click();
+            });
+
+            $('#farm_profile_cover_profile_image').change(function () {
+                if (!this.value) {
+                    return false;
+                }
+                //restrict upload file type
+                var ext = this.value.match(/\.(.+)$/)[1];
+                switch (ext) {
+                    case 'jpg':
+                    case 'jpeg':
+                    case 'png':
+                    case 'gif':
+                        setImage(this);
+                        return true;
+                        break;
+                    default:
+                        alert('Only image file type please!!');
+                        this.value = '';
+                        $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
+
+                        return false;
+                }
+
+                if ((this.files[0].size)/1024 > '{{ app.config.image_size }}') {
+                    alert("Please check upload image not over 1MB");
+                    this.value = '';
+                    $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
+                }
+
+                return false;
+            });
+
+            var showCover = function (path) {
+                var cover_img = $('.cover img');
+                if (path)  {
+                    $(".fixed").css("display", "none");
+                    $(cover_img).attr('src', path).css('display', 'block');
+                } else {
+                    $(".fixed").css("display", "");
+                    $(cover_img).attr('src', "").css('display', 'none');
+                }
+                return true;
+            };
+
+            var hideSvg = function () {
+                var  length = $("#thumb li").length;
+                if (length > 1 && length <= max_cover_image - 1) {
+                    $(".fixed").css("display", "none");
+                    $("#upload-camera").css("display", "");
+                } else {
+                    $("#upload-camera").css("display", "none");
+                    if (length == max_cover_image) {
+                        $(".fixed").css("display", "none");
+                    } else  {
+                        $(".fixed").css("display", "");
+                        showCover();
+                    }
+                }
+            };
+            hideSvg();
+            var proto_img = ''
+                + '<li class="ui-state-default">'
+                + '<img src="__path__" />'
+                + '<a class="delete-image">'
+                + '<span class="close">'
+                + '削除'
+                + '</span>'
+                + '</a>'
+                + '</li>';
+            var proto_add = '{{ form_widget(form.add_images.vars.prototype) }}';
+            var proto_del = '{{ form_widget(form.delete_images.vars.prototype) }}';
+            {% for image in form.images %}
+            var path = '{{ app.config.image_save_urlpath }}/{{ image.vars.value }}';
+            var $img = $(proto_img.replace(/__path__/g, path));
+            var $widget = $('{{ form_widget(image) }}');
+            $widget.val('{{ image.vars.value }}');
+            $("#thumb").prepend($img.append($widget));
+            showCover(path);
+            hideSvg();
+            {% endfor %}
+            {% for add_image in form.add_images %}
+            var path = '{{ app.config.image_temp_urlpath }}/{{ add_image.vars.value }}';
+            var $img_add = $(proto_img.replace(/__path__/g, path));
+            var $widget_add = $('{{ form_widget(add_image) }}');
+            $widget_add.val('{{ add_image.vars.value }}');
+            $("#thumb").prepend($img_add.append($widget_add));
+            showCover(path);
+            hideSvg();
+            {% endfor %}
+            {% for delete_image in form.delete_images %}
+            $("#thumb").append('{{ form_widget(delete_image) }}');
+            {% endfor %}
+            var count_del = 0;
+            $("#thumb").on("click", ".delete-image", function () {
+                var $new_delete_image = $(proto_del.replace(/__name__/g, count_del));
+                var src = $(this).prev().attr('src')
+                    .replace('{{ app.config.image_temp_urlpath }}/', '')
+                    .replace('{{ app.config.image_save_urlpath }}/', '');
+                $new_delete_image.val(src);
+                $("#thumb").append($new_delete_image);
+                $(this).parent("li").remove();
+                hideSvg();
+                count_del++;
+            });
+            var count_add = {{ form.add_images|length|default(0) }};
+            $('#{{ form.customer_image.vars.id }}').fileupload({
+                url: "{{ url('farm_cover_add') }}",
+                type: "post",
+                sequentialUploads: true,
+                dataType: 'json',
+                done: function (e, data) {
+                    $('#progress').hide();
+                    $.each(data.result.files, function (index, file) {
+                        var total = $('#thumb li').length;
+                        if (total < max_cover_image) {
+                            var path = '{{ app.config.image_temp_urlpath }}/' + file;
+                            var $img = $(proto_img.replace(/__path__/g, path));
+                            var $new_img = $(proto_add.replace(/__name__/g, count_add));
+                            $new_img.val(file);
+                            $child = $img.append($new_img);
+                            showCover(path);
+                            $('#thumb').prepend($child);
+                            count_add++;
+                        }
+                    });
+                    hideSvg();
+                },
+                fail: function (e, data) {
+                    alert('アップロードに失敗しました。');
+                },
+                always: function (e, data) {
+                    $('#progress').hide();
+                    $('#progress .progress-bar').width('0%');
+                },
+                start: function (e, data) {
+                    $('#progress').show();
+                },
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 10000000,
+                maxNumberOfFiles: max_cover_image,
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .progress-bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                processalways: function (e, data) {
+                    if (data.files.error) {
+                        alert("画像ファイルサイズが大きいか画像ファイルではありません。");
+                    }
+                }
+            });
+
+            $('.upload-zone-camera, .upload-list-camera').on('click', function () {
+                var total = $('#thumb li').length;
+                if (total >= max_cover_image) {
+                    return;
+                }
+                $('#{{ form.customer_image.vars.id }}').click();
+            });
+        });
+
+        // trigger onclick live action because "append"
+        $(document).on('click', '#thumb .ui-state-default img', function(e) {
+            var path = $(this).attr('src');
+            var cover_img = $('.cover img');
+            if (path)  {
+                $(".fixed").css("display", "none");
+                $(cover_img).attr('src', path).css('display', 'block');
+            } else {
+                $(".fixed").css("display", "");
+                $(cover_img).attr('src', "").css('display', 'none');
+            }
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div class="wrapper" id="service-regist-receiver-wrapper">
+        <div class="farmer-new-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
+        </div>
+        <form id="service-form" method="post" action="{{ url('farm_profile_edit') }}" enctype="multipart/form-data">
+            {{ form_widget(form._token) }}
+            <div id="upload-zone">
+                <div class="cover">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg" class="cover-image">
+                </div>
+                <div class="fixed">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg" class="upload-zone-camera">
+                    <p>カバー写真を追加</p>
+                </div>
+                {{ form_widget(form.customer_image, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
+                {{ form_errors(form.customer_image) }}
+                <div id="progress" class="progress progress-striped active" style="display:none;">
+                    <div class="progress-bar progress-bar-info"></div>
+                </div>
+                <ul id="thumb" class="clearfix">
+                    <li class="ui-default" id="upload-camera">
+                        <img class="upload-list-camera" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg">
+                    </li>
+                </ul>
+            </div>
+
+            <div id="profile">
+                <div id="receiver-profile" class="col-sm-12 col-xs-12 clearfix">
+                    {% set img = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
+                    {% if profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle medium-profile">
+                    {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
+                    {{ form_errors(form.profile_image) }}
+                    <span class="profile-name-medium color222 title16">{{ Customer.__toString }}農園</span>
+                    <span class="profile-address-medium">{{ Customer.Pref.name }}{{ Customer.addr01 }}{{ Customer.addr02 }}</span>
+                </div>
+
+                <div class="col-sm-12 col-xs-12">
+                    {{ form_errors(form.note) }}
+                    {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

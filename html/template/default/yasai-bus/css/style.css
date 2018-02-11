@@ -135,48 +135,6 @@ body {
     text-align: right !important;
 }
 
-.Rectangle {
-    width: 375px;
-    height: 30px;
-}
-
-.left_disable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: normal;
-    text-align: center;
-    color: #888888;
-}
-.left_enable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    color: #00c42b;
-    border-bottom: #00c42b solid 2px;
-}
-
-.right_disable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: normal;
-    text-align: center;
-    color: #888888;
-}
-
-.right_enable {
-    width: 24%;
-    height: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    color: #00c42b;
-    border-bottom: #00c42b solid 2px;
-}
-
 .list-2item {
     width: 49% !important;
 }
@@ -196,8 +154,6 @@ body {
 }
 
 .thumbnail {
-    width: 175px;
-    height: 241px;
     border: none !important;
     float: left;
     position: relative;
@@ -234,20 +190,6 @@ body {
     width: 50px;
     height: 50px;
     float: left;
-    margin-right: 10px;
-}
-
-.comment-profile {
-    width: 40px;
-    height: 40px;
-    float: left;
-    margin-right: 10px;
-}
-
-.comment-profile-right {
-    width: 40px;
-    height: 40px;
-    float: right;
     margin-right: 10px;
 }
 
@@ -498,21 +440,6 @@ img {
     margin: 3px;
 }
 
-.comment-description {
-    width: 295px;
-    background-color: #f2f3f7;
-    border-radius: 5px;
-    padding: 10px;
-    margin-right: 15px;
-}
-
-.comment-description p {
-    font-size: 11px;
-    line-height: 12px;
-    text-align: justify;
-    color: #444444;
-}
-
 .div-comment-profile {
     margin-left: 13px;
     margin-top: 20px;
@@ -596,14 +523,6 @@ img {
     position: absolute;
 }
 
-.farmer-comment-camera {
-    width: 24px;
-    height: 24px;
-    top: 56%;
-    right: 17%;
-    position: absolute;
-}
-
 .comment-text-limit {
     font-size: 14px;
     color: #888888;
@@ -620,15 +539,6 @@ img {
     position: absolute;
     top: 48.5%;
     right: 9%;
-}
-
-.farmer-comment-text-limit {
-    font-size: 14px;
-    color: #888888;
-    font-weight: 500;
-    position: absolute;
-    top: 57.5%;
-    right: 8.5%;
 }
 
 .service-comment-text-limit {
@@ -1792,28 +1702,6 @@ img {
     background-color: #000000 !important;
 }
 
-#upload-zone {
-    height: 211px;
-    background-color: #e6e6e6;
-    position: relative;
-}
-
-.upload-zone-camera {
-    position: absolute;
-    top: 40%;
-    left: 47%;
-}
-
-#upload-zone p {
-    position: absolute;
-    top: 59%;
-    left: 37%;
-}
-
-#cover-zone {
-    width: 373px;
-}
-
 .tag-done {
     position: absolute;
     top: 1.4%;
@@ -2205,7 +2093,7 @@ img {
     }
 
     .btn-inactive {
-        width: 96% !important;
+        /*width: 96% !important;*/
     }
 
     #receiver-profile {
@@ -2216,8 +2104,94 @@ img {
     #service-form textarea {
         height: 120px;
         border-radius: 3px;
-        width: 96% !important;
+        /*width: 96% !important;*/
     }
 }
 
+/*farm profile*/
+.exhibition {
+    margin-bottom: 10px;
+}
+.exhibition ul li:hover {
+    cursor: pointer;
+}
 
+.exhibition .enable {
+    font-size: 14px;
+    font-weight: bold;
+    color: #00c42b;
+    padding-bottom: 10px;
+    border-bottom: #00c42b solid 2px;
+}
+
+.exhibition .disable {
+    color: #888888;
+}
+
+.exhibition .text-alight-center {
+    text-align: center !important;
+}
+
+.voice-section {
+    display: none;
+}
+.voice-section .void {
+    margin-bottom: 20px;
+}
+.voice-section .voice .help {
+    position: absolute;
+    right: 25px;
+    bottom: 10px;
+}
+
+.voice-section .voice .help .farmer-comment-text-limit {
+    font-size: 14px;
+    color: #888888;
+    font-weight: 500;
+    position: relative;
+    margin-right: 10px;
+}
+
+.voice-section .voice .farmer-comment-camera {
+    width: 24px;
+    height: 22px;
+    position: relative;
+}
+
+.voice-section .div-comment-profile .comment-description {
+    width: 100%;
+    background-color: #f2f3f7;
+    border-radius: 5px;
+    padding: 10px;
+    margin-right: 15px;
+}
+
+.voice-section .div-comment-profile .comment-description p {
+    font-size: 11px;
+    line-height: 12px;
+    text-align: justify;
+    color: #444444;
+}
+.voice-section .comment {
+    margin-bottom: 10px;
+}
+
+.voice-section .comment-profile {
+    width: 40px;
+    height: 40px;
+    float: left;
+}
+
+.voice-section .comment-profile-right {
+    width: 40px;
+    height: 40px;
+    float: right;
+}
+
+.voice-section .comment-image-review {
+    width: 120px;
+}
+
+.voice-section #comment-image-section {
+    display: none;
+}

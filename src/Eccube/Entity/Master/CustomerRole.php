@@ -12,6 +12,10 @@ namespace Eccube\Entity\Master;
  */
 class CustomerRole extends \Eccube\Entity\AbstractEntity
 {
+    const FARMER = 'ROLE_FARMER';
+    const DRIVER = 'ROLE_DRIVER';
+    const RECIPIENT = 'ROLE_RECIPIENT';
+
     /**
      * @return string
      */
