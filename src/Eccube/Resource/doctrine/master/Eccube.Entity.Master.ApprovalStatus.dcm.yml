@@ -1,0 +1,19 @@
+Eccube\Entity\Master\ApprovalStatus:
+    type: entity
+    table: mtb_approval_status
+    repositoryClass: Eccube\Repository\Master\ApprovalStatusRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

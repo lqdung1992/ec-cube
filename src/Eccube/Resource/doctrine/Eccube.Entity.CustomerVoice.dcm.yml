@@ -1,0 +1,53 @@
+Eccube\Entity\CustomerVoice:
+    type: entity
+    table: dtb_customer_voice
+    repositoryClass: Eccube\Repository\CustomerVoiceRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: customer_voice_id
+            generator:
+                strategy: AUTO
+    fields:
+        create_date:
+            type: datetime
+            nullable: false
+        comment:
+            type: text
+            nullable: false
+        file_name:
+            type: text
+            nullable: true
+        update_date:
+            type: datetime
+            nullable: false
+        del_flg:
+            type: smallint
+            nullable: false
+            unsigned: false
+            options:
+                default: '0'
+    manyToOne:
+        Customer:
+            targetEntity: Eccube\Entity\Customer
+            inversedBy: CustomerVoices
+            joinColumn:
+                name: customer_id
+                referencedColumnName: customer_id
+        TargetCustomer:
+            targetEntity: Eccube\Entity\Customer
+            inversedBy: CustomerVoices
+            joinColumn:
+                name: target_customer_id
+                referencedColumnName: customer_id
+        Product:
+            targetEntity: Eccube\Entity\Product
+            inversedBy: CustomerVoices
+            joinColumn:
+                nullable: true
+                name: product_id
+                referencedColumnName: product_id
+    lifecycleCallbacks: {  }

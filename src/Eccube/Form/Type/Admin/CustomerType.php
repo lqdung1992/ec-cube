@@ -50,7 +50,7 @@ class CustomerType extends AbstractType
                 'required' => true,
             ))
             ->add('kana', 'kana', array(
-                'required' => true,
+                'required' => false,
             ))
             ->add('company_name', 'text', array(
                 'required' => false,
@@ -114,17 +114,27 @@ class CustomerType extends AbstractType
                 ),
             ))
             ->add('status', 'customer_status', array(
+                'label' => '会員種別',
                 'required' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),
             ))
+            ->add('approval_status', 'entity', array(
+                'label' => '承認状況',
+                'required' => true,
+                'expanded' => true,
+                'class' => 'Eccube\Entity\Master\ApprovalStatus',
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
             ->add('note', 'textarea', array(
-                'label' => 'SHOP用メモ',
+                'label' => '説明文',
                 'required' => false,
                 'constraints' => array(
                     new Assert\Length(array(
-                        'max' => $config['ltext_len'],
+                        'max' => $config['smtext_len'],
                     )),
                 ),
             ))

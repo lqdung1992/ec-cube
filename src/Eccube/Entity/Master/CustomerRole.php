@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Created by PhpStorm.
+ * User: lqdung
+ * Date: 2/5/2018
+ * Time: 3:19 PM
+ */
 namespace Eccube\Entity\Master;
 
 /**
@@ -7,6 +12,10 @@ namespace Eccube\Entity\Master;
  */
 class CustomerRole extends \Eccube\Entity\AbstractEntity
 {
+    const FARMER = 'ROLE_FARMER';
+    const DRIVER = 'ROLE_DRIVER';
+    const RECIPIENT = 'ROLE_RECIPIENT';
+
     /**
      * @return string
      */

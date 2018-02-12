@@ -10,10 +10,10 @@ namespace Eccube\Controller\Farm;
 use Eccube\Application;
 use Eccube\Entity\Customer;
 use Eccube\Repository\CustomerRepository;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class FarmServiceController
@@ -36,8 +36,7 @@ class FarmServiceController
         $builder2 = $app['form.factory']->createBuilder('farmer_regist', $Customer);
 
         $builder = clone $builder2;
-        $builder->remove('password')
-            ->remove('bus_stop');
+        $builder->remove('password')->remove('bus_stop');
 
         /* @var $form \Symfony\Component\Form\FormInterface */
         $form = $builder->getForm();
@@ -87,21 +86,20 @@ class FarmServiceController
                         // メール送信
                         $app['eccube.service.mail']->sendCustomerConfirmMail($Customer, $activateUrl);
 
-                        return $app->redirect($app->url('farm_service_profile', array('id' => $Customer->getId())));
-//                        return $app->redirect($app->url('farm_service'));
+                        return $app->redirect($app->url('farm_service_profile'));
                     } else {
                         return $app->redirect($activateUrl);
                     }
                 }
 
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $builder->setAttribute('freeze', true);
-                    $form = $builder->getForm();
-                    $form->handleRequest($request);
-                    return $app->render('Farm/service_register.twig', array(
-                        'form' => $form->createView(),
-                        'form2' => $form2->createView(),
-                    ));
+                if ($form->isSubmitted()) {
+                $builder->setAttribute('freeze', true);
+                $form = $builder->getForm();
+                $form->handleRequest($request);
+                return $app->render('Farm/service_register.twig', array(
+                    'form' => $form->createView(),
+                    'form2' => $form2->createView(),
+                ));
                 }
         }
 
@@ -114,36 +112,40 @@ class FarmServiceController
     /**
      * @param Application $app
      * @param Request $request
-     * @param int $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function profile(Application $app, Request $request, $id)
+    public function profile(Application $app, Request $request)
     {
-        /** @var CustomerRepository $repo */
-        $repo = $app['eccube.repository.customer'];
         /** @var Customer $Customer */
-        $Customer = $repo->find($id);
+        $Customer = $app->user();
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
         // load image
         $profileImage = null;
+        $profileImageFileType = null;
         if ($Customer->getProfileImage()) {
             $profileImage = $Customer->getProfileImage();
-            $Customer->setProfileImage(
-                new File($app['config']['image_save_realdir'].'/'. $Customer->getProfileImage())
-            );
-        }
-        if (!$Customer) {
-            throw new NotFoundHttpException();
+            $profileImageFileType = new File($app['config']['image_save_realdir'] . '/' . $Customer->getProfileImage());
+            $Customer->setProfileImage($profileImageFileType);
         }
         /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
         $builder = $app['form.factory']->createBuilder('farmer_profile', $Customer);
         $form = $builder->getForm();
+
+        // Set profile to form and return default to customer
+        if ($profileImageFileType) {
+            $Customer->setProfileImage($profileImage);
+            $form['profile_image']->setData($profileImageFileType);
+        }
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $image */
-            $image = $Customer->getProfileImage();
+            $image = $form['profile_image']->getData();
             $filename = $profileImage;
             if ($image) {
-                if (file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
+                if ($filename && file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
                     unlink($old);
                 }
                 $extension = $image->getClientOriginalExtension();
@@ -155,13 +157,48 @@ class FarmServiceController
             $app['orm.em']->persist($Customer);
             $app['orm.em']->flush();
 
-            return $app->redirect($app->url('farm_service_profile', array('id' => $Customer->getId())));
+            return $app->redirect($app->url('farm_service_profile'));
         }
 
         return $app->render('Farm/service_profile.twig', array(
             'subtitle' => 'Farm service profile',
             'profile_image' => $profileImage,
             'Customer' => $Customer,
+            'form' => $form->createView(),
+        ));
+    }
+
+    /**
+     * Profile setting
+     *
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function settingProfile(Application $app, Request $request)
+    {
+        $Customer = $app->user();
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createBuilder('farmer_regist', $Customer);
+        $builder->remove('customer_role')
+            ->remove('password')
+            ->remove('email')
+            ->remove('bus_stop');
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $app['orm.em']->persist($Customer);
+            $app['orm.em']->flush();
+
+            return $app->redirect($app->url('farm_service_profile'));
+        }
+
+        return $app->render('Farm/service_profile_setting.twig', array(
+            'subtitle' => 'Farm service profile setting',
             'form' => $form->createView(),
         ));
     }

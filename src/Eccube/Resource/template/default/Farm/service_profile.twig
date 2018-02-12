@@ -65,7 +65,7 @@
         </div>
 
         <div class="backgroundf7f7f7" id="service-regist">
-            <form id="service-form" method="post" action="{{ url('farm_service_profile', {'id': Customer.id}) }}" enctype="multipart/form-data">
+            <form id="service-form" method="post" action="{{ url('farm_service_profile') }}" enctype="multipart/form-data">
                 {{ form_widget(form._token) }}
                 <p class="padding-top25">プロフィール写真と紹介文を登録すると</p>
                 <p>やさいバスがご利用になれます</p>
@@ -85,7 +85,9 @@
                     {{ form_errors(form.note) }}
                     {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
                 </div>
+                <div class="col-sm-12 col-xs-12">
                 <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
+                </div>
             </form>
         </div>
     </div>
