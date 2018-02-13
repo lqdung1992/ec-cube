@@ -24,6 +24,8 @@
 
 namespace Eccube\Entity;
 
+use Eccube\Entity\Master\AmountUnitType;
+use Eccube\Entity\Master\CultivationMethod;
 use Eccube\Util\EntityUtil;
 
 /**
@@ -701,5 +703,150 @@ class ProductClass extends \Eccube\Entity\AbstractEntity
     public function getTaxRule()
     {
         return $this->TaxRule;
+    }
+
+    /** @var  \DateTime */
+    private $production_start_date;
+    /** @var  \DateTime */
+    private $production_end_date;
+    /** @var  int */
+    private $amount;
+    /** @var  int */
+    private $amount_unit_type_id;
+    /** @var  AmountUnitType */
+    private $AmountUnitType;
+    /** @var  int */
+    private $cultivation_method_id;
+    /** @var  CultivationMethod */
+    private $CultivationMethod;
+    /** @var  int */
+    private $amount_per_container;
+
+    /**
+     * @return \DateTime
+     */
+    public function getProductionStartDate()
+    {
+        return $this->production_start_date;
+    }
+
+    /**
+     * @param \DateTime $production_start_date
+     */
+    public function setProductionStartDate($production_start_date)
+    {
+        $this->production_start_date = $production_start_date;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getProductionEndDate()
+    {
+        return $this->production_end_date;
+    }
+
+    /**
+     * @param \DateTime $production_end_date
+     */
+    public function setProductionEndDate($production_end_date)
+    {
+        $this->production_end_date = $production_end_date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param int $amount
+     */
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmountUnitTypeId()
+    {
+        return $this->amount_unit_type_id;
+    }
+
+    /**
+     * @param int $amount_unit_type_id
+     */
+    public function setAmountUnitTypeId($amount_unit_type_id)
+    {
+        $this->amount_unit_type_id = $amount_unit_type_id;
+    }
+
+    /**
+     * @return AmountUnitType
+     */
+    public function getAmountUnitType()
+    {
+        return $this->AmountUnitType;
+    }
+
+    /**
+     * @param AmountUnitType $AmountUnitType
+     */
+    public function setAmountUnitType($AmountUnitType)
+    {
+        $this->AmountUnitType = $AmountUnitType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCultivationMethodId()
+    {
+        return $this->cultivation_method_id;
+    }
+
+    /**
+     * @param int $cultivation_method_id
+     */
+    public function setCultivationMethodId($cultivation_method_id)
+    {
+        $this->cultivation_method_id = $cultivation_method_id;
+    }
+
+    /**
+     * @return CultivationMethod
+     */
+    public function getCultivationMethod()
+    {
+        return $this->CultivationMethod;
+    }
+
+    /**
+     * @param CultivationMethod $CultivationMethod
+     */
+    public function setCultivationMethod($CultivationMethod)
+    {
+        $this->CultivationMethod = $CultivationMethod;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmountPerContainer()
+    {
+        return $this->amount_per_container;
+    }
+
+    /**
+     * @param int $amount_per_container
+     */
+    public function setAmountPerContainer($amount_per_container)
+    {
+        $this->amount_per_container = $amount_per_container;
     }
 }

@@ -1,0 +1,19 @@
+Eccube\Entity\Master\CultivationMethod:
+    type: entity
+    table: mtb_cultivation_method
+    repositoryClass: Eccube\Repository\Master\CultivationMethodRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

@@ -66,6 +66,10 @@ Eccube\Entity\Product:
             targetEntity: Eccube\Entity\ProductCategory
             cascade: ["persist", "remove"]
             mappedBy: Product
+        ProductReceiptableDates:
+            targetEntity: Eccube\Entity\ProductReceiptableDate
+            cascade: ["persist", "remove"]
+            mappedBy: Product
         ProductClasses:
             targetEntity: Eccube\Entity\ProductClass
             cascade: ["persist"]

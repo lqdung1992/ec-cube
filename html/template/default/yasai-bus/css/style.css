@@ -31,12 +31,10 @@ body {
 
 #reicever-wrapper {
     background-color: #ffffff;
-    height: 980px;
 }
 
 #driver-wrapper {
     background-color: #f7f7f7;
-    height: 800px;
 }
 
 .header {
@@ -272,7 +270,6 @@ body {
 }
 
 .fav-empty {
-    height: 667px;
     background-color: #f7f7f7;
 }
 
@@ -282,18 +279,7 @@ body {
     text-align: center;
 }
 
-.fav-empty, .cart-done p {
-    padding-top: 50%;
-}
-
 .fav-empty button {
-    width: 335px;
-    height: 50px;
-    text-shadow: 0 0 7px rgba(0, 0, 0, 0.25);
-    margin-top: 40%;
-}
-
-.primary-button {
     width: 335px;
     height: 50px;
     text-shadow: 0 0 7px rgba(0, 0, 0, 0.25);
@@ -1350,8 +1336,6 @@ img {
 }
 
 #receiver-form {
-    width: 373px;
-    height: 877px;
     background-color: #f7f7f7;
     padding-top: 15px;
 }

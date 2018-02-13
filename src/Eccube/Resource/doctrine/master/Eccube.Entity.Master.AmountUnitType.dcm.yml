@@ -1,0 +1,19 @@
+Eccube\Entity\Master\AmountUnitType:
+    type: entity
+    table: mtb_amount_unit_type
+    repositoryClass: Eccube\Repository\Master\AmountUnitTypeRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

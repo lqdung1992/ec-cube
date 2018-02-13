@@ -1,0 +1,19 @@
+Eccube\Entity\Master\ReceiptableDate:
+    type: entity
+    table: mtb_receiptable_date
+    repositoryClass: Eccube\Repository\Master\ReceiptableDateRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }
