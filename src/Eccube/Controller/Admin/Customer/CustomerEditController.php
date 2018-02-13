@@ -26,8 +26,13 @@ namespace Eccube\Controller\Admin\Customer;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\Customer;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -36,8 +41,10 @@ class CustomerEditController extends AbstractController
     public function index(Application $app, Request $request, $id = null)
     {
         $app['orm.em']->getFilters()->enable('incomplete_order_status_hidden');
+        $img = null;
         // 編集
         if ($id) {
+            /** @var Customer $Customer */
             $Customer = $app['orm.em']
                 ->getRepository('Eccube\Entity\Customer')
                 ->find($id);
@@ -48,6 +55,13 @@ class CustomerEditController extends AbstractController
             // 編集用にデフォルトパスワードをセット
             $previous_password = $Customer->getPassword();
             $Customer->setPassword($app['config']['default_password']);
+
+            if ($img = $Customer->getProfileImage()) {
+                $Customer->setProfileImage(
+                    new File($app['config']['image_save_realdir'] . '/' . $Customer->getProfileImage())
+                );
+            }
+
             // 新規登録
         } else {
             $Customer = $app['eccube.repository.customer']->newCustomer();
@@ -57,8 +71,8 @@ class CustomerEditController extends AbstractController
         }
 
         // 会員登録フォーム
-        $builder = $app['form.factory']
-            ->createBuilder('admin_customer', $Customer);
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createBuilder('admin_customer', $Customer);
 
         $event = new EventArgs(
             array(
@@ -69,12 +83,25 @@ class CustomerEditController extends AbstractController
         );
         $app['eccube.event.dispatcher']->dispatch(EccubeEvents::ADMIN_CUSTOMER_EDIT_INDEX_INITIALIZE, $event);
 
+        /** @var Form $form */
         $form = $builder->getForm();
 
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 log_info('会員登録開始', array($Customer->getId()));
+                /** @var UploadedFile $image */
+                $image = $Customer->getProfileImage();
+                $filename = $img;
+                if ($image) {
+                    if ($img && file_exists($old = $app['config']['image_save_realdir'] . '/' . $filename)) {
+                        unlink($old);
+                    }
+                    $extension = $image->getClientOriginalExtension();
+                    $filename = date('mdHis').uniqid('_').'.'.$extension;
+                    $image->move($app['config']['image_save_realdir'], $filename);
+                }
+                $Customer->setProfileImage($filename);
 
                 if ($Customer->getId() === null) {
                     $Customer->setSalt(
@@ -145,6 +172,7 @@ class CustomerEditController extends AbstractController
         return $app->render('Customer/edit.twig', array(
             'form' => $form->createView(),
             'Customer' => $Customer,
+            'profile_image' => $img,
         ));
     }
 }

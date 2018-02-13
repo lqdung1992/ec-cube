@@ -115,6 +115,22 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.csv_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
+        // Farm
+        $app['eccube.repository.master.customer_role'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\CustomerRole');
+        });
+        $app['eccube.repository.master.bus_stop'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\BusStop');
+        });
+        $app['eccube.repository.master.approval_status'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\ApprovalStatus');
+        });
+        $app['eccube.repository.customer_image'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\CustomerImage');
+        });
+        $app['eccube.repository.customer_voice'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\CustomerVoice');
+        });
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Delivery');
@@ -143,6 +159,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.customer'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Customer');
         });
+
         $app['eccube.repository.news'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\News');
         });
@@ -344,6 +361,13 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\CustomerAddressType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\ForgotType();
             $types[] = new \Eccube\Form\Type\Front\CustomerLoginType($app['session']);
+
+            // Farm
+            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceSignUpType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ServiceProfileType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\FarmProfileEditType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\FarmVoiceType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ChangePasswordType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);

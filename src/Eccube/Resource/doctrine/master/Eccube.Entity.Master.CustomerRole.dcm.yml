@@ -1,0 +1,23 @@
+Eccube\Entity\Master\CustomerRole:
+    type: entity
+    table: mtb_customer_role
+    repositoryClass: Eccube\Repository\Master\CustomerRoleRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        name_jp:
+            type: string
+            length: 100
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

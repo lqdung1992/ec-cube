@@ -41,7 +41,11 @@ Eccube\Entity\Customer:
             nullable: false
         name02:
             type: text
-            nullable: false
+            nullable: true
+        profile_image:
+            type: string
+            length: 100
+            nullable: true
         kana01:
             type: text
             nullable: true
@@ -147,6 +151,23 @@ Eccube\Entity\Customer:
             joinColumn:
                 name: status
                 referencedColumnName: id
+        ApprovalStatus:
+            targetEntity: Eccube\Entity\Master\ApprovalStatus
+            joinColumn:
+                name: approval_status
+                referencedColumnName: id
+            options:
+                default: '1'
+        CustomerRole:
+            targetEntity: Eccube\Entity\Master\CustomerRole
+            joinColumn:
+                name: customer_role
+                referencedColumnName: id
+        BusStop:
+            targetEntity: Eccube\Entity\Master\BusStop
+            joinColumn:
+                name: bus_stop
+                referencedColumnName: id
         Sex:
             targetEntity: Eccube\Entity\Master\Sex
             joinColumn:
@@ -179,4 +200,9 @@ Eccube\Entity\Customer:
         Orders:
             targetEntity: Eccube\Entity\Order
             mappedBy: Customer
+        CustomerImage:
+            targetEntity: Eccube\Entity\CustomerImage
+            mappedBy: Customer
+            orderBy:
+                id: ASC
     lifecycleCallbacks: {  }

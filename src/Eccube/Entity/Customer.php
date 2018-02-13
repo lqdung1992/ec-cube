@@ -24,8 +24,10 @@
 
 namespace Eccube\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Eccube\Common\Constant;
+use Eccube\Entity\Master\ApprovalStatus;
+use Eccube\Entity\Master\BusStop;
+use Eccube\Entity\Master\CustomerRole;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -235,6 +237,23 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     private $Orders;
 
+    /** @var CustomerRole */
+    private $CustomerRole;
+
+    /** @var BusStop */
+    private $BusStop;
+
+    /** @var string */
+    private $profile_image;
+
+    /** @var  ApprovalStatus */
+    private $ApprovalStatus;
+
+    /**
+     * @var CustomerImage[]
+     */
+    private $CustomerImage;
+
     /**
      * Constructor
      */
@@ -243,10 +262,75 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->CustomerFavoriteProducts = new \Doctrine\Common\Collections\ArrayCollection();
         $this->CustomerAddresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->Orders = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->CustomerImage = new \Doctrine\Common\Collections\ArrayCollection();
 
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
         $this->setDelFlg(Constant::DISABLED);
+    }
+
+    /**
+     * @return ApprovalStatus
+     */
+    public function getApprovalStatus()
+    {
+        return $this->ApprovalStatus;
+    }
+
+    /**
+     * @param ApprovalStatus $ApprovalStatus
+     */
+    public function setApprovalStatus(ApprovalStatus $ApprovalStatus)
+    {
+        $this->ApprovalStatus = $ApprovalStatus;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProfileImage()
+    {
+        return $this->profile_image;
+    }
+
+    /**
+     * @param string $profile_image
+     */
+    public function setProfileImage($profile_image)
+    {
+        $this->profile_image = $profile_image;
+    }
+
+    /**
+     * @return CustomerRole
+     */
+    public function getCustomerRole()
+    {
+        return $this->CustomerRole;
+    }
+
+    /**
+     * @param mixed $CustomerRole
+     */
+    public function setCustomerRole(CustomerRole $CustomerRole)
+    {
+        $this->CustomerRole = $CustomerRole;
+    }
+
+    /**
+     * @return BusStop
+     */
+    public function getBusStop()
+    {
+        return $this->BusStop;
+    }
+
+    /**
+     * @param BusStop $BusStop
+     */
+    public function setBusStop(BusStop $BusStop)
+    {
+        $this->BusStop = $BusStop;
     }
 
     /**
@@ -262,7 +346,12 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        // default role
+        $role = 'ROLE_USER';
+        if ($this->getCustomerRole() instanceof CustomerRole) {
+            $role = $this->getCustomerRole()->getName();
+        }
+        return array($role);
     }
 
     /**
@@ -1237,6 +1326,34 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     {
         $this->CustomerAddresses[] = $customerAddresses;
 
+        return $this;
+    }
+
+    /**
+     * @return CustomerImage[]
+     */
+    public function getCustomerImage()
+    {
+        return $this->CustomerImage;
+    }
+
+    /**
+     * @param CustomerImage $CustomerImage
+     * @return $this
+     */
+    public function addCustomerImage(CustomerImage $CustomerImage)
+    {
+        $this->CustomerImage->add($CustomerImage);
+        return $this;
+    }
+
+    /**
+     * @param CustomerImage $customerImage
+     * @return $this
+     */
+    public function removeCustomerImage(CustomerImage $customerImage)
+    {
+        $this->CustomerImage->removeElement($customerImage);
         return $this;
     }
 }

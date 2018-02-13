@@ -53,13 +53,10 @@ class CustomerRepository extends EntityRepository implements UserProviderInterfa
     public function newCustomer()
     {
         $Customer = new \Eccube\Entity\Customer();
-        $Status = $this->getEntityManager()
-            ->getRepository('Eccube\Entity\Master\CustomerStatus')
-            ->find(1);
+        $Status = $this->getEntityManager()->getRepository('Eccube\Entity\Master\CustomerStatus')->find(1);
+        $approvalStatus = $this->getEntityManager()->getRepository('Eccube\Entity\Master\ApprovalStatus')->find(1);
 
-        $Customer
-            ->setStatus($Status)
-            ->setDelFlg(0);
+        $Customer->setStatus($Status)->setDelFlg(0)->setApprovalStatus($approvalStatus);
 
         return $Customer;
     }
@@ -300,6 +297,31 @@ class CustomerRepository extends EntityRepository implements UserProviderInterfa
                 ->leftJoin('o.OrderDetails', 'od')
                 ->andWhere('od.product_name LIKE :buy_product_name OR od.product_code LIKE :buy_product_name')
                 ->setParameter('buy_product_name', '%' . $searchData['buy_product_code'] . '%');
+        }
+
+        // CustomerRole
+        if (!empty($searchData['customer_role']) && count($searchData['customer_role']) > 0) {
+            $qb
+                ->andWhere($qb->expr()->in('c.CustomerRole', ':CustomerRole'))
+                ->setParameter('CustomerRole', $searchData['customer_role']);
+        }
+
+        // BusStop
+        if (!empty($searchData['bus_stop']) && count($searchData['bus_stop']) > 0) {
+            $qb
+                ->andWhere($qb->expr()->in('c.BusStop', ':BusStop'))
+                ->setParameter('BusStop', array_values($searchData['bus_stop']));
+        }
+
+        // approval status
+        if (!empty($searchData['approval_status']) && count($searchData['approval_status']) > 0) {
+            $data = $searchData['approval_status'];
+            if (is_object($searchData['approval_status'])) {
+                $data = $searchData['approval_status']->toArray();
+            }
+            $qb
+                ->andWhere($qb->expr()->in('c.ApprovalStatus', ':ApprovalStatuses'))
+                ->setParameter('ApprovalStatuses', $data);
         }
 
         // Order By

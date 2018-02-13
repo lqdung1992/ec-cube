@@ -22,43 +22,47 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #}
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>{{ BaseInfo.shop_name }}{% if subtitle is defined and subtitle is not empty %} / {{ subtitle }}{% elseif title is defined and title is not empty %} / {{ title }}{% endif %}</title>
-{% if PageLayout.author is not empty %}
-    <meta name="author" content="{{ PageLayout.author }}">
-{% endif %}
-{% if PageLayout.description is not empty %}
-    <meta name="description" content="{{ PageLayout.description }}">
-{% endif %}
-{% if PageLayout.keyword is not empty %}
-    <meta name="keywords" content="{{ PageLayout.keyword }}">
-{% endif %}
-{% if PageLayout.meta_robots is not empty %}
-    <meta name="robots" content="{{ PageLayout.meta_robots }}">
-{% endif %}
-<meta name="viewport" content="width=device-width, initial-scale=1">
-{% if PageLayout.meta_tags is not empty %}
-    {{ PageLayout.meta_tags|raw }}
-{% endif %}
-{% block meta_tags %}{% endblock %}
-<link rel="icon" href="{{ app.config.front_urlpath }}/img/common/favicon.ico">
-<link rel="stylesheet" href="{{ app.config.front_urlpath }}/css/style.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}">
-<link rel="stylesheet" href="{{ app.config.front_urlpath }}/css/slick.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}">
-<link rel="stylesheet" href="{{ app.config.front_urlpath }}/css/default.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}">
-<!-- for original theme CSS -->
-{% block stylesheet %}{% endblock %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ BaseInfo.shop_name }}{% if subtitle is defined and subtitle is not empty %} / {{ subtitle }}{% elseif title is defined and title is not empty %} / {{ title }}{% endif %}</title>
+    {% if PageLayout.author is not empty %}
+        <meta name="author" content="{{ PageLayout.author }}">
+    {% endif %}
+    {% if PageLayout.description is not empty %}
+        <meta name="description" content="{{ PageLayout.description }}">
+    {% endif %}
+    {% if PageLayout.keyword is not empty %}
+        <meta name="keywords" content="{{ PageLayout.keyword }}">
+    {% endif %}
+    {% if PageLayout.meta_robots is not empty %}
+        <meta name="robots" content="{{ PageLayout.meta_robots }}">
+    {% endif %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if PageLayout.meta_tags is not empty %}
+        {{ PageLayout.meta_tags|raw }}
+    {% endif %}
+    {% block meta_tags %}{% endblock %}
+    <link rel="icon" href="{{ app.config.front_urlpath }}/img/common/favicon.ico">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{{ app.config.front_urlpath }}/js/vendor/jquery-1.11.3.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"><\/script>')</script>
+    <link href="{{ app.config.front_urlpath }}/yasai-bus/css/style.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}" rel="stylesheet"/>
+    <link href="{{ app.config.front_urlpath }}/yasai-bus/css/bootstrap.min.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}" rel="stylesheet"/>
 
-{# ▼Head COLUMN #}
-{% if PageLayout.Head %}
-    {# ▼上ナビ #}
-    {{ include('block.twig', {'Blocks': PageLayout.Head}) }}
-    {# ▲上ナビ #}
-{% endif %}
-{# ▲Head COLUMN #}
+    {#<link rel="stylesheet" href="{{ app.config.front_urlpath }}/css/style.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}">#}
+    {#<link rel="stylesheet" href="{{ app.config.front_urlpath }}/css/slick.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}">#}
+    {#<link rel="stylesheet" href="{{ app.config.front_urlpath }}/css/default.css?v={{ constant('Eccube\\Common\\Constant::VERSION') }}">#}
+    <!-- for original theme CSS -->
+    {% block stylesheet %}{% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{ app.config.front_urlpath }}/js/vendor/jquery-1.11.3.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"><\/script>')</script>
+
+    {# ▼Head COLUMN #}
+    {% if PageLayout.Head %}
+        {# ▼上ナビ #}
+        {{ include('block.twig', {'Blocks': PageLayout.Head}) }}
+        {# ▲上ナビ #}
+    {% endif %}
+    {# ▲Head COLUMN #}
 
 </head>
 <body id="page_{{ app.request.get('_route') }}" class="{{ body_class|default('other_page') }}">
@@ -71,8 +75,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 {{ include('block.twig', {'Blocks': PageLayout.Header}) }}
                 {# ▲上ナビ #}
             {% endif %}
-            {# ▲HeaderInternal COLUMN #}
-            <p id="btn_menu"><a class="nav-trigger" href="#nav">Menu<span></span></a></p>
         </div>
     </header>
 
@@ -87,6 +89,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             {% endif %}
             {# ▲TOP COLUMN #}
         </div>
+
 
         <div class="container-fluid inner">
             {# ▼LEFT COLUMN #}
@@ -163,22 +166,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 <div class="overlay"></div>
 
-<script src="{{ app.config.front_urlpath }}/js/vendor/bootstrap.custom.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>
-<script src="{{ app.config.front_urlpath }}/js/vendor/slick.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>
-<script src="{{ app.config.front_urlpath }}/js/function.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>
-<script src="{{ app.config.front_urlpath }}/js/eccube.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>
+<script type="text/javascript" src="{{ app.config.front_urlpath }}/yasai-bus/js/yasai-bus.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>
+<script type="text/javascript" src="{{ app.config.front_urlpath }}/yasai-bus/js/bootstrap.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>
+
+{#<script src="{{ app.config.front_urlpath }}/js/vendor/bootstrap.custom.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>#}
+{#<script src="{{ app.config.front_urlpath }}/js/vendor/slick.min.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>#}
+{#<script src="{{ app.config.front_urlpath }}/js/function.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>#}
+{#<script src="{{ app.config.front_urlpath }}/js/eccube.js?v={{ constant('Eccube\\Common\\Constant::VERSION') }}"></script>#}
 <script>
-$(function () {
-    $('#drawer').append($('.drawer_block').clone(true).children());
-    $.ajax({
-        url: '{{ app.config.front_urlpath }}/img/common/svg.html',
-        type: 'GET',
-        dataType: 'html',
-    }).done(function(data){
-        $('body').prepend(data);
-    }).fail(function(data){
+    $(function () {
+        $('#drawer').append($('.drawer_block').clone(true).children());
+        $.ajax({
+            url: '{{ app.config.front_urlpath }}/img/common/svg.html',
+            type: 'GET',
+            dataType: 'html',
+        }).done(function(data){
+            //$('body').prepend(data);
+        }).fail(function(data){
+        });
     });
-});
 </script>
 {% block javascript %}{% endblock %}
 </body>

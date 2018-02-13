@@ -132,13 +132,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                   {{ form_widget(searchForm.customer_status) }}
                 </div>
               </div>
+
+                <div class="col-xs-6 col-md-4">
+                    <div id="search_box_main__approval_status" class="form-group">
+                        <label>{{ searchForm.approval_status.vars.label }}</label>
+                        {{ form_widget(searchForm.approval_status) }}
+                    </div>
+                </div>
+
               <div class="col-xs-6 col-md-4">
                 <div id="search_box_main__sex" class="form-group">
                   <label>性別</label>
                   {{ form_widget(searchForm.sex) }}
                 </div>
               </div>
-              <div class="col-xs-12 col-md-4">
+
+              <div class="col-xs-12 col-md-6">
                 <div id="search_box_main__birth_month" class="form-group">
                   <label>誕生月</label>
                   {{ form_widget(searchForm.birth_month) }}
@@ -208,6 +217,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 {{ form_widget(searchForm.last_buy_start, {'attr': {'class': 'input_cal'}}) }} ～ {{ form_widget(searchForm.last_buy_end, {'attr': {'class': 'input_cal'}}) }}
               </div>
             </div>
+
+            <div class="col-xs-12 col-md-6">
+                <div id="search_box_main__customer_role" class="form-group">
+                    <label>{{ searchForm.customer_role.vars.label }}</label>
+                    {{ form_widget(searchForm.customer_role) }}
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-6" style="display: none;">
+                <div id="search_box_main__bus_stop" class="form-group">
+                    {{ form_label(searchForm.bus_stop) }}
+                    {{ form_widget(searchForm.bus_stop) }}
+                </div>
+            </div>
+
                 <div class="extra-form col-xs-12 col-sm-12">
                     {% for f in searchForm.getIterator %}
                         {% if f.vars.name matches '[^plg*]' %}
@@ -277,7 +301,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         <thead>
                         <tr id="result_list_main__header">
                             <th id="result_list_main__header_id">会員ID</th>
+                            <th id="result_list_main__header_profile">プロフィール画像</th>
                             <th id="result_list_main__header_name">会員名</th>
+                            <th id="result_list_main__header_approval_status">承認状況</th>
                             <th id="result_list_main__header_tel">電話番号</th>
                             <th id="result_list_main__header_mail">メールアドレス</th>
                             <th id="result_list_main__header_menu_box">&nbsp;</th>
@@ -287,7 +313,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         {% for Customer in pagination %}
                         <tr id="result_list_main__item--{{ Customer.id }}">
                             <td id="result_list_main__id--{{ Customer.id }}" class="member_id">{{ Customer.id }}</td>
+                            <td id="result_list_main__profile--{{ Customer.id }}" class="member_profile">
+                                {% if Customer.profile_image %}
+                                    <img src="{{ app.config.image_save_urlpath }}/{{ Customer.profile_image }}" style="width: 60px; height: 60px;">
+                                {% else %}
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/camera.PNG" style="width: 60px; height: 60px;">
+                                {% endif %}
+                            </td>
                             <td id="result_list_main__name--{{ Customer.id }}" class="member_name"><a href="{{ url('admin_customer_edit', { 'id': Customer.id}) }}">{{ Customer.name01 }}&nbsp;{{ Customer.name02 }}</a></td>
+                            <td id="result_list_main__approval_status--{{ Customer.id }}" class="member_approval_status">
+                                {{ Customer.ApprovalStatus.name }}
+                            </td>
                             <td id="result_list_main__tel--{{ Customer.id }}" class="member_tel">{{ Customer.tel01 }}-{{ Customer.tel02 }}-{{ Customer.tel03 }}</td>
                             <td id="result_list_main__mail--{{ Customer.id }}" class="member_mail">{{ Customer.email }}</td>
                             <td id="result_list_main__menu_box--{{ Customer.id }}" class="icon_edit">

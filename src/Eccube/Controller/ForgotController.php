@@ -24,8 +24,10 @@
 namespace Eccube\Controller;
 
 use Eccube\Application;
+use Eccube\Entity\Customer;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception as HttpException;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,9 +43,8 @@ class ForgotController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
-
-        $builder = $app['form.factory']
-            ->createNamedBuilder('', 'forgot');
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createNamedBuilder('', 'forgot');
 
         $event = new EventArgs(
             array(
@@ -57,13 +58,13 @@ class ForgotController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var Customer $Customer */
             $Customer = $app['eccube.repository.customer']
                 ->getActiveCustomerByEmail($form->get('login_email')->getData());
 
             if (!is_null($Customer)) {
                 // リセットキーの発行・有効期限の設定
-                $Customer
-                    ->setResetKey($app['eccube.repository.customer']->getUniqueResetKey($app))
+                $Customer->setResetKey($app['eccube.repository.customer']->getUniqueResetKey($app))
                     ->setResetExpire(new \DateTime('+' . $app['config']['customer_reset_expire'] .' min'));
 
                 // リセットキーを更新
