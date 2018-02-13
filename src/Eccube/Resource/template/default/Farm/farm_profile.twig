@@ -190,8 +190,8 @@
     <div class="wrapper" id="service-regist-receiver-wrapper">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
 
         <div id="service-form" style="background-color: #FFFFFF;">
@@ -224,7 +224,7 @@
 
             <div id="receiver-profile" class="clearfix">
                 <div class="col-sm-12 col-xs-12">
-                    <button class="btn btn-success float-right farmer-follow-btn">フォロー中</button>
+                    <a href="{{ url('farm_profile_edit') }}"><button class="btn btn-success float-right farmer-follow-btn">編集</button></a>
                     {% set img = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
                     {% if TargetCustomer.profile_image %}
                         {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}

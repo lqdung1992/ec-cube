@@ -1425,9 +1425,7 @@ img {
 }
 
 .farmer-new-header {
-    width: 375px;
     height: 54px;
-    border-top: 1px solid #a3a3a3;
     padding: 10px;
 }
 
@@ -2024,7 +2022,7 @@ img {
     .wrapper {
         width: 90%;
         background-color: #ffffff;
-        border: 1px solid #cccccc;
+        /*border: 1px solid #cccccc;*/
         margin: auto;
     }
 
@@ -2050,8 +2048,8 @@ img {
     #service-form {
         background-color: #f7f7f7;
         padding-top: 15px;
-        margin-left: 20%;
-        margin-right: 20%;
+        padding-left: 20%;
+        padding-right: 20%;
     }
 
     #service-form input{
@@ -2282,8 +2280,13 @@ img {
     text-align: justify;
     color: #444444;
 }
+
 .voice-section .comment {
     margin-bottom: 10px;
+    font-size: 12px;
+    line-height: 12px;
+    text-align: justify;
+    color: #444444;
 }
 
 .voice-section .comment-profile {
