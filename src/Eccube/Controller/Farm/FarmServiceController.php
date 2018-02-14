@@ -200,6 +200,7 @@ class FarmServiceController
         return $app->render('Farm/service_profile_setting.twig', array(
             'subtitle' => 'Farm service profile setting',
             'form' => $form->createView(),
+            'TargetCustomer' => $Customer
         ));
     }
 }

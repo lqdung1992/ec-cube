@@ -2322,3 +2322,9 @@ img {
 .voice-section #comment-image-section {
     display: none;
 }
+
+.button-x {
+    float: right;
+    margin-top:-40px;
+    font-size: 30px;
+}
