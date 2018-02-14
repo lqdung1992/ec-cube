@@ -3,17 +3,16 @@ Eccube\Entity\ProductReceiptableDate:
     table: dtb_product_receiptable_date
     repositoryClass: Eccube\Repository\ProductReceiptableDateRepository
     id:
-        id:
-            product_id:
-                type: integer
-                nullable: false
-                unsigned: false
-                id: true
-            date_id:
-                type: integer
-                nullable: false
-                unsigned: false
-                id: true
+        product_id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+        date_id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
     fields:
         max_quantity:
             type: integer
@@ -26,7 +25,7 @@ Eccube\Entity\ProductReceiptableDate:
                 name: product_id
                 referencedColumnName: product_id
         ReceiptableDate:
-            targetEntity: Eccube\Entity\ReceiptableDate
+            targetEntity: Eccube\Entity\Master\ReceiptableDate
             inversedBy: ProductReceiptableDates
             joinColumn:
                 name: date_id

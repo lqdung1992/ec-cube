@@ -113,11 +113,12 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/farmer/password/change', '\Eccube\Controller\Farm\FarmerController::changePassword')->bind('farm_farmer_password_change');
 
         // farm - profile
+        $c->match('/farm/profile', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile_own');
         $c->match('/farm/profile/edit', '\Eccube\Controller\Farm\FarmerController::editProfile')->bind('farm_profile_edit');
         $c->match('/farm/profile/{id}', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile')->assert('id', '\d+');
         $c->match('/farm/profile/voice/{id}/delete', '\Eccube\Controller\Farm\FarmerController::deleteVoice')->bind('farm_profile_voice_delete')->assert('id', '\d+');
         // Add image ajax
-        $c->post('/farm/cover/add', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_cover_add');
+        $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
 
         // farm - home
         $c->match('/farm/home', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home');

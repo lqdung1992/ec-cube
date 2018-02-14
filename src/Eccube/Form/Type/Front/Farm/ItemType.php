@@ -66,9 +66,9 @@ class ItemType extends AbstractType
             ))
             ->add('Category', 'entity', array(
                 'class' => 'Eccube\Entity\Category',
-//                'property' => 'NameWithLevel',
-                'label' => '商品カテゴリ',
-                'multiple' => true,
+                'property' => 'NameWithLevel',
+                'label' => '品目',
+//                'multiple' => false,
                 'mapped' => false,
                 // Choices list (overdrive mapped)
                 'choices' => $arrCategory,
@@ -111,7 +111,19 @@ class ItemType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
             ))
-        ;
+            ->add('Status', 'disp', array(
+            ))
+            ->add('ReceiptableDate', 'entity', array(
+                'label' => '発送可能日',
+                'class' => 'Eccube\Entity\Master\ReceiptableDate',
+                'required' => true,
+                'multiple' => false,
+                'expanded' => true,
+                'mapped' => false,
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ));
     }
 
     /**
@@ -126,6 +138,6 @@ class ItemType extends AbstractType
      */
     public function getName()
     {
-        return 'item';
+        return 'item_edit';
     }
 }

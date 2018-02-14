@@ -7,6 +7,7 @@
  */
 namespace Eccube\Controller\Farm;
 
+use Doctrine\ORM\EntityManager;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Entity\BaseInfo;
@@ -14,11 +15,15 @@ use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
+use Eccube\Entity\Master\ReceiptableDate;
 use Eccube\Entity\Product;
+use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
+use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Entity\ProductTag;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
+use Eccube\Repository\ProductReceiptableDateRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
@@ -277,8 +282,8 @@ class FarmerController
             throw new BadRequestHttpException('リクエストが不正です');
         }
 
-        $images = $request->files->get('farm_profile_edit');
-
+        $allFile = $request->files->all();
+        $images = array_shift($allFile);
         $files = array();
         if (count($images) > 0) {
             /** @var UploadedFile[] $img */
@@ -340,7 +345,7 @@ class FarmerController
         }
 
         /** @var FormBuilder $builder */
-        $builder = $app['form.factory']->createBuilder('item', $Product);
+        $builder = $app['form.factory']->createBuilder('item_edit', $Product);
         $form = $builder->getForm();
         $ProductClass->setStockUnlimited((boolean)$ProductClass->getStockUnlimited());
         $form['class']->setData($ProductClass);
@@ -371,8 +376,18 @@ class FarmerController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $Product = $form->getData();
+            $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_SHOW);
+            $Product->setStatus($Disp);
+            // error creator;
+//            $Product->setCreator($creator)
 
+            /** @var EntityManager $em */
+            $em = $app['orm.em'];
+
+            /** @var ProductClass $ProductClass */
             $ProductClass = $form['class']->getData();
+            $ProductType = $app['eccube.repository.master.product_type']->find(1);
+            $ProductClass->setProductType($ProductType);
 
             // 個別消費税
             $BaseInfo = $app['eccube.repository.base_info']->get();
@@ -398,7 +413,7 @@ class FarmerController
                     }
                 }
             }
-            $app['orm.em']->persist($ProductClass);
+            $em->persist($ProductClass);
 
             // 在庫情報を作成
             if (!$ProductClass->getStockUnlimited()) {
@@ -407,15 +422,16 @@ class FarmerController
                 // 在庫無制限時はnullを設定
                 $ProductStock->setStock(null);
             }
-            $app['orm.em']->persist($ProductStock);
+            $em->persist($ProductStock);
 
             /* @var $Product \Eccube\Entity\Product */
             foreach ($Product->getProductCategories() as $ProductCategory) {
                 $Product->removeProductCategory($ProductCategory);
-                $app['orm.em']->remove($ProductCategory);
+                $em->remove($ProductCategory);
             }
-            $app['orm.em']->persist($Product);
-            $app['orm.em']->flush();
+
+            $em->persist($Product);
+            $em->flush();
 
             $count = 1;
             $Categories = $form->get('Category')->getData();
@@ -424,7 +440,7 @@ class FarmerController
                 foreach ($Category->getPath() as $ParentCategory) {
                     if (!isset($categoriesIdList[$ParentCategory->getId()])) {
                         $ProductCategory = $this->createProductCategory($Product, $ParentCategory, $count);
-                        $app['orm.em']->persist($ProductCategory);
+                        $em->persist($ProductCategory);
                         $count++;
                         /* @var $Product \Eccube\Entity\Product */
                         $Product->addProductCategory($ProductCategory);
@@ -433,13 +449,59 @@ class FarmerController
                 }
                 if (!isset($categoriesIdList[$Category->getId()])) {
                     $ProductCategory = $this->createProductCategory($Product, $Category, $count);
-                    $app['orm.em']->persist($ProductCategory);
+                    $em->persist($ProductCategory);
                     $count++;
                     /* @var $Product \Eccube\Entity\Product */
                     $Product->addProductCategory($ProductCategory);
                     $categoriesIdList[$Category->getId()] = true;
                 }
             }
+
+            // Update
+            /** @var ReceiptableDate[] $ReceiptableDates [1,2,3,7]*/
+            $ReceiptableDates = $form->get('ReceiptableDate')->getData();
+            /** @var ProductReceiptableDateRepository $productRDRepo*/
+            $productRDRepo = $em->getRepository('Eccube\Entity\ProductReceiptableDate');
+
+            /** @var ProductReceiptableDate[] $oldProductRD [0 => 1,1 => 2,2 => 6]*/
+            $oldProductRD = $productRDRepo->findBy(array('Product' => $Product));
+            /** @var array $arrPrd [1,2,6]*/
+            $arrPrd = array();
+
+            if (count($oldProductRD) > 0) {
+                foreach ($oldProductRD as $prdTmp) {
+                    $arrPrd[$prdTmp->getDateId()] = $prdTmp;
+                }
+            }
+
+            /** @var array $arrExist [0 => 1, 1 => 2, 3 => 7]*/
+            $arrExist = array();
+            foreach ($ReceiptableDates as $ReceiptableDate) {
+                if (!isset($arrPrd[$ReceiptableDate->getId()])) {
+                    // new
+                    $PReceiptableDate = new ProductReceiptableDate();
+                    $PReceiptableDate->setProductId($Product->getId());
+                    $PReceiptableDate->setDateId($ReceiptableDate->getId());
+                    $Product->addProductReceiptableDate($PReceiptableDate);
+                    $em->persist($PReceiptableDate);
+                }
+                // existed
+                $arrExist = $ReceiptableDate->getId();
+            }
+
+            if (count($oldProductRD) > 0) {
+                // remove all redundancy.
+                foreach ($oldProductRD as $tmp) {
+                    if (!isset($arrExist[$tmp->getDateId()])) {
+                        $Product->removeProductReceiptableDate($tmp);
+                        $em->remove($tmp);
+                    }
+                }
+            }
+
+            $em->persist($Product);
+            $em->flush();
+
 
             // 画像の登録
             $add_images = $form->get('add_images')->getData();
@@ -450,7 +512,7 @@ class FarmerController
                     ->setProduct($Product)
                     ->setRank(1);
                 $Product->addProductImage($ProductImage);
-                $app['orm.em']->persist($ProductImage);
+                $em->persist($ProductImage);
 
                 // 移動
                 $file = new File($app['config']['image_temp_realdir'].'/'.$add_image);
@@ -466,10 +528,10 @@ class FarmerController
                 // 追加してすぐに削除した画像は、Entityに追加されない
                 if ($ProductImage instanceof \Eccube\Entity\ProductImage) {
                     $Product->removeProductImage($ProductImage);
-                    $app['orm.em']->remove($ProductImage);
+                    $em->remove($ProductImage);
 
                 }
-                $app['orm.em']->persist($Product);
+                $em->persist($Product);
 
                 // 削除
                 if (!empty($delete_image)) {
@@ -477,8 +539,8 @@ class FarmerController
                     $fs->remove($app['config']['image_save_realdir'].'/'.$delete_image);
                 }
             }
-            $app['orm.em']->persist($Product);
-            $app['orm.em']->flush();
+            $em->persist($Product);
+            $em->flush();
 
 
             $ranks = $request->get('rank_images');
@@ -486,41 +548,37 @@ class FarmerController
                 foreach ($ranks as $rank) {
                     list($filename, $rank_val) = explode('//', $rank);
                     /** @var ProductImage $ProductImage */
-                    $ProductImage = $app['eccube.repository.product_image']
-                        ->findOneBy(array(
-                            'file_name' => $filename,
-                            'Product' => $Product,
-                        ));
+                    $ProductImage = $app['eccube.repository.product_image']->findOneBy(array('file_name' => $filename, 'Product' => $Product));
                     $ProductImage->setRank($rank_val);
-                    $app['orm.em']->persist($ProductImage);
+                    $em->persist($ProductImage);
                 }
             }
-            $app['orm.em']->flush();
+            $em->flush();
 
             // 商品タグの登録
             // 商品タグを一度クリア
             $ProductTags = $Product->getProductTag();
             foreach ($ProductTags as $ProductTag) {
                 $Product->removeProductTag($ProductTag);
-                $app['orm.em']->remove($ProductTag);
+                $em->remove($ProductTag);
             }
 
             // 商品タグの登録
             $Tags = $form->get('Tag')->getData();
             foreach ($Tags as $Tag) {
                 $ProductTag = new ProductTag();
-                $ProductTag
-                    ->setProduct($Product)
-                    ->setTag($Tag);
+                $ProductTag->setProduct($Product)->setTag($Tag);
                 $Product->addProductTag($ProductTag);
-                $app['orm.em']->persist($ProductTag);
+                $em->persist($ProductTag);
             }
 
             $Product->setUpdateDate(new \DateTime());
-            $app['orm.em']->flush();
+            $em->flush();
 
+            return $app->redirect($app->url('farm_item_edit', array('id' => $Product->getId())));
         }
-        dump($form);
+
+//        dump($form->getErrorsAsString());
 
         return $app->render('Farm/farm_item.twig', array(
             'Product' => $Product,

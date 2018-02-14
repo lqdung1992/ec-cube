@@ -10,24 +10,8 @@
 {% block stylesheet %}
     <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
     <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
-    <link rel="stylesheet" href="{{ app.config.front_urlpath }}/yasai-bus/css/jquery-ui.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <style type="text/css">
-        #upload-zone .cover .cover-image {
-            width: 100%;
-            height: 211px;
-            display: none;
-        }
-        .ui-state-highlight {
-            height: 148px;
-            border: dashed 1px #ccc;
-            background: #fff;
-        }
-        #thumb {
-            position: absolute;
-            right: 5px;
-            top: 67%;
-        }
-
         ul#thumb li {
             list-style: none;
             display: inline-block;
@@ -37,21 +21,27 @@
         }
 
         ul#thumb li img {
-            width: 60px;
-            height: 60px;
-            border-radius: 2.3px;
+            width: 79px;
+            height: 79px;
+            border-radius: 3px;
         }
 
-        /*ul#thumb li#upload-camera img.upload-list-camera {*/
+        /*ul#thumb li#upload-camera {*/
+            /*width: 60px;*/
+            /*height: 60px;*/
+            /*border-radius: 3px;*/
+        /*}*/
+
+        ul#thumb li#upload-camera img.upload-list-camera {
             /*width: 24px;*/
             /*height: 22px;*/
             /*top: 34%;*/
             /*left: 29%;*/
             /*position: absolute;*/
-        /*}*/
+        }
 
         ul#thumb li#upload-camera {
-            background-color: #FFFFFF;
+            background-color: #344250;
             /*!*position: relative;*!*/
             /*border-radius: 3px;*/
             /*background-color: #344250;*/
@@ -64,10 +54,10 @@
             position: absolute;
             right: 0;
             bottom: 0;
-            width: 60px;
+            width: 79px;
             height: 17px;
             opacity: 0.8;
-            border-radius: 2.3px;
+            border-radius: 3px;
             background-color: #ffffff;
         }
         ul#thumb li.ui-state-default .delete-image .close {
@@ -88,24 +78,7 @@
             position: absolute;
         }
 
-        #upload-zone .fixed {
-            position: absolute;
-            top: 40%;
-            left: 40%;
-        }
-
-        #upload-zone {
-            height: 211px;
-            background-color: #e6e6e6;
-            position: relative;
-        }
-
         .upload-zone-camera {
-            position: relative;
-            left: 35%;
-        }
-
-        #upload-zone p {
             position: relative;
         }
     </style>
@@ -117,86 +90,61 @@
     <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload.js"></script>
     <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-process.js"></script>
     <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-validate.js"></script>
-    <script src="{{ app.config.front_urlpath }}/yasai-bus/js/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script type="text/javascript">
-        var max_cover_image = 5;
-        function setImage(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#upload-image').attr('src', e.target.result).width(60).height(60);
-                };
-                reader.readAsDataURL(input.files[0]);
-                return true;
-            }
-        }
+        var max_image = 5;
         $(function () {
-            $('#upload-image').click(function () {
-                $('#farm_profile_cover_profile_image').click();
-            });
+            var openModal = function (review_class, caption) {
+                var modal = document.getElementById('myModal');
+                var modalImg = document.getElementById("model-image");
+                // review image
+                var img = document.getElementsByClassName(review_class);
+                var captionText = document.getElementById("caption");
 
-            $('#farm_profile_cover_profile_image').change(function () {
-                if (!this.value) {
-                    return false;
-                }
-                //restrict upload file type
-                var ext = this.value.match(/\.(.+)$/)[1];
-                switch (ext) {
-                    case 'jpg':
-                    case 'jpeg':
-                    case 'png':
-                    case 'gif':
-                        setImage(this);
-                        return true;
-                        break;
-                    default:
-                        alert('Only image file type please!!');
-                        this.value = '';
-                        $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
-
-                        return false;
+                var text = '';
+                if (caption) {
+                    text = document.getElementsByClassName(caption);
                 }
 
-                if ((this.files[0].size)/1024 > '{{ app.config.image_size }}') {
-                    alert("Please check upload image not over 1MB");
-                    this.value = '';
-                    $('#upload-image').attr('src', '{{ app.config.front_urlpath }}'+'/yasai-bus/img/camera.PNG');
-                }
+                // review image
+                $(img).each(function(index, item) {
+                    item.onclick = function() {
+                        modal.style.display = "block";
+                        modalImg.src = this.src;
+                        if (text[index]) {
+                            captionText.innerHTML = text[index].value;
+                        } else {
+                            captionText.innerHTML = '';
+                        }
+                    };
+                });
 
-                return false;
-            });
-
-            var showCover = function (path) {
-                var cover_img = $('.cover img');
-                if (path)  {
-                    $(".fixed").css("display", "none");
-                    $(cover_img).attr('src', path).css('display', 'block');
-                } else {
-                    $(".fixed").css("display", "");
-                    $(cover_img).attr('src', "").css('display', 'none');
-                }
-                return true;
+                var span = document.getElementsByClassName("close")[0];
+                span.onclick = function() {
+                    modal.style.display = "none";
+                };
             };
+            openModal('image-review');
 
             var hideSvg = function () {
                 var  length = $("#thumb li").length;
-                if (length > 1 && length <= max_cover_image - 1) {
-                    $(".fixed").css("display", "none");
+                var upload_zone = $("#upload-zone");
+                if (length > 1 && length <= max_image - 1) {
+                    $(upload_zone).css("display", "none");
                     $("#upload-camera").css("display", "");
                 } else {
                     $("#upload-camera").css("display", "none");
-                    if (length == max_cover_image) {
-                        $(".fixed").css("display", "none");
+                    if (length == max_image) {
+                        $(upload_zone).css("display", "none");
                     } else  {
-                        $(".fixed").css("display", "");
-                        showCover();
+                        $(upload_zone).css("display", "");
                     }
                 }
             };
             hideSvg();
             var proto_img = ''
                 + '<li class="ui-state-default">'
-                + '<img src="__path__" />'
+                + '<img src="__path__" class="image-review" />'
                 + '<a class="delete-image">'
                 + '<span class="close">'
                 + '削除'
@@ -211,7 +159,6 @@
             var $widget = $('{{ form_widget(image) }}');
             $widget.val('{{ image.vars.value }}');
             $("#thumb").prepend($img.append($widget));
-            showCover(path);
             hideSvg();
             {% endfor %}
             {% for add_image in form.add_images %}
@@ -220,7 +167,6 @@
             var $widget_add = $('{{ form_widget(add_image) }}');
             $widget_add.val('{{ add_image.vars.value }}');
             $("#thumb").prepend($img_add.append($widget_add));
-            showCover(path);
             hideSvg();
             {% endfor %}
             {% for delete_image in form.delete_images %}
@@ -240,7 +186,7 @@
             });
             var count_add = {{ form.add_images|length|default(0) }};
             $('#{{ form.product_image.vars.id }}').fileupload({
-                url: "{{ url('farm_cover_add') }}",
+                url: "{{ url('farm_image_upload') }}",
                 type: "post",
                 sequentialUploads: true,
                 dataType: 'json',
@@ -248,14 +194,14 @@
                     $('#progress').hide();
                     $.each(data.result.files, function (index, file) {
                         var total = $('#thumb li').length;
-                        if (total < max_cover_image) {
+                        if (total < max_image) {
                             var path = '{{ app.config.image_temp_urlpath }}/' + file;
                             var $img = $(proto_img.replace(/__path__/g, path));
                             var $new_img = $(proto_add.replace(/__name__/g, count_add));
                             $new_img.val(file);
                             $child = $img.append($new_img);
-                            showCover(path);
                             $('#thumb').prepend($child);
+                            openModal('image-review');
                             count_add++;
                         }
                     });
@@ -273,7 +219,7 @@
                 },
                 acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
                 maxFileSize: 10000000,
-                maxNumberOfFiles: max_cover_image,
+                maxNumberOfFiles: max_image,
                 progressall: function (e, data) {
                     var progress = parseInt(data.loaded / data.total * 100, 10);
                     $('#progress .progress-bar').css(
@@ -288,26 +234,13 @@
                 }
             });
 
-            $('.upload-zone-camera, .upload-list-camera').on('click', function () {
+            $('.upload-image, .upload-list-camera').on('click', function () {
                 var total = $('#thumb li').length;
-                if (total >= max_cover_image) {
+                if (total >= max_image) {
                     return;
                 }
                 $('#{{ form.product_image.vars.id }}').click();
             });
-        });
-
-        // trigger onclick live action because "append"
-        $(document).on('click', '#thumb .ui-state-default img', function(e) {
-            var path = $(this).attr('src');
-            var cover_img = $('.cover img');
-            if (path)  {
-                $(".fixed").css("display", "none");
-                $(cover_img).attr('src', path).css('display', 'block');
-            } else {
-                $(".fixed").css("display", "");
-                $(cover_img).attr('src', "").css('display', 'none');
-            }
         });
     </script>
 {% endblock %}
@@ -318,27 +251,23 @@
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
         </div>
-        <form id="receiver-form" method="post" action="{{ url('farm_profile_edit') }}" enctype="multipart/form-data">
+        <form id="receiver-form" method="post" action="" enctype="multipart/form-data">
             {{ form_widget(form._token) }}
-            <a class="upload-image btn btn-default margin-left13 margin-bottom15">
-                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera-white.svg">商品を撮影する</a>
-
-            <div id="upload-zone">
-                <div class="cover">
-                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg" class="cover-image">
-                </div>
-                <div class="fixed">
-                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg" class="upload-zone-camera">
-                    <p>カバー写真を追加</p>
-                </div>
-                {{ form_widget(form.product_image, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
-                {{ form_errors(form.product_image) }}
+            <div class="row">
+            <div class="col-sm-12 col-xs-12" id="upload-zone">
+            <div class="margin-bottom15 text-alight-center">
+            <a class="btn btn-default upload-image">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera-white.svg" class="upload-zone-camera">商品を撮影する</a>
+            </div>
+            </div>
                 <div id="progress" class="progress progress-striped active" style="display:none;">
                     <div class="progress-bar progress-bar-info"></div>
                 </div>
-                <ul id="thumb" class="clearfix">
+                {{ form_widget(form.product_image, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
+                {{ form_errors(form.product_image) }}
+                <ul id="thumb" class="text-alight-center clearfix">
                     <li class="ui-default" id="upload-camera">
-                        <img class="upload-list-camera" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg">
+                        <img class="upload-list-camera" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera-white.svg">
                     </li>
                 </ul>
             </div>
@@ -346,8 +275,86 @@
             <div id="item-info">
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
+                        {{ form_label(form.Category) }}
+                        {{ form_errors(form.Category) }}
+                        {{ form_widget(form.Category) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    {{ form_label(form.class.cultivation_method) }}
+                    <div class="form-group form-inline">
+                        {{ form_errors(form.class.cultivation_method) }}
+                        {{ form_widget(form.class.cultivation_method) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group form-inline">
+                        {{ form_label(form.class.amount) }}
+                        {{ form_errors(form.class.amount) }}
+                        {{ form_errors(form.class.amount_unit_type) }}
+                        {{ form_widget(form.class.amount) }}
+                        {{ form_widget(form.class.amount_unit_type) }}
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        {{ form_label(form.class.price02) }}
+                        {{ form_errors(form.class.price02) }}
+                        {{ form_widget(form.class.price02) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        {{ form_label(form.class.amount_per_container) }}
+                        {{ form_errors(form.class.amount_per_container) }}
+                        {{ form_widget(form.class.amount_per_container) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        {{ form_label(form.class.sale_limit) }}
+                        {{ form_errors(form.class.sale_limit) }}
+                        {{ form_widget(form.class.sale_limit) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    {{ form_label(form.class.production_start_date) }}
+                    <div class="form-group form-inline">
+                        {{ form_errors(form.class.production_start_date) }}
+                        {{ form_errors(form.class.production_end_date) }}
+                        {{ form_widget(form.class.production_start_date) }}〜{{ form_widget(form.class.production_end_date) }}
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group form-inline">
+                        {{ form_label(form.ReceiptableDate) }}
+                        {{ form_errors(form.ReceiptableDate) }}
+                        {{ form_widget(form.ReceiptableDate) }}
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        {{ form_label(form.name) }}
                         {{ form_errors(form.name) }}
                         {{ form_widget(form.name) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        {{ form_label(form.description_detail) }}
+                        {{ form_errors(form.description_detail) }}
+                        {{ form_widget(form.description_detail) }}
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group form-inline">
+                        {{ form_label(form.Tag) }}
+                        {{ form_errors(form.Tag) }}
+                        {{ form_widget(form.Tag) }}
                     </div>
                 </div>
 
@@ -356,5 +363,12 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="model-image"/>
+        <div id="caption"></div>
     </div>
 {% endblock %}

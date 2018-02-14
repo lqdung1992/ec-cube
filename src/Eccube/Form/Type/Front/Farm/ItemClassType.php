@@ -47,7 +47,7 @@ class ItemClassType extends AbstractType
                 ),
             ))
             ->add('sale_limit', 'number', array(
-                'label' => '販売制限数',
+                'label' => '1日あたりの出荷可能数',
                 'required' => false,
                 'constraints' => array(
                     new Assert\Length(array(
@@ -80,7 +80,7 @@ class ItemClassType extends AbstractType
                 ),
             ))
             ->add('price02', 'money', array(
-                'label' => '販売価格',
+                'label' => '1点あたりの価格',
                 'currency' => 'JPY',
                 'precision' => 0,
                 'scale' => 0,
@@ -125,9 +125,9 @@ class ItemClassType extends AbstractType
                 'label' => '商品種別',
                 'multiple' => false,
                 'expanded' => false,
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                ),
+//                'constraints' => array(
+//                    new Assert\NotBlank(),
+//                ),
             ))
             ->add('delivery_date', 'delivery_date', array(
                 'label' => 'お届け可能日',
@@ -139,36 +139,90 @@ class ItemClassType extends AbstractType
                 'required' => false,
                 'value' => 1,
             ))
-            ->addEventListener(FormEvents::POST_SUBMIT, function ($event) {
-                $form = $event->getForm();
-                $data = $form->getData();
-
-                if (empty($data['stock_unlimited']) && is_null($data['stock'])) {
-                    $form['stock_unlimited']->addError(new FormError('在庫数を入力、もしくは在庫無制限を設定してください。'));
-                }
-            });
-
-        $transformer = new DataTransformer\IntegerToBooleanTransformer();
-
-        $builder
-            ->add($builder->create('stock_unlimited', 'checkbox', array(
-                'label' => '無制限',
-                'value' => '1',
+            ->add('cultivation_method', 'entity', array(
+                'label' => '栽培方法',
+                'required' => true,
+                'multiple' => false,
+                'expanded' => true,
+                'class' => 'Eccube\Entity\Master\CultivationMethod',
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
+            ->add('amount', 'number', array(
+                'label' => '1点あたりの量',
+                'required' => true,
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
+            ->add('amount_unit_type', 'entity', array(
+                'label' => '1点あたりの量',
+                'required' => true,
+                'multiple' => false,
+                'expanded' => false,
+                'class' => 'Eccube\Entity\Master\AmountUnitType',
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
+            ->add('amount_per_container', 'number', array(
+                'required' => true,
+                'label' => '段ボール・折りたたみコンテナ1つに入る点数',
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                ),
+            ))
+            ->add('production_start_date', 'date', array(
+                'label' => '生産予定期間',
                 'required' => false,
-            ))->addModelTransformer($transformer));
-
-
-        $transformer = new DataTransformer\EntityToIdTransformer(
-            $app['orm.em'],
-            '\Eccube\Entity\ClassCategory'
-        );
-        $builder
-            ->add($builder->create('ClassCategory1', 'hidden')
-                ->addModelTransformer($transformer)
-            )
-            ->add($builder->create('ClassCategory2', 'hidden')
-                ->addModelTransformer($transformer)
-            );
+                'input' => 'datetime',
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'empty_value' => array('year' => '----', 'month' => '--', 'day' => '--'),
+            ))
+            ->add('production_end_date', 'date', array(
+                'label' => '生産予定期間',
+                'required' => false,
+                'input' => 'datetime',
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'empty_value' => array('year' => '----', 'month' => '--', 'day' => '--'),
+            ));
+//            ->add('stock_unlimited', 'number', array(
+//                'empty_data' => 1,
+//            ));
+//
+//            ->addEventListener(FormEvents::POST_SUBMIT, function ($event) {
+//                $form = $event->getForm();
+//                $data = $form->getData();
+//
+//                if (empty($data['stock_unlimited']) && is_null($data['stock'])) {
+//                    $form['stock_unlimited']->addError(new FormError('在庫数を入力、もしくは在庫無制限を設定してください。'));
+//                }
+//            });
+//
+//        $transformer = new DataTransformer\IntegerToBooleanTransformer();
+//
+//        $builder
+//            ->add($builder->create('stock_unlimited', 'checkbox', array(
+//                'label' => '無制限',
+//                'value' => '1',
+//                'required' => false,
+//            ))->addModelTransformer($transformer));
+//
+//
+//        $transformer = new DataTransformer\EntityToIdTransformer(
+//            $app['orm.em'],
+//            '\Eccube\Entity\ClassCategory'
+//        );
+//        $builder
+//            ->add($builder->create('ClassCategory1', 'hidden')
+//                ->addModelTransformer($transformer)
+//            )
+//            ->add($builder->create('ClassCategory2', 'hidden')
+//                ->addModelTransformer($transformer)
+//            );
     }
 
     /**
