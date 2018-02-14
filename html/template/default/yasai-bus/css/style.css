@@ -1424,15 +1424,6 @@ img {
     text-align: center;
 }
 
-.farmer-new-header {
-    height: 54px;
-    padding: 10px;
-}
-
-.logo-svg {
-    margin-left: 20%;
-}
-
 #export-button {
     position: absolute;
     top: 65%;
@@ -1889,13 +1880,11 @@ img {
     .wrapper, .menu-wrapper {
         width: 100%;
         background-color: #ffffff;
-        border: 1px solid #cccccc;
         margin: auto;
     }
 
     .farmer-header {
         height: 54px;
-        border-bottom: 1px solid #cccccc;
         padding-left: 35%;
         position: relative;
     }
@@ -2013,6 +2002,20 @@ img {
         list-style: none;
         margin-left: 20px;
     }
+
+    .farmer-new-header {
+        height: 54px;
+        padding: 10px;
+    }
+
+    .farmer-new-header .logo-svg {
+        margin-left: 20%;
+    }
+
+    .container-fluid {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
 }
 
 /******************************
@@ -2020,7 +2023,7 @@ img {
 *******************************/
 @media only screen and (min-width: 768px) {
     .wrapper {
-        width: 90%;
+        width: 100%;
         background-color: #ffffff;
         /*border: 1px solid #cccccc;*/
         margin: auto;
@@ -2028,7 +2031,7 @@ img {
 
     .farmer-header {
         height: 54px;
-        border-bottom: 1px solid #cccccc;
+        /*border-bottom: 1px solid #cccccc;*/
         padding-left: 35%;
         position: relative;
     }
@@ -2214,11 +2217,21 @@ img {
         margin-left: 23%;
         font-size: 18px;
     }
+
+    .farmer-new-header {
+        height: 54px;
+        padding: 10px;
+    }
+
+    .farmer-new-header .logo-svg {
+        margin-left: 40%;
+    }
 }
 
 /*farm profile*/
 .exhibition {
     margin-bottom: 10px;
+    height: 60px;
 }
 .exhibition ul li:hover {
     cursor: pointer;
@@ -2302,7 +2315,8 @@ img {
 }
 
 .voice-section .comment-image-review {
-    width: 120px;
+    width: 80%;
+    margin-bottom: 15px;
 }
 
 .voice-section #comment-image-section {

@@ -194,7 +194,7 @@
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
 
-        <div id="service-form" style="background-color: #FFFFFF;">
+        <div id="service-form">
             <div class="farmer-profile">
                 {% if TargetCustomer.CustomerImage %}
                     <div id="myCarousel" class="carousel slide" data-ride="carousel">
@@ -231,7 +231,7 @@
                     {% endif %}
                     <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle medium-profile">
 
-                    <span class="profile-name-medium color222 title16">{{ TargetCustomer.__toString }}農園</span>
+                    <span class="profile-name-medium color222 title16">{{ TargetCustomer.__toString }}</span>
                     <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
                 </div>
             </div>
@@ -346,6 +346,13 @@
                                     <div class="col-sm-10 col-xs-10">
                                         <div class="comment-description">
                                             <div class="comment">{{ Voice.comment|nl2br }}</div>
+                                            {% if Voice.file_name %}
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-xs-12">
+                                                        <img class="comment-image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
+                                                    </div>
+                                                </div>
+                                            {% endif %}
                                             <div class="clearfix">
                                                 <p class="comment-date float-left">{{ Voice.create_date|date('Y/m/d') }}</p>
                                                 {% if is_owner %}
@@ -367,6 +374,13 @@
                                     <div class="col-sm-10 col-xs-10">
                                         <div class="comment-description">
                                             <div class="comment">{{ Voice.comment|nl2br }}</div>
+                                            {% if Voice.file_name %}
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-xs-12">
+                                                        <img class="comment-image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
+                                                    </div>
+                                                </div>
+                                            {% endif %}
                                             <div class="clearfix">
                                                 <p class="comment-date float-right margin-bottom10">{{ Voice.create_date|date('Y/m/d') }}</p>
                                             </div>
@@ -375,13 +389,6 @@
                                 {% endif %}
                             </div>
                         </div>
-                        {% if Voice.file_name %}
-                            <div class="row">
-                                <div class="col-sm-12 col-xs-12 text-alight-center">
-                                    <img class="comment-image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
-                                </div>
-                            </div>
-                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
