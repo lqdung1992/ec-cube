@@ -36,7 +36,7 @@ class ProductStock extends \Eccube\Entity\AbstractEntity
     private $update_date;
 
     /**
-     * @var \Eccube\Entity\Member
+     * @var \Eccube\Entity\Member|Customer
      */
     private $Creator;
 
@@ -150,10 +150,10 @@ class ProductStock extends \Eccube\Entity\AbstractEntity
     /**
      * Set Creator
      *
-     * @param \Eccube\Entity\Member $creator
+     * @param \Eccube\Entity\Customer $creator
      * @return ProductStock
      */
-    public function setCreator(\Eccube\Entity\Member $creator)
+    public function setCreator(\Eccube\Entity\Customer $creator)
     {
         $this->Creator = $creator;
 
@@ -163,7 +163,7 @@ class ProductStock extends \Eccube\Entity\AbstractEntity
     /**
      * Get Creator
      *
-     * @return \Eccube\Entity\Member 
+     * @return \Eccube\Entity\Customer
      */
     public function getCreator()
     {

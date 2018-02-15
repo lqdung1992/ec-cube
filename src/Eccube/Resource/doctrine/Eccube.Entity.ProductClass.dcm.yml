@@ -79,18 +79,6 @@ Eccube\Entity\ProductClass:
             unsigned: true
             options:
                 default: '0'
-        amount_unit_type_id:
-            type: integer
-            nullable: true
-            unsigned: true
-            options:
-                default: '1'
-        cultivation_method_id:
-            type: integer
-            nullable: true
-            unsigned: true
-            options:
-                default: '1'
         amount_per_container:
             type: integer
             nullable: true
@@ -141,10 +129,10 @@ Eccube\Entity\ProductClass:
                 name: delivery_date_id
                 referencedColumnName: date_id
         Creator:
-            targetEntity: Eccube\Entity\Member
+            targetEntity: Eccube\Entity\Customer
             joinColumn:
                 name: creator_id
-                referencedColumnName: member_id
+                referencedColumnName: customer_id
                 nullable: false
     oneToOne:
         ProductStock:

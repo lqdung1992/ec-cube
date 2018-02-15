@@ -9,14 +9,14 @@ Eccube\Entity\ProductReceiptableDate:
             unsigned: false
             id: true
         date_id:
-            type: integer
+            type: smallint
             nullable: false
             unsigned: false
             id: true
     fields:
         max_quantity:
             type: integer
-            nullable: false
+            nullable: true
     manyToOne:
         Product:
             targetEntity: Eccube\Entity\Product

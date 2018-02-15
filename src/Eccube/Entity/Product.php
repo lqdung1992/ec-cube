@@ -490,7 +490,7 @@ class Product extends \Eccube\Entity\AbstractEntity
     private $CustomerFavoriteProducts;
 
     /**
-     * @var \Eccube\Entity\Member
+     * @var \Eccube\Entity\Customer
      */
     private $Creator;
 
@@ -889,10 +889,10 @@ class Product extends \Eccube\Entity\AbstractEntity
     /**
      * Set Creator
      *
-     * @param  \Eccube\Entity\Member $creator
+     * @param  Member|Customer $creator
      * @return Product
      */
-    public function setCreator(\Eccube\Entity\Member $creator)
+    public function setCreator($creator)
     {
         $this->Creator = $creator;
 
@@ -902,7 +902,7 @@ class Product extends \Eccube\Entity\AbstractEntity
     /**
      * Get Creator
      *
-     * @return \Eccube\Entity\Member
+     * @return Customer|Member
      */
     public function getCreator()
     {

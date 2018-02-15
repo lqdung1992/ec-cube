@@ -238,7 +238,7 @@ class ProductClass extends \Eccube\Entity\AbstractEntity
     private $DeliveryDate;
 
     /**
-     * @var \Eccube\Entity\Member
+     * @var Member|Customer
      */
     private $Creator;
 
@@ -626,10 +626,10 @@ class ProductClass extends \Eccube\Entity\AbstractEntity
     /**
      * Set Creator
      *
-     * @param  \Eccube\Entity\Member $creator
+     * @param  Customer|Member $creator
      * @return ProductClass
      */
-    public function setCreator(\Eccube\Entity\Member $creator)
+    public function setCreator($creator)
     {
         $this->Creator = $creator;
 
@@ -639,7 +639,7 @@ class ProductClass extends \Eccube\Entity\AbstractEntity
     /**
      * Get Creator
      *
-     * @return \Eccube\Entity\Member
+     * @return Member|Customer
      */
     public function getCreator()
     {

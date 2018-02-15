@@ -117,7 +117,7 @@ class ItemType extends AbstractType
                 'label' => '発送可能日',
                 'class' => 'Eccube\Entity\Master\ReceiptableDate',
                 'required' => true,
-                'multiple' => false,
+                'multiple' => true,
                 'expanded' => true,
                 'mapped' => false,
                 'constraints' => array(

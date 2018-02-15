@@ -315,6 +315,14 @@ class FarmerController
 
     public function item(Application $app, Request $request, $id = null)
     {
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+        // Todo: check is farmer
+        // || !$app->isGranted(CustomerRole::FARMER)
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
         if (is_null($id)) {
             $Product = new \Eccube\Entity\Product();
             $ProductClass = new \Eccube\Entity\ProductClass();
@@ -324,10 +332,12 @@ class FarmerController
                 ->setStatus($Disp);
             $ProductClass->setDelFlg(Constant::DISABLED)
                 ->setStockUnlimited(true)
-                ->setProduct($Product);
+                ->setProduct($Product)
+                ->setCreator($Customer);
             $ProductStock = new \Eccube\Entity\ProductStock();
             $ProductClass->setProductStock($ProductStock);
-            $ProductStock->setProductClass($ProductClass);
+            $ProductStock->setProductClass($ProductClass)
+                ->setCreator($Customer);
         } else {
             /** @var Product $Product */
             $Product = $app['eccube.repository.product']->find($id);
@@ -347,7 +357,9 @@ class FarmerController
         /** @var FormBuilder $builder */
         $builder = $app['form.factory']->createBuilder('item_edit', $Product);
         $form = $builder->getForm();
-        $ProductClass->setStockUnlimited((boolean)$ProductClass->getStockUnlimited());
+        $ProductType = $app['eccube.repository.master.product_type']->find(1);
+        $ProductClass->setStockUnlimited(true);
+
         $form['class']->setData($ProductClass);
 
         $images = array();
@@ -372,6 +384,13 @@ class FarmerController
         }
         $form['Tag']->setData($Tags);
 
+        $rd = array();
+        $productRDs = $Product->getProductReceiptableDates();
+        foreach ($productRDs as $productRD) {
+            $rd[] = $productRD->getReceiptableDate();
+        }
+        $form['ReceiptableDate']->setData($rd);
+
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -379,14 +398,13 @@ class FarmerController
             $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_SHOW);
             $Product->setStatus($Disp);
             // error creator;
-//            $Product->setCreator($creator)
+            $Product->setCreator($Customer);
 
             /** @var EntityManager $em */
             $em = $app['orm.em'];
 
             /** @var ProductClass $ProductClass */
             $ProductClass = $form['class']->getData();
-            $ProductType = $app['eccube.repository.master.product_type']->find(1);
             $ProductClass->setProductType($ProductType);
 
             // 個別消費税
@@ -458,47 +476,25 @@ class FarmerController
             }
 
             // Update
-            /** @var ReceiptableDate[] $ReceiptableDates [1,2,3,7]*/
+            /** @var ReceiptableDate[] $ReceiptableDates*/
             $ReceiptableDates = $form->get('ReceiptableDate')->getData();
-            /** @var ProductReceiptableDateRepository $productRDRepo*/
-            $productRDRepo = $em->getRepository('Eccube\Entity\ProductReceiptableDate');
 
-            /** @var ProductReceiptableDate[] $oldProductRD [0 => 1,1 => 2,2 => 6]*/
-            $oldProductRD = $productRDRepo->findBy(array('Product' => $Product));
-            /** @var array $arrPrd [1,2,6]*/
-            $arrPrd = array();
-
-            if (count($oldProductRD) > 0) {
-                foreach ($oldProductRD as $prdTmp) {
-                    $arrPrd[$prdTmp->getDateId()] = $prdTmp;
-                }
+            $ProductRDs = $Product->getProductReceiptableDates();
+            foreach ($ProductRDs as $productRD) {
+                $Product->removeProductReceiptableDate($productRD);
+                $em->remove($productRD);
             }
 
-            /** @var array $arrExist [0 => 1, 1 => 2, 3 => 7]*/
-            $arrExist = array();
-            foreach ($ReceiptableDates as $ReceiptableDate) {
-                if (!isset($arrPrd[$ReceiptableDate->getId()])) {
-                    // new
-                    $PReceiptableDate = new ProductReceiptableDate();
-                    $PReceiptableDate->setProductId($Product->getId());
-                    $PReceiptableDate->setDateId($ReceiptableDate->getId());
-                    $Product->addProductReceiptableDate($PReceiptableDate);
-                    $em->persist($PReceiptableDate);
-                }
-                // existed
-                $arrExist = $ReceiptableDate->getId();
+            foreach ($ReceiptableDates as $receiptableDate) {
+                $productRD = new ProductReceiptableDate();
+                $productRD->setProduct($Product);
+                $productRD->setProductId($Product->getId());
+                $productRD->setReceiptableDate($receiptableDate);
+                $productRD->setDateId($receiptableDate->getId());
+                $productRD->setMaxQuantity(1);
+                $Product->addProductReceiptableDate($productRD);
+                $em->persist($productRD);
             }
-
-            if (count($oldProductRD) > 0) {
-                // remove all redundancy.
-                foreach ($oldProductRD as $tmp) {
-                    if (!isset($arrExist[$tmp->getDateId()])) {
-                        $Product->removeProductReceiptableDate($tmp);
-                        $em->remove($tmp);
-                    }
-                }
-            }
-
             $em->persist($Product);
             $em->flush();
 
@@ -567,7 +563,7 @@ class FarmerController
             $Tags = $form->get('Tag')->getData();
             foreach ($Tags as $Tag) {
                 $ProductTag = new ProductTag();
-                $ProductTag->setProduct($Product)->setTag($Tag);
+                $ProductTag->setProduct($Product)->setTag($Tag)->setCreator($Customer);
                 $Product->addProductTag($ProductTag);
                 $em->persist($ProductTag);
             }

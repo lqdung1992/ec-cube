@@ -29,8 +29,6 @@ class ItemClassType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $app = $this->app;
-
         $builder
             ->add('code', 'text', array(
                 'label' => '商品コード',
@@ -121,14 +119,15 @@ class ItemClassType extends AbstractType
                     )),
                 ),
             ))
-            ->add('product_type', 'product_type', array(
-                'label' => '商品種別',
-                'multiple' => false,
-                'expanded' => false,
+//            ->add('product_type', 'product_type', array(
+//                'label' => '商品種別',
+//                'multiple' => false,
+//                'expanded' => false,
+//                'data' => 1,
 //                'constraints' => array(
 //                    new Assert\NotBlank(),
 //                ),
-            ))
+//            ))
             ->add('delivery_date', 'delivery_date', array(
                 'label' => 'お届け可能日',
                 'required' => false,
