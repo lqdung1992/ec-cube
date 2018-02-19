@@ -7,9 +7,11 @@ $(function () {
     $(".hambuger-menu-reicever").click(function () {
         $(".wrapper").hide();
         $("#reicever-menu-wrapper").removeClass("hidden");
+        $("#main-menu").removeClass("hidden");
+        $("#setting-menu").addClass("hidden");
     });
     
-    $("#reicever-profile-img").click(function () {
+    $(".li-profile").click(function () {
         $(".wrapper").show();
         $("#reicever-menu-wrapper").addClass("hidden");
     });
@@ -25,6 +27,11 @@ $(function () {
         $('.x-button').addClass("hidden");
         $('.modal-select-time').addClass("hidden");
         $('.wrapper').removeClass("shadow");
+    });
+
+    $("#setting").click(function () {
+        $("#main-menu").addClass("hidden");
+        $("#setting-menu").removeClass("hidden");
     });
 
 });

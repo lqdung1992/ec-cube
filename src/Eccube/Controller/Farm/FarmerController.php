@@ -260,7 +260,7 @@ class FarmerController
             $app['orm.em']->persist($Customer);
             $app['orm.em']->flush();
 
-            return $app->redirect($app->url('farm_profile_edit'));
+            return $app->redirect($app->url('farm_profile', array('id' => $Customer->getId())));
         }
 
         return $app->render('Farm/farm_profile_edit.twig', array(

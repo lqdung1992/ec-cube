@@ -157,7 +157,7 @@ class FarmServiceController
             $app['orm.em']->persist($Customer);
             $app['orm.em']->flush();
 
-            return $app->redirect($app->url('farm_service_profile'));
+            return $app->redirect($app->url('farm_profile', array('id' => $Customer->getId())));
         }
 
         return $app->render('Farm/service_profile.twig', array(
@@ -200,6 +200,7 @@ class FarmServiceController
         return $app->render('Farm/service_profile_setting.twig', array(
             'subtitle' => 'Farm service profile setting',
             'form' => $form->createView(),
+            'TargetCustomer' => $Customer
         ));
     }
 }

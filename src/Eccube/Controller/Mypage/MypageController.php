@@ -48,7 +48,7 @@ class MypageController extends AbstractController
         if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
             log_info('認証済のためログイン処理をスキップ');
 
-            return $app->redirect($app->url('mypage'));
+            return $app->redirect($app->url('farm_profile', array('id' => $app->user()->getId())));
         }
 
         /* @var $form \Symfony\Component\Form\FormInterface */

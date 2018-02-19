@@ -14,8 +14,7 @@
     <style type="text/css">
         #upload-zone .cover .cover-image {
             width: 100%;
-            height: 211px;
-            display: none;
+            height: 400px;
         }
         .ui-state-highlight {
             height: 148px;
@@ -25,7 +24,7 @@
         #thumb {
             position: absolute;
             right: 5px;
-            top: 67%;
+            top: 80%;
         }
 
         ul#thumb li {
@@ -34,6 +33,8 @@
             position: relative;
             margin-right: 5px;
             border-radius: 2.3px;
+            width: 60px;
+            height: 60px;
         }
 
         ul#thumb li img {
@@ -42,22 +43,8 @@
             border-radius: 2.3px;
         }
 
-        /*ul#thumb li#upload-camera img.upload-list-camera {*/
-            /*width: 24px;*/
-            /*height: 22px;*/
-            /*top: 34%;*/
-            /*left: 29%;*/
-            /*position: absolute;*/
-        /*}*/
-
         ul#thumb li#upload-camera {
             background-color: #FFFFFF;
-            /*!*position: relative;*!*/
-            /*border-radius: 3px;*/
-            /*background-color: #344250;*/
-            /*width: 60px;*/
-            /*height: 60px;*/
-            /*!*top: -17%;*!*/
         }
 
         ul#thumb li.ui-state-default .delete-image {
@@ -95,7 +82,6 @@
         }
 
         #upload-zone {
-            height: 211px;
             background-color: #e6e6e6;
             position: relative;
         }
@@ -107,6 +93,14 @@
 
         #upload-zone p {
             position: relative;
+        }
+
+        #profile {
+            min-height: 300px;
+        }
+
+        #profile-change-wrapper {
+            padding: auto;
         }
     </style>
 {% endblock stylesheet %}
@@ -313,15 +307,15 @@
     </script>
 {% endblock %}
 {% block main %}
-    <div class="wrapper" id="service-regist-receiver-wrapper">
+    <div class="wrapper" id="profile-change-wrapper">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
         <form id="service-form" method="post" action="{{ url('farm_profile_edit') }}" enctype="multipart/form-data">
             {{ form_widget(form._token) }}
-            <div id="upload-zone">
+            <div id="upload-zone" class="clearfix">
                 <div class="cover">
                     <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg" class="cover-image">
                 </div>
@@ -341,7 +335,7 @@
                 </ul>
             </div>
 
-            <div id="profile">
+            <div id="profile" >
                 <div id="receiver-profile" class="col-sm-12 col-xs-12 clearfix">
                     {% set img = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
                     {% if profile_image %}
@@ -350,7 +344,7 @@
                     <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle medium-profile">
                     {{ form_widget(form.profile_image, {'attr': {'style': 'display: none;'}}) }}
                     {{ form_errors(form.profile_image) }}
-                    <span class="profile-name-medium color222 title16">{{ Customer.__toString }}農園</span>
+                    <span class="profile-name-medium color222 title16">{{ Customer.__toString }}</span>
                     <span class="profile-address-medium">{{ Customer.Pref.name }}{{ Customer.addr01 }}{{ Customer.addr02 }}</span>
                 </div>
 
@@ -359,9 +353,67 @@
                     {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
                 </div>
                 <div class="col-sm-12 col-xs-12">
-                <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
+                <button type="submit" class="btn btn-inactive">プロフィールを保存</button>
                 </div>
             </div>
         </form>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ Customer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item"><a href="{{ url('farm_profile', {'id': Customer.id} ) }}">プロフィール</a></li>
+                <li class="list-group-item"><a href="#">過去の出品</a></li>
+                <li class="list-group-item"><a href="#"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
+                <li class="list-group-item" id="setting"><a href="#">設定</a></li>
+                <li class="list-group-item"><a href="#">お問い合わせ</a></li>
+                <li class="list-group-item"><a href="#">ガイド</a></li>
+            </ul>
+
+            <ul class="list-group hidden" id="setting-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ Customer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_service_profile_setting') }}">
+                        登録者名・住所・電話番号
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_farmer_password_change') }}">
+                        メールアドレス・パスワード
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        指定購入者への割引設定
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        やさいバスについて
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 {% endblock %}

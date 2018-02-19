@@ -75,8 +75,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 {{ include('block.twig', {'Blocks': PageLayout.Header}) }}
                 {# ▲上ナビ #}
             {% endif %}
-            {# ▲HeaderInternal COLUMN #}
-            <p id="btn_menu"><a class="nav-trigger" href="#nav">Menu<span></span></a></p>
         </div>
     </header>
 
@@ -91,6 +89,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             {% endif %}
             {# ▲TOP COLUMN #}
         </div>
+
 
         <div class="container-fluid inner">
             {# ▼LEFT COLUMN #}
@@ -182,7 +181,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             type: 'GET',
             dataType: 'html',
         }).done(function(data){
-            $('body').prepend(data);
+            //$('body').prepend(data);
         }).fail(function(data){
         });
     });
