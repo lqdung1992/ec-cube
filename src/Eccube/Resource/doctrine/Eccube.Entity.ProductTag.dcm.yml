@@ -31,9 +31,9 @@ Eccube\Entity\ProductTag:
                 referencedColumnName: id
                 nullable: false
         Creator:
-            targetEntity: Eccube\Entity\Member
+            targetEntity: Eccube\Entity\Customer
             joinColumn:
                 name: creator_id
-                referencedColumnName: member_id
+                referencedColumnName: customer_id
                 nullable: false
     lifecycleCallbacks: {  }

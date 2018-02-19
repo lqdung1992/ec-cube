@@ -131,6 +131,16 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.customer_voice'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\CustomerVoice');
         });
+        // Farm - item
+        $app['eccube.repository.master.cultivation_method'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\CultivationMethod');
+        });
+        $app['eccube.repository.master.amount_unit_type'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\AmountUnitType');
+        });
+        $app['eccube.repository.master.receiptable_date'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\ReceiptableDate');
+        });
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Delivery');
@@ -368,6 +378,8 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\Farm\FarmProfileEditType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\Farm\FarmVoiceType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\Farm\ChangePasswordType($app['config']);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ItemType($app);
+            $types[] = new \Eccube\Form\Type\Front\Farm\ItemClassType($app);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);

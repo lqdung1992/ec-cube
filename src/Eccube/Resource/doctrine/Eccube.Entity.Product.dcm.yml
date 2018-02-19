@@ -50,10 +50,10 @@ Eccube\Entity\Product:
             nullable: false
     manyToOne:
         Creator:
-            targetEntity: Eccube\Entity\Member
+            targetEntity: Eccube\Entity\Customer
             joinColumn:
                 name: creator_id
-                referencedColumnName: member_id
+                referencedColumnName: customer_id
                 nullable: false
         Status:
             targetEntity: Eccube\Entity\Master\Disp
@@ -64,6 +64,10 @@ Eccube\Entity\Product:
     oneToMany:
         ProductCategories:
             targetEntity: Eccube\Entity\ProductCategory
+            cascade: ["persist", "remove"]
+            mappedBy: Product
+        ProductReceiptableDates:
+            targetEntity: Eccube\Entity\ProductReceiptableDate
             cascade: ["persist", "remove"]
             mappedBy: Product
         ProductClasses:

@@ -25,10 +25,10 @@ Eccube\Entity\ProductStock:
             nullable: false
     manyToOne:
         Creator:
-            targetEntity: Eccube\Entity\Member
+            targetEntity: Eccube\Entity\Customer
             joinColumn:
                 name: creator_id
-                referencedColumnName: member_id
+                referencedColumnName: customer_id
                 nullable: false
     oneToOne:
         ProductClass:

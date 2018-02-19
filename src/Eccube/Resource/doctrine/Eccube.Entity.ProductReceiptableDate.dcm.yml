@@ -1,0 +1,34 @@
+Eccube\Entity\ProductReceiptableDate:
+    type: entity
+    table: dtb_product_receiptable_date
+    repositoryClass: Eccube\Repository\ProductReceiptableDateRepository
+    id:
+        product_id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+        date_id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        max_quantity:
+            type: integer
+            nullable: true
+    manyToOne:
+        Product:
+            targetEntity: Eccube\Entity\Product
+            inversedBy: ProductReceiptableDates
+            joinColumn:
+                name: product_id
+                referencedColumnName: product_id
+        ReceiptableDate:
+            targetEntity: Eccube\Entity\Master\ReceiptableDate
+            inversedBy: ProductReceiptableDates
+            joinColumn:
+                name: date_id
+                referencedColumnName: id
+    lifecycleCallbacks: {  }
+

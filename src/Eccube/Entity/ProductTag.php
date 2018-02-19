@@ -32,7 +32,7 @@ class ProductTag extends \Eccube\Entity\AbstractEntity
     private $Tag;
 
     /**
-     * @var \Eccube\Entity\Member
+     * @var \Eccube\Entity\Member|Customer
      */
     private $Creator;
 
@@ -119,10 +119,10 @@ class ProductTag extends \Eccube\Entity\AbstractEntity
     /**
      * Set Creator
      *
-     * @param \Eccube\Entity\Member $creator
+     * @param \Eccube\Entity\Member|Customer $creator
      * @return ProductTag
      */
-    public function setCreator(\Eccube\Entity\Member $creator)
+    public function setCreator($creator)
     {
         $this->Creator = $creator;
 
