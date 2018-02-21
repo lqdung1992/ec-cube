@@ -9,111 +9,14 @@
 {% set body_class = ' ' %}
 {% block stylesheet %}
     <style type="text/css">
-        .comment-image, .comment-image-review {
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-        .comment-image:hover, .comment-image-review:hover {opacity: 0.7;}
-
-        /* The Modal (background) */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            padding-top: 100px; /* Location of the box */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
-        }
-
-        /* Modal Content (image) */
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-        }
-
-        /* Caption of Modal Image */
-        #caption {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            text-align: center;
-            color: #ccc;
-            padding: 10px 0;
-            height: 150px;
-        }
-
-        /* Add Animation */
-        .modal-content, #caption {
-            -webkit-animation-name: zoom;
-            -webkit-animation-duration: 0.6s;
-            animation-name: zoom;
-            animation-duration: 0.6s;
-        }
-
-        @-webkit-keyframes zoom {
-            from {-webkit-transform:scale(0)}
-            to {-webkit-transform:scale(1)}
-        }
-
-        @keyframes zoom {
-            from {transform:scale(0)}
-            to {transform:scale(1)}
-        }
-
-        /* The Close Button */
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* 100% Image Width on Smaller Screens */
-        @media only screen and (max-width: 700px){
-            .modal-content {
-                width: 100%;
-            }
+        .image-review {
+            max-width: 120px;
         }
     </style>
 {% endblock stylesheet %}
 
 {% block javascript %}
     <script type="text/javascript">
-        var modal = document.getElementById('myModal');
-        var modalImg = document.getElementById("model-image");
-
-        // preview before post
-        var img = document.getElementById('comment-image');
-        var captionText = document.getElementById("caption");
-        var text = document.getElementById("farm_voice_comment");
-        img.onclick = function(){
-            modal.style.display = "block";
-            modalImg.src = this.src;
-            captionText.innerHTML = text.value;
-        };
-        var span = document.getElementsByClassName("close")[0];
-        span.onclick = function() {
-            modal.style.display = "none";
-        };
-
         function setImage(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -126,15 +29,40 @@
             }
         }
         $(function () {
-            // review after post
-            var img_review = document.getElementsByClassName('comment-image-review');
-            $(img_review).each(function(index, item) {
-                item.onclick = function() {
-                    modal.style.display = "block";
-                    modalImg.src = this.src;
-                    captionText.innerHTML = '';
+
+            var openModal = function (review_class, caption) {
+                var modal = document.getElementById('myModal');
+                var modalImg = document.getElementById("model-image");
+                // review image
+                var img = document.getElementsByClassName(review_class);
+                var captionText = document.getElementById("caption");
+
+                var text = '';
+                if (caption) {
+                    text = document.getElementsByClassName(caption);
+                }
+
+                // review image
+                $(img).each(function(index, item) {
+                    item.onclick = function() {
+                        modal.style.display = "block";
+                        modalImg.src = this.src;
+                        if (text[index]) {
+                            captionText.innerHTML = text[index].value;
+                        } else {
+                            captionText.innerHTML = '';
+                        }
+                    };
+                });
+
+                var span = document.getElementsByClassName("close")[0];
+                span.onclick = function() {
+                    modal.style.display = "none";
                 };
-            });
+            };
+
+            openModal('comment-image', 'farm_voice_comment');
+            openModal('image-review');
 
             $('.farmer-comment-camera').click(function () {
                 $('#farm_voice_file_name').click();
@@ -180,7 +108,7 @@
                 $('.'+$class).show();
             });
 
-            if  ('{{ app.request.query.get('voice') }}') {
+            if ('{{ app.request.query.get('voice') }}') {
                 $("ul li#voice").click();
             }
         });
@@ -190,7 +118,7 @@
     <div class="wrapper" id="service-regist-receiver-wrapper">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
 
@@ -349,7 +277,7 @@
                                             {% if Voice.file_name %}
                                                 <div class="row">
                                                     <div class="col-sm-12 col-xs-12">
-                                                        <img class="comment-image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
+                                                        <img class="image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
                                                     </div>
                                                 </div>
                                             {% endif %}
@@ -377,7 +305,7 @@
                                             {% if Voice.file_name %}
                                                 <div class="row">
                                                     <div class="col-sm-12 col-xs-12">
-                                                        <img class="comment-image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
+                                                        <img class="image-review" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name }}">
                                                     </div>
                                                 </div>
                                             {% endif %}

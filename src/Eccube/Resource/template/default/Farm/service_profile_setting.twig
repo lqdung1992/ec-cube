@@ -19,7 +19,7 @@
     <div class="wrapper" id="service-regist-receiver-wrapper">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
 

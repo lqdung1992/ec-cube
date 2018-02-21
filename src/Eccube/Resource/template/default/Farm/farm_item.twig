@@ -326,7 +326,7 @@
     <div class="container wrapper" id="receiver-form">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
         <form id="receiver-form" method="post" action="" enctype="multipart/form-data">
@@ -446,7 +446,13 @@
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
-                    <button type="submit" class="btn btn-inactive margin-bottom40">やさいバスの利用をはじめる</button>
+                    <button type="submit" class="btn btn-inactive margin-bottom40">
+                        {% if id is null%}
+                            商品を出品する
+                        {% else %}
+                            編集を完了する
+                        {% endif %}
+                    </button>
                 </div>
             </div>
         </form>

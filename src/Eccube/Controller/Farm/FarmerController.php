@@ -24,6 +24,7 @@ use Eccube\Entity\ProductTag;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
 use Eccube\Repository\ProductReceiptableDateRepository;
+use Eccube\Repository\ProductRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
@@ -305,14 +306,39 @@ class FarmerController
         return $app->json(array('files' => $files), 200);
     }
 
-
-    public function home(Application $app, Request $request)
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function home(Application $app, Request $request, $id)
     {
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+        $TargetCustomer = $app['eccube.repository.customer']->find($id);
+        if (!$TargetCustomer instanceof Customer) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var ProductRepository $productRepo */
+        $productRepo = $app['eccube.repository.product'];
+        $productList = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
+
         return $app->render('Farm/farm_home.twig', array(
             'items' => array(),
+            'products' => $productList,
+            'TargetCustomer' => $TargetCustomer
         ));
     }
 
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param null $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function item(Application $app, Request $request, $id = null)
     {
         /** @var Customer $Customer */
@@ -484,6 +510,7 @@ class FarmerController
                 $Product->removeProductReceiptableDate($productRD);
                 $em->remove($productRD);
             }
+            $em->flush();
 
             foreach ($ReceiptableDates as $receiptableDate) {
                 $productRD = new ProductReceiptableDate();
@@ -506,7 +533,8 @@ class FarmerController
                 $ProductImage
                     ->setFileName($add_image)
                     ->setProduct($Product)
-                    ->setRank(1);
+                    ->setRank(1)
+                    ->setCreator($Customer);
                 $Product->addProductImage($ProductImage);
                 $em->persist($ProductImage);
 
@@ -571,10 +599,8 @@ class FarmerController
             $Product->setUpdateDate(new \DateTime());
             $em->flush();
 
-            return $app->redirect($app->url('farm_item_edit', array('id' => $Product->getId())));
+            return $app->redirect($app->url('farm_home', array('id' => $Customer->getId())));
         }
-
-//        dump($form->getErrorsAsString());
 
         return $app->render('Farm/farm_item.twig', array(
             'Product' => $Product,
