@@ -510,6 +510,7 @@ class FarmerController
                 $Product->removeProductReceiptableDate($productRD);
                 $em->remove($productRD);
             }
+            $em->flush();
 
             foreach ($ReceiptableDates as $receiptableDate) {
                 $productRD = new ProductReceiptableDate();
