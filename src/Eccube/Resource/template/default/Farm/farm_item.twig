@@ -446,7 +446,13 @@
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
-                    <button type="submit" class="btn btn-inactive margin-bottom40">やさいバスの利用をはじめる</button>
+                    <button type="submit" class="btn btn-inactive margin-bottom40">
+                        {% if id is null%}
+                            商品を出品する
+                        {% else %}
+                            編集を完了する
+                        {% endif %}
+                    </button>
                 </div>
             </div>
         </form>

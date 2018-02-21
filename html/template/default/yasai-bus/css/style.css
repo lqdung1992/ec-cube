@@ -2003,6 +2003,13 @@ img {
         padding-right: 0 !important;
         padding-left: 0 !important;
     }
+
+    #action-button {
+        width: 98%;
+        height: 50px;
+        font-size: 18px;
+        margin-top: 20px;
+    }
 }
 
 /******************************
@@ -2205,6 +2212,13 @@ img {
     .farmer-new-header .logo-svg {
         margin-left: 40%;
     }
+
+    #action-button {
+        width: 50%;
+        height: 50px;
+        font-size: 18px;
+        margin-top: 20px;
+    }
 }
 
 /*farm profile*/
@@ -2391,5 +2405,7 @@ img {
 
 /*Farm selling*/
 .product-section {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    background-color: #f7f7f7;
+    padding:20px 0;
 }

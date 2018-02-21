@@ -9,6 +9,27 @@
 {% set body_class = ' ' %}
 {% block stylesheet %}
     <style type="text/css">
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            .thumbnail {
+                border: 1px solid #ddd !important;
+                height: 420px;
+            }
+        }
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            .thumbnail {
+                border: 1px solid #ddd !important;
+                height: 350px;
+            }
+        }
+
+
     </style>
 {% endblock stylesheet %}
 
@@ -51,11 +72,10 @@
 {% endblock %}
 {% block main %}
     <div id="reicever-wrapper" class="wrapper">
-        <div class="container">
             <div class="farmer-new-header">
                 <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
-                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
+                <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+                <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
             </div>
 
             <div class="exhibition">
@@ -111,13 +131,10 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-12 col-xs-12 text-alight-center">
-                        <div class="btn-group">
-                        <button class="btn btn-success">出品する</button>
-                        </div>
+                        <button class="btn btn-success" id="action-button">出品する</button>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
     <!-- The Modal -->

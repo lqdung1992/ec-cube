@@ -598,7 +598,7 @@ class FarmerController
             $Product->setUpdateDate(new \DateTime());
             $em->flush();
 
-            return $app->redirect($app->url('farm_item_edit', array('id' => $Product->getId())));
+            return $app->redirect($app->url('farm_home', array('id' => $Customer->getId())));
         }
 
         return $app->render('Farm/farm_item.twig', array(
