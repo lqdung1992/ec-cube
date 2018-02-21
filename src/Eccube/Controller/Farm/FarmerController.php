@@ -395,13 +395,8 @@ class FarmerController
         }
         $form['images']->setData($images);
 
-        $categories = array();
-        $ProductCategories = $Product->getProductCategories();
-        foreach ($ProductCategories as $ProductCategory) {
-            /* @var $ProductCategory \Eccube\Entity\ProductCategory */
-            $categories[] = $ProductCategory->getCategory();
-        }
-        $form['Category']->setData($categories);
+        $category = $Product->getProductCategories()->first()->getCategory();
+        $form['Category']->setData($category);
 
         $Tags = array();
         $ProductTags = $Product->getProductTag();
@@ -473,33 +468,13 @@ class FarmerController
                 $Product->removeProductCategory($ProductCategory);
                 $em->remove($ProductCategory);
             }
-
             $em->persist($Product);
             $em->flush();
 
-            $count = 1;
-            $Categories = $form->get('Category')->getData();
-            $categoriesIdList = array();
-            foreach ($Categories as $Category) {
-                foreach ($Category->getPath() as $ParentCategory) {
-                    if (!isset($categoriesIdList[$ParentCategory->getId()])) {
-                        $ProductCategory = $this->createProductCategory($Product, $ParentCategory, $count);
-                        $em->persist($ProductCategory);
-                        $count++;
-                        /* @var $Product \Eccube\Entity\Product */
-                        $Product->addProductCategory($ProductCategory);
-                        $categoriesIdList[$ParentCategory->getId()] = true;
-                    }
-                }
-                if (!isset($categoriesIdList[$Category->getId()])) {
-                    $ProductCategory = $this->createProductCategory($Product, $Category, $count);
-                    $em->persist($ProductCategory);
-                    $count++;
-                    /* @var $Product \Eccube\Entity\Product */
-                    $Product->addProductCategory($ProductCategory);
-                    $categoriesIdList[$Category->getId()] = true;
-                }
-            }
+            $Category = $form->get('Category')->getData();
+            $productCate = $this->createProductCategory($Product, $Category);
+            $em->persist($productCate);
+            $em->flush();            
 
             // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
@@ -524,7 +499,6 @@ class FarmerController
             }
             $em->persist($Product);
             $em->flush();
-
 
             // 画像の登録
             $add_images = $form->get('add_images')->getData();
@@ -565,7 +539,6 @@ class FarmerController
             }
             $em->persist($Product);
             $em->flush();
-
 
             $ranks = $request->get('rank_images');
             if ($ranks) {
