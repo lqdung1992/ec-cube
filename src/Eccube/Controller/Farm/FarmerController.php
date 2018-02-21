@@ -580,6 +580,7 @@ class FarmerController
             'Product' => $Product,
             'id' => $id,
             'form' => $form->createView(),
+            'TargetCustomer' => $Customer
         ));
     }
 
