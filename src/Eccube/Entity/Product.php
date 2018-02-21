@@ -490,7 +490,7 @@ class Product extends \Eccube\Entity\AbstractEntity
     private $CustomerFavoriteProducts;
 
     /**
-     * @var \Eccube\Entity\Member
+     * @var \Eccube\Entity\Customer
      */
     private $Creator;
 
@@ -510,6 +510,7 @@ class Product extends \Eccube\Entity\AbstractEntity
         $this->CustomerFavoriteProducts = new ArrayCollection();
         $this->ProductImage = new ArrayCollection();
         $this->ProductTag = new ArrayCollection();
+        $this->ProductReceiptableDates = new ArrayCollection();
     }
 
     public function __clone()
@@ -888,10 +889,10 @@ class Product extends \Eccube\Entity\AbstractEntity
     /**
      * Set Creator
      *
-     * @param  \Eccube\Entity\Member $creator
+     * @param  Member|Customer $creator
      * @return Product
      */
-    public function setCreator(\Eccube\Entity\Member $creator)
+    public function setCreator($creator)
     {
         $this->Creator = $creator;
 
@@ -901,7 +902,7 @@ class Product extends \Eccube\Entity\AbstractEntity
     /**
      * Get Creator
      *
-     * @return \Eccube\Entity\Member
+     * @return Customer|Member
      */
     public function getCreator()
     {
@@ -1018,6 +1019,33 @@ class Product extends \Eccube\Entity\AbstractEntity
     public function getProductTag()
     {
         return $this->ProductTag;
+    }
+
+    /** @var  ProductReceiptableDate[] */
+    private $ProductReceiptableDates;
+
+    /**
+     * @return ProductReceiptableDate[]
+     */
+    public function getProductReceiptableDates()
+    {
+        return $this->ProductReceiptableDates;
+    }
+
+    /**
+     * @param ProductReceiptableDate $ProductReceiptableDate
+     */
+    public function addProductReceiptableDate(ProductReceiptableDate $ProductReceiptableDate)
+    {
+        $this->ProductReceiptableDates->add($ProductReceiptableDate);
+    }
+
+    /**
+     * @param ProductReceiptableDate $ProductReceiptableDate
+     */
+    public function removeProductReceiptableDate(ProductReceiptableDate $ProductReceiptableDate)
+    {
+        $this->ProductReceiptableDates->removeElement($ProductReceiptableDate);
     }
 
 

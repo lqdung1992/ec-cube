@@ -127,10 +127,10 @@
         }
         $(function () {
             $('#upload-image').click(function () {
-                $('#farm_profile_cover_profile_image').click();
+                $('#farm_profile_edit_profile_image').click();
             });
 
-            $('#farm_profile_cover_profile_image').change(function () {
+            $('#farm_profile_edit_profile_image').change(function () {
                 if (!this.value) {
                     return false;
                 }
@@ -235,7 +235,7 @@
             });
             var count_add = {{ form.add_images|length|default(0) }};
             $('#{{ form.customer_image.vars.id }}').fileupload({
-                url: "{{ url('farm_cover_add') }}",
+                url: "{{ url('farm_image_upload') }}",
                 type: "post",
                 sequentialUploads: true,
                 dataType: 'json',

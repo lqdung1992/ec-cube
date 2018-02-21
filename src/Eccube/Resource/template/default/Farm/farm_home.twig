@@ -1,0 +1,57 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script type="text/javascript">
+    </script>
+{% endblock %}
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper">
+        <div class="container">
+        <div class="farmer-new-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
+        </div>
+
+        <div class="exhibition">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <ul class="list-inline">
+                        <li class="col-sm-3 col-xs-3 text-alight-center enable " id="selling">出品</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="transaction">出荷登録</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="delivery">集荷・配送</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="complete">取引終了</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-section">
+            <div class="row">
+            <div class="col-sm-12 col-xs-12">
+                    <div class="fav-empty">
+                        <p>
+                            <span class="title12 display-block">出品されている商品はありません</span>
+                            <span class="title12">出品ボタンから商品の登録ができます</span>
+                        </p>
+
+                        <button class="btn btn-success">出品する</button>
+                    </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}

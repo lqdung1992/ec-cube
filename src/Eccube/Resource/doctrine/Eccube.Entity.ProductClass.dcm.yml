@@ -67,6 +67,24 @@ Eccube\Entity\ProductClass:
             unsigned: false
             options:
                 default: '0'
+        production_start_date:
+            type: datetime
+            nullable: true
+        production_end_date:
+            type: datetime
+            nullable: true
+        amount:
+            type: integer
+            nullable: true
+            unsigned: true
+            options:
+                default: '0'
+        amount_per_container:
+            type: integer
+            nullable: true
+            unsigned: true
+            options:
+                default: '0'
     manyToOne:
         Product:
             targetEntity: Eccube\Entity\Product
@@ -81,6 +99,18 @@ Eccube\Entity\ProductClass:
                 name: product_type_id
                 referencedColumnName: id
                 nullable: false
+        AmountUnitType:
+            targetEntity: Eccube\Entity\Master\AmountUnitType
+            joinColumn:
+                name: amount_unit_type_id
+                referencedColumnName: id
+                nullable: true
+        CultivationMethod:
+            targetEntity: Eccube\Entity\Master\CultivationMethod
+            joinColumn:
+                name: cultivation_method_id
+                referencedColumnName: id
+                nullable: true
         ClassCategory1:
             targetEntity: Eccube\Entity\ClassCategory
             joinColumn:
@@ -99,10 +129,10 @@ Eccube\Entity\ProductClass:
                 name: delivery_date_id
                 referencedColumnName: date_id
         Creator:
-            targetEntity: Eccube\Entity\Member
+            targetEntity: Eccube\Entity\Customer
             joinColumn:
                 name: creator_id
-                referencedColumnName: member_id
+                referencedColumnName: customer_id
                 nullable: false
     oneToOne:
         ProductStock:
