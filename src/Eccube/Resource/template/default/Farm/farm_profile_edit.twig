@@ -353,10 +353,17 @@
                     {{ form_widget(form.note, {'attr': {'class': 'color888', 'placeholder': '紹介文を入力...100文字'}}) }}
                 </div>
                 <div class="col-sm-12 col-xs-12">
-                <button type="submit" class="btn btn-inactive">プロフィールを保存</button>
+                <button type="submit" class="btn btn-inactive margin-bottom40">プロフィールを保存</button>
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="model-image"/>
+        <div id="caption"></div>
     </div>
 
     <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
