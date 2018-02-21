@@ -310,7 +310,7 @@
     <div class="wrapper" id="profile-change-wrapper">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('farm_home', {'id': Customer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
         <form id="service-form" method="post" action="{{ url('farm_profile_edit') }}" enctype="multipart/form-data">
@@ -370,8 +370,8 @@
         <div class="Rectangle">
             <ul class="list-group" id="main-menu">
                 <li class="list-group-item li-profile">
-                    {% if TargetCustomer.profile_image %}
-                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% if Customer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ Customer.profile_image %}
                     {% endif %}
                     <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
                     <span class="profile-name">{{ Customer.__toString }}</span>
@@ -387,8 +387,8 @@
 
             <ul class="list-group hidden" id="setting-menu">
                 <li class="list-group-item li-profile">
-                    {% if TargetCustomer.profile_image %}
-                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% if Customer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ Customer.profile_image %}
                     {% endif %}
                     <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
                     <span class="profile-name">{{ Customer.__toString }}</span>
