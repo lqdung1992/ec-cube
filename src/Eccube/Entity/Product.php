@@ -26,6 +26,7 @@ namespace Eccube\Entity;
 
 use Eccube\Common\Constant;
 use Doctrine\Common\Collections\ArrayCollection;
+use Eccube\Entity\Master\AmountUnitType;
 use Eccube\Util\EntityUtil;
 
 /**
@@ -46,6 +47,10 @@ class Product extends \Eccube\Entity\AbstractEntity
     private $classCategories2 = array();
     private $className1;
     private $className2;
+    /** @var array */
+    private $amount;
+    /** @var AmountUnitType[] */
+    private $amountUnitTypes;
 
     /**
      * @return string
@@ -87,6 +92,8 @@ class Product extends \Eccube\Entity\AbstractEntity
 
                 // price02IncTax
                 $this->price02IncTaxs[] = $ProductClass->getPrice02IncTax();
+                $this->amount[] = $ProductClass->getAmount();
+                $this->amountUnitTypes[] = $ProductClass->getAmountUnitType();
 
                 // product_code
                 $this->codes[] = $ProductClass->getCode();
@@ -112,6 +119,24 @@ class Product extends \Eccube\Entity\AbstractEntity
             }
             $this->_calc = true;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getAmount()
+    {
+        $this->_calc();
+
+        return $this->amount;
+    }
+
+    /**
+     * @return AmountUnitType[]
+     */
+    public function getAmountUnitTypes()
+    {
+        return $this->amountUnitTypes;
     }
 
     /**
@@ -334,6 +359,53 @@ class Product extends \Eccube\Entity\AbstractEntity
         $this->_calc();
 
         return max($this->price02IncTaxs);
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmountFollowPrice02Min()
+    {
+        $this->_calc();
+        $key = array_keys($this->price02IncTaxs, $this->getPrice02IncTaxMin())[0];
+        return $this->amount[$key];
+    }
+
+    /**
+     * @return int
+     */
+    public function getAmountFollowPrice02Max()
+    {
+        $this->_calc();
+
+
+        $key = array_keys($this->price02IncTaxs, $this->getPrice02IncTaxMax())[0];
+
+        return $this->amount[$key];
+    }
+
+    /**
+     * @return AmountUnitType
+     */
+    public function getAmountUnitTypeFollowPrice02Min()
+    {
+        $this->_calc();
+
+        $key = array_keys($this->price02IncTaxs, $this->getPrice02IncTaxMin())[0];
+
+        return $this->amountUnitTypes[$key];
+    }
+
+    /**
+     * @return AmountUnitType
+     */
+    public function getAmountUnitTypeFollowPrice02Max()
+    {
+        $this->_calc();
+
+        $key = array_keys($this->price02IncTaxs, $this->getPrice02IncTaxMax())[0];
+
+        return $this->amountUnitTypes[$key];
     }
 
     /**

@@ -27,6 +27,7 @@ namespace Eccube\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Eccube\Application;
+use Eccube\Entity\Customer;
 use Eccube\Util\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -304,6 +305,25 @@ class ProductRepository extends EntityRepository
         // Order By
         // XXX Paginater を使用した場合に PostgreSQL で正しくソートできない
         $qb->addOrderBy('cfp.create_date', 'DESC');
+
+        return $qb;
+    }
+
+    /**
+     * Get query builder by customer
+     *
+     * @param $Customer
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getProductQueryBuilderByCustomer(Customer $Customer)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.Creator = :Customer AND p.Status = 1')
+            ->setParameter('Customer', $Customer);
+
+        // Order By
+        // XXX Paginater を使用した場合に PostgreSQL で正しくソートできない
+        $qb->addOrderBy('p.create_date', 'DESC');
 
         return $qb;
     }
