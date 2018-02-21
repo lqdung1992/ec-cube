@@ -11,8 +11,6 @@ namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\EntityManager;
-use Eccube\Entity\Master\ReceiptableDate;
 
 /**
  * Class Version20180215231300
