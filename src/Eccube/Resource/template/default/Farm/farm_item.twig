@@ -254,12 +254,13 @@
         <form id="receiver-form" method="post" action="" enctype="multipart/form-data">
             {{ form_widget(form._token) }}
             <div class="row">
-            <div class="col-sm-12 col-xs-12" id="upload-zone">
-            <div class="margin-bottom15 text-alight-center">
-            <a class="btn btn-default upload-image">
-                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera-white.svg" class="upload-zone-camera">商品を撮影する</a>
-            </div>
-            </div>
+                <div class="col-sm-12 col-xs-12" id="upload-zone">
+                    <div class="margin-bottom15 text-alight-center">
+                        <a class="btn btn-default upload-image">
+                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera-white.svg"
+                                 class="upload-zone-camera">商品を撮影する</a>
+                    </div>
+                </div>
                 <div id="progress" class="progress progress-striped active" style="display:none;">
                     <div class="progress-bar progress-bar-info"></div>
                 </div>
@@ -359,7 +360,7 @@
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
-                <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
+                    <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
                 </div>
             </div>
         </form>
