@@ -221,7 +221,7 @@ class EccubeExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getDateFormatFilter($date, $value = '', $format = 'Y/m/d')
+    public function getDateFormatFilter($date, $value = '', $format = 'Y年m月d日')
     {
         if (is_null($date)) {
             return $value;

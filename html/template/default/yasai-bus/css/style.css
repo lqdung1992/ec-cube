@@ -1732,15 +1732,6 @@ img {
     padding: 4px 10px 0 13px;
 }
 
-#pc-profile-description {
-    width: 500px;
-    height: 235px;
-    background-color: #f2f3f7;
-    border-radius: 5px;
-    padding: 15px;
-    margin: 10px 0 10px 13px;
-}
-
 .pc-textarea {
     width: 630px;
     height: 120px;
@@ -1755,7 +1746,6 @@ img {
 }
 
 #pc-detail-rate .list-inline {
-    width: 640px;
     height: 95px;
 }
 
@@ -2295,6 +2285,10 @@ img {
     display: none;
 }
 
+.voice-section .image-voice {
+    max-width: 265px;
+}
+
 .button-x {
     float: right;
     margin-top:-40px;
@@ -2389,4 +2383,16 @@ img {
 /*Farm selling*/
 .product-section {
     margin-bottom: 20px;
+}
+
+/*Farm item detail*/
+.slides img {
+    max-width: 100%;
+}
+
+
+.description {
+    background-color: #f2f3f7;
+    border-radius: 5px;
+    padding: 15px;
 }
