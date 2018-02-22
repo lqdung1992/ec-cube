@@ -2409,9 +2409,16 @@ img {
     max-width: 100%;
 }
 
-
 .description {
     background-color: #f2f3f7;
     border-radius: 5px;
     padding: 15px;
+}
+
+.height120 {
+    height: 120px !important;
+}
+
+input[readonly], textarea[readonly] {
+    cursor: not-allowed;
 }
