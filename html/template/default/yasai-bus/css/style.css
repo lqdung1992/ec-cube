@@ -2409,3 +2409,11 @@ img {
     background-color: #f7f7f7;
     padding:20px 0;
 }
+
+.height120 {
+    height: 120px !important;
+}
+
+input[readonly], textarea[readonly] {
+    cursor: not-allowed;
+}
