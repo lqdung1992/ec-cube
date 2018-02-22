@@ -23,8 +23,8 @@ use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Entity\ProductTag;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
-use Eccube\Repository\ProductReceiptableDateRepository;
 use Eccube\Repository\ProductRepository;
+use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
@@ -96,7 +96,7 @@ class FarmerController
         }
         /** @var CustomerVoiceRepository $voiceRepo */
         $voiceRepo = $app['eccube.repository.customer_voice'];
-        $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer), array('create_date' => 'ASC'));
+        $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer, 'Product' => null), array('create_date' => 'ASC'));
 
         return $app->render('Farm/farm_profile.twig', array(
             'TargetCustomer' => $TargetCustomer,
@@ -395,8 +395,11 @@ class FarmerController
         }
         $form['images']->setData($images);
 
-        $category = $Product->getProductCategories()->first()->getCategory();
-        $form['Category']->setData($category);
+        $collection = $Product->getProductCategories();
+        if (count($collection) > 0) {
+            $category = $collection->first()->getCategory();
+            $form['Category']->setData($category);
+        }
 
         $Tags = array();
         $ProductTags = $Product->getProductTag();
@@ -474,7 +477,7 @@ class FarmerController
             $Category = $form->get('Category')->getData();
             $productCate = $this->createProductCategory($Product, $Category);
             $em->persist($productCate);
-            $em->flush();            
+            $em->flush();
 
             // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
@@ -582,4 +585,21 @@ class FarmerController
         ));
     }
 
+    /**
+     * ProductCategory作成
+     * @param \Eccube\Entity\Product $Product
+     * @param \Eccube\Entity\Category $Category
+     * @return \Eccube\Entity\ProductCategory
+     */
+    private function createProductCategory($Product, $Category, $count = 1)
+    {
+        $ProductCategory = new \Eccube\Entity\ProductCategory();
+        $ProductCategory->setProduct($Product);
+        $ProductCategory->setProductId($Product->getId());
+        $ProductCategory->setCategory($Category);
+        $ProductCategory->setCategoryId($Category->getId());
+        $ProductCategory->setRank($count);
+
+        return $ProductCategory;
+    }
 }
