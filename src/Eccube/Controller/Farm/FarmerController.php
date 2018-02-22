@@ -23,8 +23,8 @@ use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Entity\ProductTag;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
-use Eccube\Repository\ProductReceiptableDateRepository;
 use Eccube\Repository\ProductRepository;
+use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
@@ -96,7 +96,7 @@ class FarmerController
         }
         /** @var CustomerVoiceRepository $voiceRepo */
         $voiceRepo = $app['eccube.repository.customer_voice'];
-        $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer), array('create_date' => 'ASC'));
+        $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer, 'Product' => null), array('create_date' => 'ASC'));
 
         return $app->render('Farm/farm_profile.twig', array(
             'TargetCustomer' => $TargetCustomer,
@@ -395,13 +395,11 @@ class FarmerController
         }
         $form['images']->setData($images);
 
-        $categories = array();
-        $ProductCategories = $Product->getProductCategories();
-        foreach ($ProductCategories as $ProductCategory) {
-            /* @var $ProductCategory \Eccube\Entity\ProductCategory */
-            $categories[] = $ProductCategory->getCategory();
+        $collection = $Product->getProductCategories();
+        if (count($collection) > 0) {
+            $category = $collection->first()->getCategory();
+            $form['Category']->setData($category);
         }
-        $form['Category']->setData($categories);
 
         $Tags = array();
         $ProductTags = $Product->getProductTag();
@@ -473,33 +471,13 @@ class FarmerController
                 $Product->removeProductCategory($ProductCategory);
                 $em->remove($ProductCategory);
             }
-
             $em->persist($Product);
             $em->flush();
 
-            $count = 1;
-            $Categories = $form->get('Category')->getData();
-            $categoriesIdList = array();
-            foreach ($Categories as $Category) {
-                foreach ($Category->getPath() as $ParentCategory) {
-                    if (!isset($categoriesIdList[$ParentCategory->getId()])) {
-                        $ProductCategory = $this->createProductCategory($Product, $ParentCategory, $count);
-                        $em->persist($ProductCategory);
-                        $count++;
-                        /* @var $Product \Eccube\Entity\Product */
-                        $Product->addProductCategory($ProductCategory);
-                        $categoriesIdList[$ParentCategory->getId()] = true;
-                    }
-                }
-                if (!isset($categoriesIdList[$Category->getId()])) {
-                    $ProductCategory = $this->createProductCategory($Product, $Category, $count);
-                    $em->persist($ProductCategory);
-                    $count++;
-                    /* @var $Product \Eccube\Entity\Product */
-                    $Product->addProductCategory($ProductCategory);
-                    $categoriesIdList[$Category->getId()] = true;
-                }
-            }
+            $Category = $form->get('Category')->getData();
+            $productCate = $this->createProductCategory($Product, $Category);
+            $em->persist($productCate);
+            $em->flush();            
 
             // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
@@ -510,6 +488,7 @@ class FarmerController
                 $Product->removeProductReceiptableDate($productRD);
                 $em->remove($productRD);
             }
+            $em->flush();
 
             foreach ($ReceiptableDates as $receiptableDate) {
                 $productRD = new ProductReceiptableDate();
@@ -565,7 +544,6 @@ class FarmerController
             $em->persist($Product);
             $em->flush();
 
-
             $ranks = $request->get('rank_images');
             if ($ranks) {
                 foreach ($ranks as $rank) {
@@ -608,4 +586,80 @@ class FarmerController
         ));
     }
 
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function detail(Application $app, Request $request, $id)
+    {
+        /** @var ProductRepository $productRepo */
+        $productRepo = $app['eccube.repository.product'];
+        /** @var Product $Product */
+        $Product = $productRepo->find($id);
+
+        if (!$Product) {
+            throw new NotFoundHttpException();
+        }
+        $TargetCustomer = $Product->getCreator();
+        $Customer = $app->user();
+
+        $voice = new CustomerVoice();
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createBuilder('farm_voice', $voice);
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!($Customer instanceof Customer)) {
+                return $app->redirect($app->url('mypage_login'));
+            }
+            /** @var UploadedFile $image */
+            $image = $form['file_name']->getData();
+            if ($image) {
+                $extension = $image->getClientOriginalExtension();
+                $fileName = date('mdHis').uniqid('_').'.'.$extension;
+                $image->move($app['config']['image_save_realdir'], $fileName);
+                $voice->setFileName($fileName);
+            }
+            $voice->setCustomer($Customer);
+            $voice->setTargetCustomer($TargetCustomer);
+            $voice->setProduct($Product);
+            $app['orm.em']->persist($voice);
+            $app['orm.em']->flush();
+
+        }
+        /** @var CustomerVoiceRepository $voiceRepo */
+        $voiceRepo = $app['eccube.repository.customer_voice'];
+        $CustomerVoice = $voiceRepo->findBy(array('Product' => $Product), array('create_date' => 'ASC'));
+        $ProductRate = $Product->getProductRate();
+        if (EntityUtil::isEmpty($ProductRate)) {
+            $ProductRate = null;
+        }
+        return $app->render('Farm/farm_item_detail.twig', array(
+            'subtitle' => $Product->getName(),
+            'Product' => $Product,
+            'form' => $form->createView(),
+            'CustomerVoice' =>$CustomerVoice,
+            'ProductRate' => $ProductRate,
+        ));
+    }
+
+    /**
+     * ProductCategory作成
+     * @param \Eccube\Entity\Product $Product
+     * @param \Eccube\Entity\Category $Category
+     * @return \Eccube\Entity\ProductCategory
+     */
+    private function createProductCategory($Product, $Category, $count = 1)
+    {
+        $ProductCategory = new \Eccube\Entity\ProductCategory();
+        $ProductCategory->setProduct($Product);
+        $ProductCategory->setProductId($Product->getId());
+        $ProductCategory->setCategory($Category);
+        $ProductCategory->setCategoryId($Category->getId());
+        $ProductCategory->setRank($count);
+
+        return $ProductCategory;
+    }
 }
