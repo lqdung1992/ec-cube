@@ -57,8 +57,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/cart/buystep', '\Eccube\Controller\CartController::buystep')->bind('cart_buystep');
 
         // contact
-        $c->match('/contact', '\Eccube\Controller\ContactController::index')->bind('contact');
-        $c->match('/contact/complete', '\Eccube\Controller\ContactController::complete')->bind('contact_complete');
+//        $c->match('/contact', '\Eccube\Controller\ContactController::index')->bind('contact');
+//        $c->match('/contact/complete', '\Eccube\Controller\ContactController::complete')->bind('contact_complete');
 
         // entry
         $c->match('/entry', '\Eccube\Controller\EntryController::index')->bind('entry');
@@ -128,7 +128,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/item/{id}/edit', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_edit')->assert('id', '\d+');
 
         //farm - contact
-        $c->match('/farm/contact', '\Eccube\Controller\Farm\FarmController::contact')->bind('farm_contact');
+        $c->match('/farm/contact', '\Eccube\Controller\Farm\FarmerController::contact')->bind('farm_contact');
+        $c->match('/farm/contact/complete', '\Eccube\Controller\Farm\FarmerController::complete')->bind('farm_contact_complete');
 
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');

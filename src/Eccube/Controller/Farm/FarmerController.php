@@ -587,90 +587,6 @@ class FarmerController
     }
 
     /**
-     * お問い合わせ画面.
-     *
-     * @param Application $app
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function contact(Application $app, Request $request)
-    {
-        $builder = $app['form.factory']->createBuilder('contact');
-
-        if ($app->isGranted('ROLE_USER')) {
-            $user = $app['user'];
-            $builder->setData(
-                array(
-                    'name01' => $user->getName01(),
-                    'name02' => $user->getName02(),
-                    'kana01' => $user->getKana01(),
-                    'kana02' => $user->getKana02(),
-                    'zip01' => $user->getZip01(),
-                    'zip02' => $user->getZip02(),
-                    'pref' => $user->getPref(),
-                    'addr01' => $user->getAddr01(),
-                    'addr02' => $user->getAddr02(),
-                    'tel01' => $user->getTel01(),
-                    'tel02' => $user->getTel02(),
-                    'tel03' => $user->getTel03(),
-                    'email' => $user->getEmail(),
-                )
-            );
-        }
-
-        // FRONT_CONTACT_INDEX_INITIALIZE
-        $event = new EventArgs(
-            array(
-                'builder' => $builder,
-            ),
-            $request
-        );
-        $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CONTACT_INDEX_INITIALIZE, $event);
-
-        $form = $builder->getForm();
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            switch ($request->get('mode')) {
-                case 'confirm':
-                    $builder->setAttribute('freeze', true);
-                    $form = $builder->getForm();
-                    $form->handleRequest($request);
-
-                    return $app->render('Contact/farm_contact.twig', array(
-                        'form' => $form->createView(),
-                        'mode' => 'complete'
-                    ));
-
-                case 'complete':
-
-                    $data = $form->getData();
-
-                    $event = new EventArgs(
-                        array(
-                            'form' => $form,
-                            'data' => $data,
-                        ),
-                        $request
-                    );
-                    $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CONTACT_INDEX_COMPLETE, $event);
-
-                    $data = $event->getArgument('data');
-
-                    // メール送信
-                    $app['eccube.service.mail']->sendContactMail($data);
-
-                    return $app->redirect($app->url('contact_complete'));
-            }
-        }
-
-        return $app->render('Farm/farm_contact.twig', array(
-            'form' => $form->createView(),
-            'mode' => 'confirm'
-        ));
-    }
-
-    /**
      * ProductCategory作成
      * @param \Eccube\Entity\Product $Product
      * @param \Eccube\Entity\Category $Category
@@ -686,5 +602,75 @@ class FarmerController
         $ProductCategory->setRank($count);
 
         return $ProductCategory;
+    }
+
+    /**
+     * お問い合わせ画面.
+     *
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function contact(Application $app, Request $request)
+    {
+        $builder = $app['form.factory']->createBuilder('contact');
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        $user = $app['user'];
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            switch ($request->get('mode')) {
+                case 'confirm':
+                    //$builder->setAttribute('freeze', true);
+                    $form = $builder->getForm();
+                    $form->handleRequest($request);
+
+                    return $app->render('Farm/farm_contact_confirm.twig', array(
+                        'form' => $form->createView(),
+                        'TargetCustomer' => $app['user']
+                    ));
+
+                case 'complete':
+                    $data = $form->getData();
+                    $data = array(
+                            'name01' => $user->getName01(),
+                            'name02' => $user->getName02(),
+                            'kana01' => $user->getKana01(),
+                            'kana02' => $user->getKana02(),
+                            'zip01' => $user->getZip01(),
+                            'zip02' => $user->getZip02(),
+                            'pref' => $user->getPref(),
+                            'addr01' => $user->getAddr01(),
+                            'addr02' => $user->getAddr02(),
+                            'tel01' => $user->getTel01(),
+                            'tel02' => $user->getTel02(),
+                            'tel03' => $user->getTel03(),
+                            'email' => $user->getEmail(),
+                            'title' => $data['title'],
+                            'contents' => $data['contents']
+                    );
+                    // メール送信
+                    $app['eccube.service.mail']->sendContactMail($data);
+                    return $app->redirect($app->url('farm_contact_complete'));
+            }
+        }
+
+        return $app->render('Farm/farm_contact.twig', array(
+            'form' => $form->createView(),
+            'TargetCustomer' => $app['user']
+        ));
+    }
+
+    /**
+     * お問い合わせ完了画面.
+     *
+     * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function complete(Application $app)
+    {
+        return $app->render('Farm/farm_contact_complete.twig', array(
+            'TargetCustomer' => $app['user']
+        ));
     }
 }

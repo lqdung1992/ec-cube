@@ -11,6 +11,15 @@
     <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
     <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <style type="text/css">
+        #submit-button button {
+            height: 50px;
+            font-size: 18px;
+            width: 100%;
+        }
+
+        input
+    </style>
 {% endblock stylesheet %}
 
 {% block javascript %}
@@ -34,19 +43,25 @@
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
                         <label class="display-block">お問い合わせ内容</label>
-                        {{ form_widget(form.title, {attr: {placeholder: 'タイトルを入力...'}}) }}
+                        {{ form_widget(form.title, {attr: {placeholder: 'タイトルを入力...', readonly : 'readonly'}}) }}
                         {{ form_errors(form.title) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_widget(form.contents, {attr: {placeholder: 'お問い合せ内容を入力...', class : 'height120'}}) }}
+                        {{ form_widget(form.contents, {attr: {placeholder: 'お問い合せ内容を入力...', class : 'height120', readonly : 'readonly'}}) }}
                         {{ form_errors(form.contents) }}
                     </div>
                 </div>
 
-                <div class="col-sm-12 col-xs-12">
-                    <button type="submit" class="btn btn-inactive margin-bottom40" name="mode" value="confirm">確認ページへ</button>
+                <div class="col-sm-12 col-xs-12 margin-bottom40" id="submit-button">
+                    <div class="col-sm-6 col-xs-6">
+                        <button type="submit" class="btn btn-success" name="mode" value="complete">送信をする</button>
+                    </div>
+
+                    <div class="col-sm-6 col-xs-6">
+                        <button type="submit" class="btn btn-info" name="mode" value="back">戻る</button>
+                    </div>
                 </div>
                 <p class="title12 text-alight-center margin-top15">注文した商品が届かない・出荷に間に合わなかったなど</p>
                 <p class="title12 text-alight-center">緊急時の場合は下記へご連絡ください</p>
