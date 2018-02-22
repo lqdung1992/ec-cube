@@ -477,7 +477,7 @@ class FarmerController
             $Category = $form->get('Category')->getData();
             $productCate = $this->createProductCategory($Product, $Category);
             $em->persist($productCate);
-            $em->flush();            
+            $em->flush();
 
             // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
@@ -502,7 +502,6 @@ class FarmerController
             }
             $em->persist($Product);
             $em->flush();
-
 
             // 画像の登録
             $add_images = $form->get('add_images')->getData();
