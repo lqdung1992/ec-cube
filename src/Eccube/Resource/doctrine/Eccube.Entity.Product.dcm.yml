@@ -85,4 +85,12 @@ Eccube\Entity\Product:
         CustomerFavoriteProducts:
             targetEntity: Eccube\Entity\CustomerFavoriteProduct
             mappedBy: Product
+    oneToOne:
+        ProductRate:
+            targetEntity: Eccube\Entity\ProductRate
+            inversedBy: Product
+            joinColumn:
+                name: product_id
+                referencedColumnName: product_id
+                nullable: false
     lifecycleCallbacks: {  }
