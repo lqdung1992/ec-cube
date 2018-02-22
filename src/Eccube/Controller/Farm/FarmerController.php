@@ -732,4 +732,17 @@ class FarmerController
             'TargetCustomer' => $app['user']
         ));
     }
+
+    /**
+     * Farm guide
+     *
+     * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function guide(Application $app)
+    {
+        return $app->render('Farm/farm_guide.twig', array(
+            'TargetCustomer' => $app['user']
+        ));
+    }
 }
