@@ -30,6 +30,15 @@
         };
 
         $(function () {
+            $('.slides').slick({
+                dots: true,
+                arrows: false,
+                speed: 300,
+                customPaging: function(slider, i) {
+                    return '<button class="thumbnail">' + $(slider.$slides[i]).find('img').prop('outerHTML') + '</button>';
+                }
+            });
+
             var openModal = function (review_class, caption) {
                 var modal = document.getElementById('myModal');
                 var modalImg = document.getElementById("model-image");
@@ -95,6 +104,14 @@
 
                 return false;
             });
+
+            $('#farmer-button-edit').click(function () {
+
+            });
+            $('#receiver-cart-button').click(function () {
+
+
+            });
         });
     </script>
 {% endblock %}
@@ -115,7 +132,8 @@
                     <div id="detail_image_box__slides" class="slides">
                         {% if Product.ProductImage|length > 0 %}
                             {% for ProductImage in Product.ProductImage %}
-                                <div id="detail_image_box__item--{{ loop.index }}"><img src="{{ app.config.image_save_urlpath }}/{{ ProductImage|no_image_product }}"/></div>
+                                <div id="detail_image_box__item--{{ loop.index }}">
+                                    <img class="" src="{{ app.config.image_save_urlpath }}/{{ ProductImage|no_image_product }}"/></div>
                             {% endfor %}
                         {% else %}
                             <div id="detail_image_box__item"><img src="{{ app.config.image_save_urlpath }}/{{ ''|no_image_product }}"/></div>
@@ -153,9 +171,21 @@
                                 </p>
                             </div>
                             <div class="float-right">
-                                <button id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</button>
-                                <button id="farmer-button-edit" class="btn btn-success margin-top15">編集</button>
+                            {% if app.user.id == TargetCustomer.id %}
+                                <a href="?" id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</a>
+                                <a href="{{ url('farm_item_edit', {'id': Product.id}) }}" id="farmer-button-edit" class="btn btn-success margin-top15">編集</a>
+                            {% else %}
+                                <form method="post" action="?" id="add-cart-form" name="add-cart-form">
+                                    <input type="hidden" name="mode" value="add_cart"/>
+                                    {{ form_widget(cartForm._token) }}
+                                    <input type="hidden" name="product_class_id" id="product_class_id" value="{{ Product.getProductClasses[0].id }}">
+                                    <input type="hidden" name="quantity" id="quantity" value="1">
+                                    <input type="hidden" name="product_id" id="product_id" value="{{ Product.id }}">
+                                    <button class="btn btn-success" id="receiver-cart-button" type="submit">注文へ進む</button>
+                                </form>
+                            {% endif %}
                             </div>
+
                         </div>
 
                         <div class="title-section-small">
@@ -238,7 +268,8 @@
                     <div class="row">
                         <div class="col-sm-12 col-xs-12">
                             <div class="voice clearfix">
-                                <form method="post" action="?" enctype="multipart/form-data">
+                                <form name="comment" id="comment" method="post" action="?" enctype="multipart/form-data">
+                                    <input type="hidden" name="mode" value="add_voice"/>
                                     {{ form_widget(form._token) }}
                                     <div class="col-sm-12 col-xs-12 margin-bottom10">
                                         {{ form_widget(form.comment, {attr: {placeholder: 'コメントを入力。。。'}}) }}
