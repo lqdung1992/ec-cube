@@ -586,65 +586,6 @@ class FarmerController
     }
 
     /**
-     * @param Application $app
-     * @param Request $request
-     * @param $id
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function detail(Application $app, Request $request, $id)
-    {
-        /** @var ProductRepository $productRepo */
-        $productRepo = $app['eccube.repository.product'];
-        /** @var Product $Product */
-        $Product = $productRepo->find($id);
-
-        if (!$Product) {
-            throw new NotFoundHttpException();
-        }
-        $TargetCustomer = $Product->getCreator();
-        $Customer = $app->user();
-
-        $voice = new CustomerVoice();
-        /** @var FormBuilder $builder */
-        $builder = $app['form.factory']->createBuilder('farm_voice', $voice);
-        $form = $builder->getForm();
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!($Customer instanceof Customer)) {
-                return $app->redirect($app->url('mypage_login'));
-            }
-            /** @var UploadedFile $image */
-            $image = $form['file_name']->getData();
-            if ($image) {
-                $extension = $image->getClientOriginalExtension();
-                $fileName = date('mdHis').uniqid('_').'.'.$extension;
-                $image->move($app['config']['image_save_realdir'], $fileName);
-                $voice->setFileName($fileName);
-            }
-            $voice->setCustomer($Customer);
-            $voice->setTargetCustomer($TargetCustomer);
-            $voice->setProduct($Product);
-            $app['orm.em']->persist($voice);
-            $app['orm.em']->flush();
-
-        }
-        /** @var CustomerVoiceRepository $voiceRepo */
-        $voiceRepo = $app['eccube.repository.customer_voice'];
-        $CustomerVoice = $voiceRepo->findBy(array('Product' => $Product), array('create_date' => 'ASC'));
-        $ProductRate = $Product->getProductRate();
-        if (EntityUtil::isEmpty($ProductRate)) {
-            $ProductRate = null;
-        }
-        return $app->render('Farm/farm_item_detail.twig', array(
-            'subtitle' => $Product->getName(),
-            'Product' => $Product,
-            'form' => $form->createView(),
-            'CustomerVoice' =>$CustomerVoice,
-            'ProductRate' => $ProductRate,
-        ));
-    }
-
-    /**
      * ProductCategory作成
      * @param \Eccube\Entity\Product $Product
      * @param \Eccube\Entity\Category $Category
