@@ -254,14 +254,14 @@ class CartService
         $productName = $this->getProductName($ProductClass);
 
         // 商品種別に紐づく配送業者を取得
-        $deliveries = $this->app['eccube.repository.delivery']->getDeliveries($ProductClass->getProductType());
-
-        if (count($deliveries) == 0) {
-            // 商品種別が存在しなければエラー
-            $this->removeProduct($ProductClass->getId());
-            $this->addError('cart.product.not.producttype', $productName);
-            throw new CartException('cart.product.not.producttype');
-        }
+//        $deliveries = $this->app['eccube.repository.delivery']->getDeliveries($ProductClass->getProductType());
+//
+//        if (count($deliveries) == 0) {
+//            // 商品種別が存在しなければエラー
+//            $this->removeProduct($ProductClass->getId());
+//            $this->addError('cart.product.not.producttype', $productName);
+//            throw new CartException('cart.product.not.producttype');
+//        }
 
         $this->setCanAddProductType($ProductClass->getProductType());
 

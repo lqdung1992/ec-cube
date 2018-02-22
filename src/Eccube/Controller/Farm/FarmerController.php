@@ -396,8 +396,11 @@ class FarmerController
         }
         $form['images']->setData($images);
 
-        $category = $Product->getProductCategories()->first()->getCategory();
-        $form['Category']->setData($category);
+        $collection = $Product->getProductCategories();
+        if (count($collection) > 0) {
+            $category = $collection->first()->getCategory();
+            $form['Category']->setData($category);
+        }
 
         $Tags = array();
         $ProductTags = $Product->getProductTag();
@@ -475,7 +478,7 @@ class FarmerController
             $Category = $form->get('Category')->getData();
             $productCate = $this->createProductCategory($Product, $Category);
             $em->persist($productCate);
-            $em->flush();            
+            $em->flush();
 
             // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
@@ -670,5 +673,22 @@ class FarmerController
             'ProductRate' => $ProductRate,
             'cartForm' => $cartForm,
         ));
+    }
+    /**
+     * ProductCategory作成
+     * @param \Eccube\Entity\Product $Product
+     * @param \Eccube\Entity\Category $Category
+     * @return \Eccube\Entity\ProductCategory
+     */
+    private function createProductCategory($Product, $Category, $count = 1)
+    {
+        $ProductCategory = new \Eccube\Entity\ProductCategory();
+        $ProductCategory->setProduct($Product);
+        $ProductCategory->setProductId($Product->getId());
+        $ProductCategory->setCategory($Category);
+        $ProductCategory->setCategoryId($Category->getId());
+        $ProductCategory->setRank($count);
+
+        return $ProductCategory;
     }
 }
