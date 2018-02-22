@@ -43,29 +43,36 @@ class ContactType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'name', array(
-                'required' => true,
-            ))
-            ->add('kana', 'kana', array(
-                'required' => false,
-            ))
-            ->add('zip', 'zip', array(
-                'required' => false,
-            ))
-            ->add('address', 'address', array(
-                'required' => false,
-            ))
-            ->add('tel', 'tel', array(
-                'required' => false,
-            ))
-            ->add('email', 'email', array(
+//            ->add('name', 'name', array(
+//                'required' => true,
+//            ))
+            ->add('title', 'title', array(
                 'required' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
-                    new Assert\Email(array('strict' => true)),
                 ),
             ))
+//            ->add('kana', 'kana', array(
+//                'required' => false,
+//            ))
+//            ->add('zip', 'zip', array(
+//                'required' => false,
+//            ))
+//            ->add('address', 'address', array(
+//                'required' => false,
+//            ))
+//            ->add('tel', 'tel', array(
+//                'required' => false,
+//            ))
+//            ->add('email', 'email', array(
+//                'required' => true,
+//                'constraints' => array(
+//                    new Assert\NotBlank(),
+//                    new Assert\Email(array('strict' => true)),
+//                ),
+//            ))
             ->add('contents', 'textarea', array(
+                'required' => true,
                 'help' => 'form.contact.contents.help',
                 'constraints' => array(
                     new Assert\NotBlank(),
