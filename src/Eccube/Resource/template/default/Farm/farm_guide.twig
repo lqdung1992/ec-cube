@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
     <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <style type="text/css">
+        #receiver-form {
+            min-height: 700px;
+        }
+    </style>
 {% endblock stylesheet %}
 
 {% block javascript %}
@@ -28,31 +33,17 @@
             <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
-        <form id="receiver-form" method="post" action="" enctype="multipart/form-data">
-            {{ form_widget(form._token) }}
-            <div id="item-info">
-                <div class="col-sm-12 col-xs-12">
-                    <div class="form-group">
-                        <label class="display-block">お問い合わせ内容</label>
-                        {{ form_widget(form.title, {attr: {placeholder: 'タイトルを入力...'}}) }}
-                        {{ form_errors(form.title) }}
-                    </div>
-                </div>
-                <div class="col-sm-12 col-xs-12">
-                    <div class="form-group">
-                        {{ form_widget(form.contents, {attr: {placeholder: 'お問い合せ内容を入力...', class : 'height120'}}) }}
-                        {{ form_errors(form.contents) }}
-                    </div>
-                </div>
 
-                <div class="col-sm-12 col-xs-12">
-                    <button type="submit" class="btn btn-inactive margin-bottom40" name="mode" value="confirm">確認ページへ</button>
-                </div>
-                <p class="title12 text-alight-center margin-top15">注文した商品が届かない・出荷に間に合わなかったなど</p>
-                <p class="title12 text-alight-center">緊急時の場合は下記へご連絡ください</p>
-                <p class="title20 text-alight-center">00-1234-5678</p>
-            </div>
-        </form>
+        <div class="col-sm-12 col-xs-12 Rectangle-12">
+            <p class="guide-title">やさいバスとは何ですか？</p>
+            <p class="guide-content">当社が扱う食材はすべて、誰がどこでどのように作っているか明確に説明できるものだけ。しかも、レストラン等プロ向けに提供することを主としてきましたので、味にも自信があるものを取り扱っています。ちょっとしたパーティの食材やご贈答用、現場のわかる食材を使いたいご家庭用として、ご利用ください。決済はAmazonを使っておりますが、商品は当社が責任もってお届けいたします。本サイトよりご購入ください。また、業務向けとしまして、料理人の方、会社の福利厚生用にも商品を組むことが可能です。</p>
+        </div>
+
+        <div class="col-sm-12 col-xs-12 Rectangle-12">
+            <p class="guide-title">やさいバスとは何ですか？</p>
+            <p class="guide-content">当社が扱う食材はすべて、誰がどこでどのように作っているか明確に説明できるものだけ。しかも、レストラン等プロ向けに提供することを主としてきましたので、味にも自信があるものを取り扱っています。ちょっとしたパーティの食材やご贈答用、現場のわかる食材を使いたいご家庭用として、ご利用ください。決済はAmazonを使っておりますが、商品は当社が責任もってお届けいたします。本サイトよりご購入ください。また、業務向けとしまして、料理人の方、会社の福利厚生用にも商品を組むことが可能です。</p>
+        </div>
+
     </div>
 
     <!-- The Modal -->
