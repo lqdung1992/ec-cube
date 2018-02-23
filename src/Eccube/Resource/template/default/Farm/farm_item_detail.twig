@@ -1,0 +1,395 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/21/2018
+ # Time: 13:39
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        #farm_voice_comment {
+            height: 120px;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        function setImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#comment-image-section').attr('style', 'display:block;');
+                    $('#comment-image').attr('src', e.target.result).width(120).height(120);
+                };
+                reader.readAsDataURL(input.files[0]);
+                return true;
+            }
+        };
+
+        $(function () {
+            var openModal = function (review_class, caption) {
+                var modal = document.getElementById('myModal');
+                var modalImg = document.getElementById("model-image");
+                // review image
+                var img = document.getElementsByClassName(review_class);
+                var captionText = document.getElementById("caption");
+
+                var text = '';
+                if (caption) {
+                    text = document.getElementsByClassName(caption);
+                }
+
+                // review image
+                $(img).each(function(index, item) {
+                    item.onclick = function() {
+                        modal.style.display = "block";
+                        modalImg.src = this.src;
+                        if (text[index]) {
+                            captionText.innerHTML = text[index].value;
+                        } else {
+                            captionText.innerHTML = '';
+                        }
+                    };
+                });
+
+                var span = document.getElementsByClassName("close")[0];
+                span.onclick = function() {
+                    modal.style.display = "none";
+                };
+            };
+            openModal('image-review');
+
+            $('.farmer-comment-camera').click(function () {
+                $('#farm_voice_file_name').click();
+            });
+
+            $('#farm_voice_file_name').change(function () {
+                if (!this.value) {
+                    return false;
+                }
+                //restrict upload file type
+                var ext = this.value.match(/\.(.+)$/)[1];
+                switch (ext) {
+                    case 'jpg':
+                    case 'jpeg':
+                    case 'png':
+                    case 'gif':
+                        setImage(this);
+                        return true;
+                        break;
+                    default:
+                        alert('Only image file type please!!');
+                        this.value = '';
+                        $('#comment-image-section').hide();
+                        return false;
+                }
+
+                if ((this.files[0].size)/1024 > '{{ app.config.image_size }}') {
+                    alert("Please check upload image not over 1MB");
+                    this.value = '';
+                    $('#comment-image-section').hide();
+                }
+
+                return false;
+            });
+
+            $('.slides').slick({
+                dots: true,
+                arrows: false,
+                speed: 300,
+                customPaging: function(slider, i) {
+                    return '<button class="thumbnail">' + $(slider.$slides[i]).find('img').prop('outerHTML') + '</button>';
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block main %}
+    {% set TargetCustomer = Product.Creator %}
+
+    <div id="reicever-wrapper" class="wrapper">
+        <div class="wrapper">
+            <div class="farmer-new-header">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+                <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+                <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+            </div>
+
+            <div class="row margin-top20">
+                <div id="item_photo_area" class="col-sm-6">
+                    <div id="detail_image_box__slides" class="slides">
+                        {% if Product.ProductImage|length > 0 %}
+                            {% for ProductImage in Product.ProductImage %}
+                                <div id="detail_image_box__item--{{ loop.index }}"><img src="{{ app.config.image_save_urlpath }}/{{ ProductImage|no_image_product }}"/></div>
+                            {% endfor %}
+                        {% else %}
+                            <div id="detail_image_box__item"><img src="{{ app.config.image_save_urlpath }}/{{ ''|no_image_product }}"/></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <section id="item_detail_area" class="col-sm-6">
+                    <!--★商品名★-->
+                    <h3 id="detail_description_box__name" class="title-section-medium title20">{{ Product.name }}</h3>
+                    <div id="detail_description_box__body" class="item_detail">
+                        <div class="tag">
+                            {% if Product.ProductTag is not empty %}
+                                {% for ProductTag in Product.ProductTag %}
+                                    <button class="btn btn-success">{{ ProductTag.Tag.name }}</button>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div id="receiver-profile" class="clearfix">
+                            <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle medium-profile">
+                            <span class="profile-name-medium">{{ TargetCustomer.__toString }}</span>
+                            <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                        </div>
+
+                        <div class="description clearfix">
+                            {{ Product.description_detail|raw|nl2br }}
+                        </div>
+
+                        <div class="pc-bottom-cart-button">
+                            <div class="float-left">
+                                <p>
+                                    <span class="price-title display-block">{{ Product.getPrice02IncTaxMin|price }}<span class="price-tax ">（税込）</span></span>
+                                    <span class="price-quality">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}</span>
+                                </p>
+                            </div>
+                            <div class="float-right">
+                                <button id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</button>
+                                <a href="{{ url('farm_item_edit', {'id': Product.id} )  }}"><button id="farmer-button-edit" class="btn btn-success margin-top15">編集</button></a>
+                            </div>
+                        </div>
+
+                        <div class="title-section-small">
+                            <p>商品情報</p>
+                        </div>
+                        <div id="detail-info">
+                            <div class="">
+                                <p><span class="fix-length">品目</span><span>
+                                    {% for ProductCategory in Product.ProductCategories %}
+                                        {% for Category in ProductCategory.Category.path %}
+                                            {{ Category.name }}
+                                        {% endfor %}
+                                    {% endfor %}
+                                    </span>
+                                </p>
+                                <p><span class="fix-length">栽培方法</span><span>{{ Product.getProductClasses[0].CultivationMethod.name }}</span></p>
+                                <p><span class="fix-length">受領可能日</span><span>
+                                        {% for ProductReceiptableDate in Product.getProductReceiptableDates %}
+                                            {{ ProductReceiptableDate.getReceiptableDate.name }}
+                                            {% if loop.last != true %} / {% endif %}
+                                        {% endfor %}
+                                    </span></p>
+                                <p><span class="fix-length">生産予定期間</span><span>
+                                        {{ Product.getProductClasses[0].getProductionStartDate|date_format() }}〜{{ Product.getProductClasses[0].getProductionEndDate|date_format() }}
+                                    </span></p>
+                            </div>
+                        </div>
+
+                        <div class="title-section-small">
+                            <p>購入者の声</p>
+                        </div>
+                        <div id="pc-detail-rate">
+                            <ul class="list-inline">
+                                <li class="list-group-item">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-like.svg" class="display-block">
+                                    <span class="pc-rate-des">ありがとう</span>
+                                    <span class="display-block">
+                                        {% if ProductRate is not empty %}
+                                            {{ Product.ProductRate.like_count }}
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-tasty.svg" class="display-block">
+                                    <span class="pc-rate-des">おいしい</span>
+                                    <span class="display-block">
+                                        {% if ProductRate is not empty %}
+                                        {{ Product.ProductRate.delicious_count|default(0) }}
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-freshness.svg" class="display-block">
+                                    <span class="pc-rate-des">新鮮</span>
+                                    <span class="display-block">
+                                        {% if ProductRate is not empty %}
+                                        {{ Product.ProductRate.fresh_count|default(0) }}
+                                        {% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-vivid.svg" class="display-block">
+                                    <span class="pc-rate-des">色あざやか</span>
+                                    <span class="display-block">{% if ProductRate is not empty %}{{ Product.ProductRate.vivid_count|default(0) }}{% endif %}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-smell.svg" class="display-block">
+                                    <span class="pc-rate-des">香りがよい</span>
+                                    <span class="display-block">{% if ProductRate is not empty %}{{ Product.ProductRate.aroma_count|default(0) }}{% endif %}</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+            <div class="voice-section" style="display: block">
+                {% if is_granted('ROLE_USER') %}
+                    <div class="row">
+                        <div class="col-sm-12 col-xs-12">
+                            <div class="voice clearfix">
+                                <form method="post" action="?" enctype="multipart/form-data">
+                                    {{ form_widget(form._token) }}
+                                    <div class="col-sm-12 col-xs-12 margin-bottom10">
+                                        {{ form_widget(form.comment, {attr: {placeholder: 'コメントを入力。。。'}}) }}
+                                        <div class="help">
+                                            <span class="farmer-comment-text-limit color888">200</span>
+                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/camera.svg" class="farmer-comment-camera">
+                                        </div>
+                                        {{ form_widget(form.file_name, {'attr': {'style': 'display: none;'}}) }}
+                                        {{ form_errors(form.file_name) }}
+                                    </div>
+                                    <div id="comment-image-section" class="col-sm-12 col-xs-12 text-alight-center margin-bottom10">
+                                        <img id="comment-image" class="image-review" src="">
+                                    </div>
+                                    <div class="col-sm-12 col-xs-12">
+                                        <button type="submit" class="btn btn-inactive">コメントを投稿</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if CustomerVoice %}
+                    <div class="row">
+                        <div class="col-sm-12 col-xs-12">
+                            {% for Voice in CustomerVoice %}
+                                <div class="div-comment-profile clearfix">
+                                    <div class="row">
+                                        <div class="col-sm-12 col-xs-12">
+                                            {% if Voice.Customer.id == TargetCustomer.id %}
+                                                <div class="col-sm-10 col-xs-10">
+                                                    <div class="comment-description">
+                                                        <div class="comment">{{ Voice.comment|nl2br }}</div>
+                                                        {% if Voice.file_name %}
+                                                            <div class="row">
+                                                                <div class="col-sm-12 col-xs-12">
+                                                                    <img class="image-review image-voice" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name|no_image_product }}">
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="clearfix">
+                                                            <p class="comment-date float-left">{{ Voice.create_date|date('Y/m/d') }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2 col-xs-2">
+                                                    <img src="{{ app.config.image_save_urlpath }}/{{ Voice.TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle comment-profile-right">
+                                                </div>
+                                            {% else %}
+                                                <div class="col-sm-2 col-xs-2">
+                                                    <img src="{{ app.config.image_save_urlpath }}/{{ Voice.Customer.profile_image|no_image_product }}" alt="profile" class="img-circle comment-profile">
+                                                </div>
+                                                <div class="col-sm-10 col-xs-10">
+                                                    <div class="comment-description">
+                                                        <div class="comment">{{ Voice.comment|nl2br }}</div>
+                                                        {% if Voice.file_name %}
+                                                            <div class="row">
+                                                                <div class="col-sm-12 col-xs-12">
+                                                                    <img class="image-review image-voice" src="{{ app.config.image_save_urlpath }}/{{ Voice.file_name|no_image_product }}">
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="clearfix">
+                                                            <p class="comment-date float-right margin-bottom10">{{ Voice.create_date|date('Y/m/d') }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="model-image"/>
+        <div id="caption"></div>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item"><a href="{{ url('farm_profile', {'id': TargetCustomer.id} ) }}">プロフィール</a></li>
+                <li class="list-group-item"><a href="#">過去の出品</a></li>
+                <li class="list-group-item"><a href="#"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
+                <li class="list-group-item" id="setting"><a href="#">設定</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_contact') }}">お問い合わせ</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_guide') }}">ガイド</a></li>
+            </ul>
+
+            <ul class="list-group hidden" id="setting-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_service_profile_setting') }}">
+                        登録者名・住所・電話番号
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_farmer_password_change') }}">
+                        メールアドレス・パスワード
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        指定購入者への割引設定
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        やさいバスについて
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

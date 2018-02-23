@@ -126,6 +126,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         // farm - add item
         $c->match('/farm/item/new', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_new');
         $c->match('/farm/item/{id}/edit', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_edit')->assert('id', '\d+');
+        $c->match('/farm/item/detail/{id}', '\Eccube\Controller\Farm\FarmerController::detail')->bind('farm_item_detail')->assert('id', '\d+');
 
         //farm - contact
         $c->match('/farm/contact', '\Eccube\Controller\Farm\FarmerController::contact')->bind('farm_contact');

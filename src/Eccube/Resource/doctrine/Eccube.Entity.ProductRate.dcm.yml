@@ -1,0 +1,40 @@
+Eccube\Entity\ProductRate:
+    type: entity
+    table: dtb_product_rate
+    repositoryClass: Eccube\Repository\ProductRateRepository
+    id:
+        product_id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        like_count:
+            type: integer
+            nullable: true
+            unsigned: true
+        delicious_count:
+            type: integer
+            nullable: true
+            unsigned: true
+        fresh_count:
+            type: integer
+            nullable: true
+            unsigned: true
+        vivid_count:
+            type: integer
+            nullable: true
+            unsigned: true
+        aroma_count:
+            type: integer
+            nullable: true
+            unsigned: true
+    oneToOne:
+        Product:
+            targetEntity: Eccube\Entity\Product
+            inversedBy: ProductRate
+            joinColumn:
+                name: product_id
+                referencedColumnName: product_id
+                nullable: false
+    lifecycleCallbacks: {  }

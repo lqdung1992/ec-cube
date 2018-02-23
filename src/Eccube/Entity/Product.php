@@ -1120,5 +1120,22 @@ class Product extends \Eccube\Entity\AbstractEntity
         $this->ProductReceiptableDates->removeElement($ProductReceiptableDate);
     }
 
+    /** @var ProductRate */
+    private $ProductRate;
 
+    /**
+     * @return ProductRate
+     */
+    public function getProductRate()
+    {
+        return $this->ProductRate;
+    }
+
+    /**
+     * @param ProductRate $ProductRate
+     */
+    public function setProductRate($ProductRate)
+    {
+        $this->ProductRate = $ProductRate;
+    }
 }
