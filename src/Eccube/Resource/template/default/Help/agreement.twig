@@ -20,10 +20,12 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #}
 {% extends 'default_frame.twig' %}
-
+{% set body_class = ' ' %}
 {% block main %}
-
-    <div id="contents" class="main_only">
+    <div class="wrapper container" id="receiver-form">
+        <div class="farmer-new-header">
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+        </div>
         <div id="agreement_wrap" class="container-fluid inner no-padding">
             <div id="main">
                 <h1 class="page-heading">利用規約</h1>
@@ -31,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                     <div id="agreement_box__customer_agreement" class="row">
                         <div class="col-md-10 col-md-offset-1">
                             {% if help is not null %}
-                            {{ help.customerAgreement|raw|nl2br }}
+                                {{ help.customerAgreement|raw|nl2br }}
                             {% endif %}
                         </div><!-- /.col -->
                     </div><!-- /.row -->
@@ -40,5 +42,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             </div>
         </div>
     </div>
-
 {% endblock %}
