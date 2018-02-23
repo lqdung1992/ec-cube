@@ -961,6 +961,9 @@ img {
     margin-bottom: 10px !important;
 }
 
+.margin-bottom40 {
+    margin-bottom: 40px !important;
+}
 .padding-bottom10 {
     padding-bottom: 10px;
 }
@@ -1555,8 +1558,6 @@ img {
 }
 
 .Rectangle-12 {
-    width: 345px;
-    height: 326px;
     border-radius: 3px;
     background-color: #ffffff;
     border: solid 0.5px #cccccc;
@@ -1822,6 +1823,114 @@ img {
     text-align: center;
 }
 
+
+/* --------------------------------
+	Detail Page
+-------------------------------- */
+
+#item_detail + row {
+    margin-top: -1px;
+    background: #fff;
+}
+
+/*#item_detail .btn_area li:last-child {
+    padding-left: 0;
+}
+*/
+
+
+/* Slider */
+.slick-loading .slick-list {
+    background: #fff url('ajax-loader.gif') center center no-repeat;
+}
+
+
+/* Arrow */
+
+.slick_prev,
+.slick_next {
+    font-size: 18px;
+    font-size: 1.8rem;
+    width: 40px; height: 40px;
+    line-height: 40px;
+}
+
+/* Dots */
+.slick-slider {
+    margin-bottom: 30px;
+}
+
+.slick-dots {
+    position: absolute;
+    bottom: -45px;
+    display: block;
+    width: 100%;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+}
+.slick-dots li {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 0 5px;
+    padding: 0;
+
+    cursor: pointer;
+}
+.slick-dots li button {
+    font-size: 0;
+    line-height: 0;
+    display: block;
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+    cursor: pointer;
+    color: transparent;
+    border: 0;
+    outline: none;
+    background: transparent;
+}
+.slick-dots li button:hover,
+.slick-dots li button:focus {
+    outline: none;
+}
+.slick-dots li button:hover:before,
+.slick-dots li button:focus:before {
+    opacity: 1;
+}
+.slick-dots li button:before {
+    content:" ";
+    line-height: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    text-align: center;
+    opacity: .25;
+    background-color: black;
+    border-radius: 50%;
+
+}
+.slick-dots li.slick-active button:before {
+    opacity: .75;
+    background-color: black;
+}
+
+.slick-dots li button.thumbnail img {
+    width: 0; height: 0;
+}
+
+#item_photo_area .slick-slide {
+    text-align: center;
+}
+#item_photo_area .slick-slide img {
+    display: inline-block;
+}
+
+
 /******************************
 	Media Query for smart phone
 *******************************/
@@ -1964,6 +2073,13 @@ img {
     .container-fluid {
         padding-right: 0 !important;
         padding-left: 0 !important;
+    }
+
+    #action-button {
+        width: 98%;
+        height: 50px;
+        font-size: 18px;
+        margin-top: 20px;
     }
 }
 
@@ -2167,6 +2283,51 @@ img {
     .farmer-new-header .logo-svg {
         margin-left: 40%;
     }
+
+    #action-button {
+        width: 50%;
+        height: 50px;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+
+    /* --------------------------------
+		Detail Page
+	-------------------------------- */
+
+    #item_photo_area .slick-dots {
+        margin: 0 -16px;
+        position: relative;
+        bottom: 0;
+    }
+    #item_photo_area .slick-dots::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    #item_photo_area .slick-dots li {
+        width: 25%; height: auto;
+        padding: 16px;
+        margin: 0;
+        float: left;
+    }
+
+    .slick-dots li button.thumbnail {
+        width: 100%; height: auto;
+        padding: 0;
+    }
+    .slick-dots li button.thumbnail img {
+        width: 100%; height: auto;
+        opacity: 0.8;
+    }
+    .slick-dots li button.thumbnail:hover img,
+    .slick-dots li.slick-active button.thumbnail img {
+        opacity: 1;
+    }
+    .slick-dots li button.thumbnail::before {
+        display: none;
+    }
 }
 
 /*farm profile*/
@@ -2357,7 +2518,9 @@ img {
 
 /*Farm selling*/
 .product-section {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    background-color: #f7f7f7;
+    padding:20px 0;
 }
 
 /*Farm item detail*/
@@ -2366,6 +2529,18 @@ img {
     border-radius: 5px;
     padding: 15px;
 }
+
+.height120 {
+    height: 120px !important;
+}
+
+input[readonly], textarea[readonly] {
+    cursor: not-allowed;
+}
+
+
+
+
 
 /* Slider */
 .slick-loading .slick-list {

@@ -19,7 +19,7 @@
     <div class="wrapper" id="service-regist-receiver-wrapper">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
 
@@ -123,7 +123,7 @@
                 <li class="list-group-item"><a href="#"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
                 <li class="list-group-item" id="setting"><a href="#">設定</a></li>
                 <li class="list-group-item"><a href="#">お問い合わせ</a></li>
-                <li class="list-group-item"><a href="#">ガイド</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_guide') }}">ガイド</a></li>
             </ul>
 
             <ul class="list-group hidden" id="setting-menu">

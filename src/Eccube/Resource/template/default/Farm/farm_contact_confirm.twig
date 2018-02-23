@@ -1,0 +1,135 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/11/2018
+ # Time: 11:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <style type="text/css">
+        #submit-button button {
+            height: 50px;
+            font-size: 18px;
+            width: 100%;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/vendor/jquery.ui.widget.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.iframe-transport.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-process.js"></script>
+    <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-validate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+{% endblock %}
+{% block main %}
+    <div class="wrapper container" id="receiver-form">
+        <div class="farmer-new-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+        </div>
+        <form id="receiver-form" method="post" action="" enctype="multipart/form-data">
+            {{ form_widget(form._token) }}
+            <div id="item-info">
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        <label class="display-block">お問い合わせ内容</label>
+                        {{ form_widget(form.title, {attr: {placeholder: 'タイトルを入力...', readonly : 'readonly'}}) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12">
+                    <div class="form-group">
+                        {{ form_widget(form.contents, {attr: {placeholder: 'お問い合せ内容を入力...', class : 'height120', readonly : 'readonly'}}) }}
+                        {{ form_errors(form.contents) }}
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-xs-12 margin-bottom40" id="submit-button">
+                    <div class="col-sm-6 col-xs-6">
+                        <button type="submit" class="btn btn-success" name="mode" value="complete">送信をする</button>
+                    </div>
+
+                    <div class="col-sm-6 col-xs-6">
+                        <button type="submit" class="btn btn-info" name="mode" value="back">戻る</button>
+                    </div>
+                </div>
+                <p class="title12 text-alight-center margin-top15">注文した商品が届かない・出荷に間に合わなかったなど</p>
+                <p class="title12 text-alight-center">緊急時の場合は下記へご連絡ください</p>
+                <p class="title20 text-alight-center">00-1234-5678</p>
+            </div>
+        </form>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="model-image"/>
+        <div id="caption"></div>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item"><a href="{{ url('farm_profile', {'id': TargetCustomer.id} ) }}">プロフィール</a></li>
+                <li class="list-group-item"><a href="#">過去の出品</a></li>
+                <li class="list-group-item"><a href="#"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
+                <li class="list-group-item" id="setting"><a href="#">設定</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_contact') }}">お問い合わせ</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_guide') }}">ガイド</a></li>
+            </ul>
+
+            <ul class="list-group hidden" id="setting-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_service_profile_setting') }}">
+                        登録者名・住所・電話番号
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_farmer_password_change') }}">
+                        メールアドレス・パスワード
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        指定購入者への割引設定
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        やさいバスについて
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

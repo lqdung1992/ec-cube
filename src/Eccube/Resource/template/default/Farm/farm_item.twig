@@ -241,15 +241,89 @@
                 }
                 $('#{{ form.product_image.vars.id }}').click();
             });
+
+            $("#item_edit_Tag .checkbox label").each(function () {
+                var tag_name = $(this).text();
+                var id = $(this).find('input').attr('id');
+                var checked = $(this).find('input').attr('checked');
+                if (checked) {
+                    $("#tag-group").append('<button class="btn btn-success margin-right10" input_id="'+id+'" type="button">'+tag_name+'</button>');
+                } else {
+                    $("#tag-group").append('<button class="btn btn-default margin-right10" input_id="'+id+'" type="button">'+tag_name+'</button>');
+                }
+            });
+
+            var index = 0;
+            $("#item_edit_class_cultivation_method .radio label").each(function () {
+                var tag_name = $(this).text();
+                var id = $(this).find('input').attr('id');
+                var checked = $(this).find('input').attr('checked');
+                if (checked) {
+                    $("#product_type_group").append('<button class="btn btn-success" input_id="'+id+'" type="button">'+tag_name+'</button>');
+                } else {
+                    $("#product_type_group").append('<button class="btn btn-default" input_id="'+id+'" type="button">'+tag_name+'</button>');
+                }
+                index++;
+            });
+
+            $("#item_edit_ReceiptableDate .checkbox label").each(function () {
+                var tag_name = $(this).text();
+                var id = $(this).find('input').attr('id');
+                var checked = $(this).find('input').attr('checked');
+                if (checked) {
+                    $("#date_group").append('<button class="btn btn-success days-button" input_id="' + id + '" type="button">' + tag_name + '</button>');
+                } else {
+                    $("#date_group").append('<button class="btn btn-default days-button" input_id="' + id + '" type="button">' + tag_name + '</button>');
+                }
+            });
+
+            $("#product_type_group button").click(function () {
+                var ele = $(this);
+                var id = ele.attr('input_id');
+                ele.addClass('btn-success');
+                ele.removeClass('btn-default');
+                ele.siblings().addClass('btn-default');
+                ele.siblings().removeClass('btn-success');
+                $("#"+id).prop('checked', true);
+            });
+
+            $("#date_group button").click(function () {
+                var ele = $(this);
+                var id = ele.attr('input_id');
+                if (ele.hasClass('btn-success')) {
+                    $(this).removeClass('btn-success');
+                    $(this).addClass('btn-default');
+                    $("#"+id).prop('checked', false);
+                } else {
+                    $(this).addClass('btn-success');
+                    $(this).removeClass('btn-default');
+                    $("#"+id).prop('checked', true);
+                }
+            });
+
+            $("#tag-group button").click(function () {
+                var ele = $(this);
+                var id = ele.attr('input_id');
+                if (ele.hasClass('btn-success')) {
+                    $(this).removeClass('btn-success');
+                    $(this).addClass('btn-default');
+                    $("#"+id).prop('checked', false);
+                } else {
+                    $(this).addClass('btn-success');
+                    $(this).removeClass('btn-default');
+                    $("#"+id).prop('checked', true);
+                }
+
+            });
         });
     </script>
 {% endblock %}
 {% block main %}
-    <div class="container" id="receiver-form">
+    <div class="container wrapper" id="receiver-form">
         <div class="farmer-new-header">
             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg">
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
         </div>
         <form id="receiver-form" method="post" action="" enctype="multipart/form-data">
             {{ form_widget(form._token) }}
@@ -276,38 +350,43 @@
             <div id="item-info">
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_label(form.Category) }}
+                        <label class="display-block">品目<span class="badge wait-approve">必須</span></label>
                         {{ form_errors(form.Category) }}
-                        {{ form_widget(form.Category) }}
+                        {{ form_widget(form.Category, {'attr': {'class': 'select'}}) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
-                    {{ form_label(form.class.cultivation_method) }}
+                    <label class="display-block">栽培方法<span class="badge wait-approve">必須</span></label>
                     <div class="form-group form-inline">
-                        {{ form_errors(form.class.cultivation_method) }}
-                        {{ form_widget(form.class.cultivation_method) }}
+                        {{ form_widget(form.class.cultivation_method, {'attr': {'class': 'hidden'}}) }}
+                    </div>
+
+                    <div class="btn-group form-group btn-group-lg" role="group" id="product_type_group">
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group form-inline">
-                        {{ form_label(form.class.amount) }}
+                        <label class="display-block">1点あたりの量<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.class.amount) }}#}
                         {{ form_errors(form.class.amount) }}
                         {{ form_errors(form.class.amount_unit_type) }}
                         {{ form_widget(form.class.amount) }}
-                        {{ form_widget(form.class.amount_unit_type) }}
+                        {{ form_widget(form.class.amount_unit_type, {'attr': {'class': 'select'}}) }}
                     </div>
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_label(form.class.price02) }}
+                        <label class="display-block">1点あたりの価格<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.class.price02) }}#}
                         {{ form_errors(form.class.price02) }}
                         {{ form_widget(form.class.price02) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_label(form.class.amount_per_container) }}
+                        <label class="display-block">段ボール・折りたたみコンテナ1つに入る点数<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.class.amount_per_container) }}#}
                         {{ form_errors(form.class.amount_per_container) }}
                         {{ form_widget(form.class.amount_per_container) }}
                     </div>
@@ -324,43 +403,52 @@
                     <div class="form-group form-inline">
                         {{ form_errors(form.class.production_start_date) }}
                         {{ form_errors(form.class.production_end_date) }}
-                        {{ form_widget(form.class.production_start_date) }}〜{{ form_widget(form.class.production_end_date) }}
+                        {{ form_widget(form.class.production_start_date) }}　～　{{ form_widget(form.class.production_end_date) }}
                     </div>
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
-                    <div class="form-group form-inline">
-                        {{ form_label(form.ReceiptableDate) }}
+                    <div class="form-group form-inline" id="date_group">
+                        <label class="display-block">発送可能日<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.ReceiptableDate) }}#}
                         {{ form_errors(form.ReceiptableDate) }}
-                        {{ form_widget(form.ReceiptableDate) }}
+                        {{ form_widget(form.ReceiptableDate, {'attr': {'class': 'hidden'}}) }}
                     </div>
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_label(form.name) }}
+                        <label class="display-block">タイトル<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.name) }}#}
                         {{ form_errors(form.name) }}
                         {{ form_widget(form.name) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_label(form.description_detail) }}
+                        <label class="display-block">商品説明<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.description_detail) }}#}
                         {{ form_errors(form.description_detail) }}
-                        {{ form_widget(form.description_detail) }}
+                        {{ form_widget(form.description_detail, {'attr': {'class': 'height120'}}) }}
                     </div>
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
-                    <div class="form-group form-inline">
-                        {{ form_label(form.Tag) }}
+                    <div class="form-group form-inline" id="tag-group">
+                        <label class="display-block">タグ</label>
                         {{ form_errors(form.Tag) }}
-                        {{ form_widget(form.Tag) }}
+                        {{ form_widget(form.Tag, {'attr': {'class': 'hidden'}}) }}
                     </div>
                 </div>
 
                 <div class="col-sm-12 col-xs-12">
-                    <button type="submit" class="btn btn-inactive">やさいバスの利用をはじめる</button>
+                    <button type="submit" class="btn btn-inactive margin-bottom40">
+                        {% if id is null%}
+                            商品を出品する
+                        {% else %}
+                            編集を完了する
+                        {% endif %}
+                    </button>
                 </div>
             </div>
         </form>
@@ -371,5 +459,63 @@
         <span class="close">&times;</span>
         <img class="modal-content" id="model-image"/>
         <div id="caption"></div>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item"><a href="{{ url('farm_profile', {'id': TargetCustomer.id} ) }}">プロフィール</a></li>
+                <li class="list-group-item"><a href="#">過去の出品</a></li>
+                <li class="list-group-item"><a href="#"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
+                <li class="list-group-item" id="setting"><a href="#">設定</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_contact') }}">お問い合わせ</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_guide') }}">ガイド</a></li>
+            </ul>
+
+            <ul class="list-group hidden" id="setting-menu">
+                <li class="list-group-item li-profile">
+                    {% if TargetCustomer.profile_image %}
+                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
+                    {% endif %}
+                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                    <span class="button-x">X</span>
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_service_profile_setting') }}">
+                        登録者名・住所・電話番号
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="{{ url('farm_farmer_password_change') }}">
+                        メールアドレス・パスワード
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        指定購入者への割引設定
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+
+                </li>
+                <li class="list-group-item">
+                    <a href="#">
+                        やさいバスについて
+                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 {% endblock %}
