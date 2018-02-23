@@ -671,7 +671,7 @@ class FarmerController
             'form' => $form->createView(),
             'CustomerVoice' =>$CustomerVoice,
             'ProductRate' => $ProductRate,
-            'cartForm' => $cartForm,
+            'cartForm' => $cartForm->createView(),
         ));
     }
     /**

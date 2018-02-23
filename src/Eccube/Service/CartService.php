@@ -29,7 +29,10 @@ use Eccube\Common\Constant;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Master\Disp;
 use Eccube\Entity\ProductClass;
+use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Exception\CartException;
+use Eccube\Repository\ProductClassRepository;
+use Eccube\Util\DateUtil;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class CartService
@@ -203,26 +206,45 @@ class CartService
     }
 
     /**
-     *
-     * @param  string $productClassId
-     * @param  integer $quantity
-     * @return \Eccube\Service\CartService
+     * @param $productClassId
+     * @param int $quantity
+     * @param array $dates array date_id [1->7]
+     * @return $this
+     * @throws CartException
      */
-    public function addProduct($productClassId, $quantity = 1)
+    public function addProduct($productClassId, $quantity = 1, array $dates = array())
     {
-        $quantity += $this->getProductQuantity($productClassId);
-        $this->setProductQuantity($productClassId, $quantity);
+        if ($dates) {
+            $productReceptionDates = $dates;
+        } else {
+            /** @var ProductClassRepository $productClassRepo */
+            $productClassRepo = $this->app['eccube.repository.product_class'];
+            /** @var ProductClass $ProductClass */
+            $ProductClass = $productClassRepo->find($productClassId);
+            $productReceptionDates = $ProductClass->getProduct()->getProductReceiptableDates();
+        }
+        foreach ($productReceptionDates as $productReceptionDate) {
+            $quantity_tmp = $quantity;
+            $dateId = $productReceptionDate;
+            if ($productReceptionDate instanceof ProductReceiptableDate) {
+                $dateId = $productReceptionDate->getDateId();
+            }
+            $date = DateUtil::getDay($dateId);
+            $quantity_tmp += $this->getProductQuantity($productClassId, $date);
+            $this->setProductQuantity($productClassId, $quantity_tmp, $date);
+        }
 
         return $this;
     }
 
     /**
      * @param  string $productClassId
+     * @param \DateTime|null $date
      * @return integer
      */
-    public function getProductQuantity($productClassId)
+    public function getProductQuantity($productClassId, $date = null)
     {
-        $CartItem = $this->cart->getCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId);
+        $CartItem = $this->cart->getCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId, $date);
         if ($CartItem) {
             return $CartItem->getQuantity();
         } else {
@@ -233,10 +255,11 @@ class CartService
     /**
      * @param  \Eccube\Entity\ProductClass|integer $ProductClass
      * @param  integer $quantity
+     * @param \DateTime $date
      * @return \Eccube\Service\CartService
      * @throws CartException
      */
-    public function setProductQuantity($ProductClass, $quantity)
+    public function setProductQuantity($ProductClass, $quantity, $date = null)
     {
         if (!$ProductClass instanceof ProductClass) {
             $ProductClass = $this->entityManager
@@ -263,24 +286,25 @@ class CartService
 //            throw new CartException('cart.product.not.producttype');
 //        }
 
-        $this->setCanAddProductType($ProductClass->getProductType());
-
-        if ($this->BaseInfo->getOptionMultipleShipping() != Constant::ENABLED) {
-            if (!$this->canAddProduct($ProductClass->getId())) {
-                // 複数配送対応でなければ商品種別が異なればエラー
-                throw new CartException('cart.product.type.kind');
-            }
-        } else {
-            // 複数配送の場合、同一支払方法がなければエラー
-            if (!$this->canAddProductPayment($ProductClass->getProductType())) {
-                throw new CartException('cart.product.payment.kind');
-            }
-        }
+//        $this->setCanAddProductType($ProductClass->getProductType());
+//
+//        if ($this->BaseInfo->getOptionMultipleShipping() != Constant::ENABLED) {
+//            if (!$this->canAddProduct($ProductClass->getId())) {
+//                // 複数配送対応でなければ商品種別が異なればエラー
+//                throw new CartException('cart.product.type.kind');
+//            }
+//        } else {
+//            // 複数配送の場合、同一支払方法がなければエラー
+//            if (!$this->canAddProductPayment($ProductClass->getProductType())) {
+//                throw new CartException('cart.product.payment.kind');
+//            }
+//        }
 
         $tmp_subtotal = 0;
         $tmp_quantity = 0;
         foreach ($this->getCartObj()->getCartItems() as $cartitem) {
             $pc = $cartitem->getObject();
+            // Todo: check date, current dont need subtotal
             if ($pc->getId() != $ProductClass->getId()) {
                 // 追加された商品以外のtotal priceをセット
                 $tmp_subtotal += $cartitem->getTotalPrice();
@@ -301,7 +325,6 @@ class CartService
 
         // 制限数チェック(在庫不足の場合は、処理の中でカート内商品を削除している)
         $quantity = $this->setProductLimit($ProductClass, $productName, $tmp_quantity);
-
 		// 新しい数量でカート内商品を登録する
         if (0 < $quantity) {
             $CartItem = new CartItem();
@@ -309,9 +332,10 @@ class CartService
                 ->setClassName('Eccube\Entity\ProductClass')
                 ->setClassId((string)$ProductClass->getId())
                 ->setPrice($ProductClass->getPrice02IncTax())
-                ->setQuantity($quantity);
+                ->setQuantity($quantity)
+                ->setReceptionDate($date);
 
-            $this->cart->setCartItem($CartItem);
+            $this->cart->setCartItem($CartItem, $date);
         }
 
         return $this;
@@ -461,31 +485,33 @@ class CartService
 
     /**
      * @param  string $productClassId
+     * @param \DateTime $date
      * @return \Eccube\Service\CartService
      */
-    public function removeProduct($productClassId)
+    public function removeProduct($productClassId, $date = null)
     {
-        $this->cart->removeCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId);
+        $this->cart->removeCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId, $date);
 
+        // Todo: payment method
         // 支払方法の再設定
-        if ($this->BaseInfo->getOptionMultipleShipping() == Constant::ENABLED) {
-
-            // 複数配送対応
-            $productTypes = array();
-            foreach ($this->getCart()->getCartItems() as $item) {
-                /* @var $ProductClass \Eccube\Entity\ProductClass */
-                $ProductClass = $item->getObject();
-                $productTypes[] = $ProductClass->getProductType();
-            }
-
-            // 配送業者を取得
-            $deliveries = $this->entityManager->getRepository('Eccube\Entity\Delivery')->getDeliveries($productTypes);
-
-            // 支払方法を取得
-            $payments = $this->entityManager->getRepository('Eccube\Entity\Payment')->findAllowedPayments($deliveries);
-
-            $this->getCart()->setPayments($payments);
-        }
+//        if ($this->BaseInfo->getOptionMultipleShipping() == Constant::ENABLED) {
+//
+//            // 複数配送対応
+//            $productTypes = array();
+//            foreach ($this->getCart()->getCartItems() as $item) {
+//                /* @var $ProductClass \Eccube\Entity\ProductClass */
+//                $ProductClass = $item->getObject();
+//                $productTypes[] = $ProductClass->getProductType();
+//            }
+//
+//            // 配送業者を取得
+//            $deliveries = $this->entityManager->getRepository('Eccube\Entity\Delivery')->getDeliveries($productTypes);
+//
+//            // 支払方法を取得
+//            $payments = $this->entityManager->getRepository('Eccube\Entity\Payment')->findAllowedPayments($deliveries);
+//
+//            $this->getCart()->setPayments($payments);
+//        }
 
         return $this;
     }

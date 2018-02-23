@@ -540,24 +540,11 @@ img {
     position: relative;
 }
 
-.modal-select-time {
-    width: 345px;
-    height: 491px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    margin: auto;
-    position: absolute;
-    z-index: 1000;
-    top: 60px;
-    left: 10.7%;
-}
-
 .count-number {
     width: 32px;
     height: 32px;
     font-size: 16px;
     border-radius: 3px;
-    padding-top: 7px;
     background-color: #ffffff;
     border: solid 1px #c9c9c9;
     text-align: center;
@@ -567,19 +554,13 @@ img {
 .count-modal {
     background-color: #ffffff;
     border-bottom: 0.5px solid #cccccc;
-    height: 69px;
     padding: 4px 10px 0 13px;
-}
-
-.count-modal span {
-    display: block;
 }
 
 .count-date {
     color: #222222;
     font-size: 16px;
     font-weight: 600;
-    margin-top: 10px;
 }
 
 .count-quality {
@@ -595,10 +576,6 @@ img {
     color: #888888;
     font-size: 12px;
     font-weight: 500;
-}
-
-.count-right {
-    margin-top: 10px;
 }
 
 .modal-header {
@@ -708,7 +685,6 @@ img {
 }
 
 .title-section-white {
-    width: 374px;
     height: 62px;
     background-color: #ffffff;
     font-weight: bold;
@@ -732,7 +708,6 @@ img {
 
 #receiver-cart-wrapper {
     background-color: #ffffff;
-    height: 1410px;
 }
 
 #receiver-cart-confirm-wrapper {

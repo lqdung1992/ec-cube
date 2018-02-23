@@ -23,7 +23,7 @@ $(function () {
         $(document).scrollTop(5);
     });
 
-    $(".x-button").click(function () {
+    $(".x-button, .close").click(function () {
         $('.x-button').addClass("hidden");
         $('.modal-select-time').addClass("hidden");
         $('.wrapper').removeClass("shadow");

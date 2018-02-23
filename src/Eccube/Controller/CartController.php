@@ -24,10 +24,13 @@
 
 namespace Eccube\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Eccube\Application;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
+use Eccube\Service\CartService;
+use Eccube\Util\DateUtil;
 use Symfony\Component\HttpFoundation\Request;
 
 class CartController extends AbstractController
@@ -41,6 +44,7 @@ class CartController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
+        /* @var $Cart \Eccube\Entity\Cart */
         $Cart = $app['eccube.service.cart']->getCart();
 
         // FRONT_CART_INDEX_INITIALIZE
@@ -51,7 +55,6 @@ class CartController extends AbstractController
         $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CART_INDEX_INITIALIZE, $event);
 
         /* @var $BaseInfo \Eccube\Entity\BaseInfo */
-        /* @var $Cart \Eccube\Entity\Cart */
         $BaseInfo = $app['eccube.repository.base_info']->get();
 
         $isDeliveryFree = false;
@@ -86,6 +89,20 @@ class CartController extends AbstractController
             return $event->getResponse();
         }
 
+        $receptionDate = array();
+        foreach ($Cart->getCartItems() as $CartItem) {
+            $receptionDate[$CartItem->getReceptionDate()->format('Y/m/d')] = $CartItem->getReceptionDate();
+        }
+
+        /** @var EntityManager $em */
+        $em = $app['orm.em'];
+
+        $masterDate = $em->createQueryBuilder()
+            ->select('rd')
+            ->from('Eccube\Entity\Master\ReceiptableDate', 'rd', 'rd.id')
+            ->getQuery()
+            ->getResult();
+
         return $app->render(
             'Cart/index.twig',
             array(
@@ -93,6 +110,8 @@ class CartController extends AbstractController
                 'least' => $least,
                 'quantity' => $quantity,
                 'is_delivery_free' => $isDeliveryFree,
+                'reception_dates' => $receptionDate,
+                'master_date' => $masterDate
             )
         );
     }
@@ -311,8 +330,9 @@ class CartController extends AbstractController
     public function remove(Application $app, Request $request, $productClassId)
     {
         $this->isTokenValid($app);
+        $dateId = $request->get('date_id');
 
-        log_info('カート削除処理開始', array('product_class_id' => $productClassId));
+        log_info('カート削除処理開始', array('product_class_id' => $productClassId, 'date_id' => $dateId));
 
         // FRONT_CART_REMOVE_INITIALIZE
         $event = new EventArgs(
@@ -324,7 +344,11 @@ class CartController extends AbstractController
         $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CART_REMOVE_INITIALIZE, $event);
 
         $productClassId = $event->getArgument('productClassId');
-        $app['eccube.service.cart']->removeProduct($productClassId)->save();
+        $date = null;
+        if ($dateId) {
+            $date = DateUtil::getDay($dateId);
+        }
+        $app['eccube.service.cart']->removeProduct($productClassId, $date)->save();
 
         log_info('カート削除処理完了', array('product_class_id' => $productClassId));
 
@@ -396,5 +420,34 @@ class CartController extends AbstractController
         }
 
         return $app->redirect($app->url('shopping'));
+    }
+
+    /**
+     * modify cart
+     *
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function modify(Application $app, Request $request)
+    {
+        $quantity = $request->request->has('quantity') ? $request->get('quantity') : 1;
+        /** @var CartService $serviceCart */
+        $serviceCart = $app['eccube.service.cart'];
+        try {
+
+            foreach ($quantity as $productClassId => $item) {
+                foreach ($item as $dateId => $quantity) {
+                    $date = DateUtil::getDay($dateId);
+                    $serviceCart->setProductQuantity($productClassId, $quantity, $date)->save();
+                }
+            }
+        } catch (CartException $e) {
+
+            log_info('カート追加エラー', array($e->getMessage()));
+            $app->addRequestError($e->getMessage());
+        }
+
+        return $app->redirect($app->url('cart'));
     }
 }

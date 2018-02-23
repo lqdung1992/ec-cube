@@ -104,14 +104,6 @@
 
                 return false;
             });
-
-            $('#farmer-button-edit').click(function () {
-
-            });
-            $('#receiver-cart-button').click(function () {
-
-
-            });
         });
     </script>
 {% endblock %}
@@ -174,7 +166,7 @@
                             {% if app.user.id == TargetCustomer.id %}
                                 <a href="?" id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</a>
                                 <a href="{{ url('farm_item_edit', {'id': Product.id}) }}" id="farmer-button-edit" class="btn btn-success margin-top15">編集</a>
-                            {% else %}
+                            {% elseif is_granted("ROLE_RECIPIENT") %}
                                 <form method="post" action="?" id="add-cart-form" name="add-cart-form">
                                     <input type="hidden" name="mode" value="add_cart"/>
                                     {{ form_widget(cartForm._token) }}
@@ -258,7 +250,6 @@
                                 </li>
                             </ul>
                         </div>
-
                     </div>
                 </section>
             </div>
