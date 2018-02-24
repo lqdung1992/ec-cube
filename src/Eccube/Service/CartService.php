@@ -26,6 +26,7 @@ namespace Eccube\Service;
 
 use Doctrine\ORM\EntityManager;
 use Eccube\Common\Constant;
+use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Master\Disp;
 use Eccube\Entity\ProductClass;
@@ -481,6 +482,50 @@ class CartService
         }
 
         return $this->cart;
+    }
+
+    /**
+     * getCart by date for confirm
+     *
+     * @todo Remove new cart from old cart
+     * @param \DateTime $date
+     * @return \Eccube\Entity\Cart New cart
+     */
+    public function getCartByDate($date)
+    {
+        $CartNew = new Cart();
+        $dateTime = $date->format('Y/m/d');
+        foreach ($this->cart->getCartItems() as $CartItem) {
+            $cartDate = $CartItem->getReceptionDate()->format('Y/m/d');
+            if ($dateTime != $cartDate) {
+                continue;
+            }
+            /** @var \Eccube\Entity\ProductClass $ProductClass */
+            $ProductClass = $CartItem->getObject();
+            if (!$ProductClass) {
+                $this->loadProductClassFromCartItem($CartItem);
+
+                $ProductClass = $CartItem->getObject();
+            }
+
+            if ($ProductClass->getDelFlg() == Constant::DISABLED) {
+                // 商品情報が有効
+                if (!$this->isProductDisplay($ProductClass)) {
+                    $this->setError('cart.product.not.status');
+                } else {
+                    $CartNew->addCartItem($CartItem);
+                }
+
+            } else {
+                // 商品情報が削除されていたらエラー
+                $this->setError('cart.product.delete');
+                // カートから削除
+                $this->removeProduct($ProductClass->getId());
+            }
+        }
+        $CartNew->setLock(true)
+            ->setPreOrderId(null);
+        return $CartNew;
     }
 
     /**

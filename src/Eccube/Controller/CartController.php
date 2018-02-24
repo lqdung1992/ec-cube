@@ -26,6 +26,9 @@ namespace Eccube\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Eccube\Application;
+use Eccube\Entity\Cart;
+use Eccube\Entity\CartItem;
+use Eccube\Entity\Customer;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
@@ -44,8 +47,9 @@ class CartController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
-        /* @var $Cart \Eccube\Entity\Cart */
-        $Cart = $app['eccube.service.cart']->getCart();
+        /** @var CartService $cartService */
+        $cartService = $app['eccube.service.cart'];
+        $Cart = $cartService->getCart();
 
         // FRONT_CART_INDEX_INITIALIZE
         $event = new EventArgs(
@@ -53,30 +57,6 @@ class CartController extends AbstractController
             $request
         );
         $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CART_INDEX_INITIALIZE, $event);
-
-        /* @var $BaseInfo \Eccube\Entity\BaseInfo */
-        $BaseInfo = $app['eccube.repository.base_info']->get();
-
-        $isDeliveryFree = false;
-        $least = 0;
-        $quantity = 0;
-        if ($BaseInfo->getDeliveryFreeAmount()) {
-            if ($BaseInfo->getDeliveryFreeAmount() <= $Cart->getTotalPrice()) {
-                // 送料無料（金額）を超えている
-                $isDeliveryFree = true;
-            } else {
-                $least = $BaseInfo->getDeliveryFreeAmount() - $Cart->getTotalPrice();
-            }
-        }
-
-        if ($BaseInfo->getDeliveryFreeQuantity()) {
-            if ($BaseInfo->getDeliveryFreeQuantity() <= $Cart->getTotalQuantity()) {
-                // 送料無料（個数）を超えている
-                $isDeliveryFree = true;
-            } else {
-                $quantity = $BaseInfo->getDeliveryFreeQuantity() - $Cart->getTotalQuantity();
-            }
-        }
 
         // FRONT_CART_INDEX_COMPLETE
         $event = new EventArgs(
@@ -89,11 +69,6 @@ class CartController extends AbstractController
             return $event->getResponse();
         }
 
-        $receptionDate = array();
-        foreach ($Cart->getCartItems() as $CartItem) {
-            $receptionDate[$CartItem->getReceptionDate()->format('Y/m/d')] = $CartItem->getReceptionDate();
-        }
-
         /** @var EntityManager $em */
         $em = $app['orm.em'];
 
@@ -103,13 +78,57 @@ class CartController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        $mode = $request->get('mode');
+        switch ($mode) {
+            case 'confirm':
+                $dateId = $request->get('date_id');
+                $dateTime = DateUtil::getDay($dateId);
+                /** @var Cart $CartByDate */
+                $CartByDate = $cartService->getCartByDate($dateTime);
+
+                /** @var  Customer[] $arrCreator */
+                $arrCreator = array();
+                /** @var  CartItem $cart */
+                foreach ($CartByDate->getCartItems() as $cart) {
+                    $Creator = $cart->getObject()->getProduct()->getCreator();
+                    $arrCreator[$Creator->getId()] = $Creator;
+                }
+
+                $arrTotal = array();
+                foreach ($arrCreator as $creator) {
+                    $arrTotal[$creator->getId()] = 0;
+                    foreach ($CartByDate->getCartItems() as $cartItem) {
+                        if ($cartItem->getObject()->getProduct()->getCreator()->getId() == $creator->getId()) {
+                            $arrTotal[$creator->getId()] += $cartItem->getTotalPrice();
+                        }
+                    }
+                }
+
+                return $app->render(
+                    'Cart/confirm.twig',
+                    array(
+                        'Cart' => $CartByDate,
+                        'reception_date' => $dateTime,
+                        'Creators' => $arrCreator,
+                        'creator_total' => $arrTotal,
+                        'date_id' => $dateId,
+                        'master_date' => $masterDate
+                    )
+                );
+        }
+
+        $receptionDate = array();
+        foreach ($Cart->getCartItems() as $CartItem) {
+            $receptionDate[$CartItem->getReceptionDate()->format('Y/m/d')] = $CartItem->getReceptionDate();
+        }
+
         return $app->render(
             'Cart/index.twig',
             array(
                 'Cart' => $Cart,
-                'least' => $least,
-                'quantity' => $quantity,
-                'is_delivery_free' => $isDeliveryFree,
+//                'least' => $least,
+//                'quantity' => $quantity,
+//                'is_delivery_free' => $isDeliveryFree,
                 'reception_dates' => $receptionDate,
                 'master_date' => $masterDate
             )

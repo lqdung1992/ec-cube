@@ -1,0 +1,91 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 2/23/2018
+ # Time: 11:41 PM
+ #}{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+{% endblock javascript %}
+{% block main %}
+
+    <div id="receiver-cart-confirm-wrapper" class="wrapper">
+        <div class="container">
+        <div class="header receiver-header margin-bottom0">
+            <div class="float-left">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg">
+            </div>
+            <div class="logo float-left">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg">
+            </div>
+            <div class="float-right">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-cart.svg">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-search.svg">
+            </div>
+        </div>
+
+        <div id="cart-confirm-main">
+            <div class="title-section-medium">
+                <p>ご注文内容をケースにまとめました</p>
+                <p>内容・金額に問題なければ確定をお願いします</p>
+            </div>
+
+            <div class="cart-title">
+                <p>
+                    <span class="title14">{{ reception_date|date('m月d日') }}({{ master_date[reception_date|date('N')].name }}) お届け予定</span>
+                </p>
+            </div>
+
+            {% for Creator in Creators %}
+
+            <div class="cart-content" id="cart-main-content1">
+                <p class="title14 margin-left10 margin-top10">{{ Creator.__toString }}</p>
+                {% for CartItem in Cart.CartItems %}
+                {% set ProductClass = CartItem.Object %}
+                {% set Product = ProductClass.Product %}
+                {% set Customer = Product.Creator %}
+                    {% if Customer.id == Creator.id %}
+                <div class="receiver-cart-confirm clearfix">
+                    <div>
+                        <div class="receiver-cart-confirm-profile float-left">
+                            <img src="{{ app.config.image_save_urlpath }}/{{ Product.MainListImage|no_image_product }}" alt="{{ Product.name }}" class="profile50">
+                            <span class="profile-name-medium">{{ Product.name }}</span>
+                            <span class="profile-address-medium">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}</span>
+                        </div>
+                        <div class="float-right">
+                            <p>{{ CartItem.total_price|price }}</p>
+                        </div>
+                    </div>
+                </div>
+                    {% endif %}
+                {% endfor %}
+
+                <p class="title12 margin-left10 margin-top15">到着ケース数</p>
+                <div class="margin-left10 clearfix cart-container margin-right10 margin-bottom15 padding-bottom15">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg">
+                </div>
+                <div class="float-right">
+                    <span class="color888">小計</span>
+                    <span>{{ creator_total[Creator.id]|price }}</span>
+                    <span class="color888 margin-left30">送料</span>
+                    <span class="margin-right10">350円</span>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+
+        <div id="cart-button-group" class="clearfix">
+            <div class="float-left">
+                <span class="profile-address-medium color88 title12">合計</span>
+                <span class="profile-name-medium color222 title16">{{ Cart.total_price|price }} <label class="title10">（税込）</label></span>
+            </div>
+            <div class="float-right">
+                <button class="btn btn-success">注文を確定する</button>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock main %}
