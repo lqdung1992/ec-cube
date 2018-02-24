@@ -334,10 +334,7 @@
         <div class="Rectangle">
             <ul class="list-group" id="main-menu">
                 <li class="list-group-item li-profile">
-                    {% if TargetCustomer.profile_image %}
-                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
-                    {% endif %}
-                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <img id="upload-image" src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
                     <span class="profile-name">{{ TargetCustomer.__toString }}</span>
                     <span class="button-x">X</span>
                 </li>
@@ -351,10 +348,7 @@
 
             <ul class="list-group hidden" id="setting-menu">
                 <li class="list-group-item li-profile">
-                    {% if TargetCustomer.profile_image %}
-                        {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
-                    {% endif %}
-                    <img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">
+                    <img id="upload-image" src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
                     <span class="profile-name">{{ TargetCustomer.__toString }}</span>
                     <span class="button-x">X</span>
                 </li>

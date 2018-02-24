@@ -21,6 +21,7 @@ use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
 use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Entity\ProductTag;
+use Eccube\Exception\CartException;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
 use Eccube\Repository\ProductRepository;
@@ -317,7 +318,7 @@ class FarmerController
         /** @var Customer $Customer */
         $Customer = $app->user();
         $TargetCustomer = $app['eccube.repository.customer']->find($id);
-        if (!$TargetCustomer instanceof Customer) {
+        if (!$TargetCustomer) {
             throw new NotFoundHttpException();
         }
 
@@ -609,26 +610,55 @@ class FarmerController
         /** @var FormBuilder $builder */
         $builder = $app['form.factory']->createBuilder('farm_voice', $voice);
         $form = $builder->getForm();
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!($Customer instanceof Customer)) {
-                return $app->redirect($app->url('mypage_login'));
-            }
-            /** @var UploadedFile $image */
-            $image = $form['file_name']->getData();
-            if ($image) {
-                $extension = $image->getClientOriginalExtension();
-                $fileName = date('mdHis') . uniqid('_') . '.' . $extension;
-                $image->move($app['config']['image_save_realdir'], $fileName);
-                $voice->setFileName($fileName);
-            }
-            $voice->setCustomer($Customer);
-            $voice->setTargetCustomer($TargetCustomer);
-            $voice->setProduct($Product);
-            $app['orm.em']->persist($voice);
-            $app['orm.em']->flush();
 
+        /* @var $builderCart \Symfony\Component\Form\FormBuilderInterface */
+        $builderCart = $app['form.factory']->createNamedBuilder('', 'add_cart', null, array(
+            'product' => $Product,
+            'id_add_product_id' => false,
+        ));
+        $cartForm = $builderCart->getForm();
+
+        $mode = $request->get('mode');
+
+        switch ($mode) {
+            case 'add_cart':
+                $cartForm->handleRequest($request);
+                if ($cartForm->isSubmitted() && $cartForm->isValid()) {
+                    $addCartData = $cartForm->getData();
+                    try {
+                        $app['eccube.service.cart']->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
+                    } catch (CartException $e) {
+                        $app->addRequestError($e->getMessage());
+                    }
+
+                    return $app->redirect($app->url('cart'));
+                }
+                break;
+            case 'add_voice':
+                $form->handleRequest($request);
+                if ($form->isSubmitted() && $form->isValid()) {
+                    if (!($Customer instanceof Customer)) {
+                        return $app->redirect($app->url('mypage_login'));
+                    }
+                    /** @var UploadedFile $image */
+                    $image = $form['file_name']->getData();
+                    if ($image) {
+                        $extension = $image->getClientOriginalExtension();
+                        $fileName = date('mdHis').uniqid('_').'.'.$extension;
+                        $image->move($app['config']['image_save_realdir'], $fileName);
+                        $voice->setFileName($fileName);
+                    }
+                    $voice->setCustomer($Customer);
+                    $voice->setTargetCustomer($TargetCustomer);
+                    $voice->setProduct($Product);
+                    $app['orm.em']->persist($voice);
+                    $app['orm.em']->flush();
+                }
+                break;
+            default:
+                break;
         }
+
         /** @var CustomerVoiceRepository $voiceRepo */
         $voiceRepo = $app['eccube.repository.customer_voice'];
         $CustomerVoice = $voiceRepo->findBy(array('Product' => $Product), array('create_date' => 'ASC'));
@@ -642,6 +672,7 @@ class FarmerController
             'form' => $form->createView(),
             'CustomerVoice' => $CustomerVoice,
             'ProductRate' => $ProductRate,
+            'cartForm' => $cartForm->createView(),
         ));
     }
 
