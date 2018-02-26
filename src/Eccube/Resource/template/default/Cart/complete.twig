@@ -1,0 +1,40 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 2/26/2018
+ # Time: 10:47 PM
+ #}{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+{% endblock javascript %}
+{% block main %}
+    <div id="reicever-cart-done" class="wrapper">
+        <div class="header receiver-header">
+            <div class="float-left">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg">
+            </div>
+            <div class="logo float-left">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg">
+            </div>
+            <div class="float-right">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-cart.svg">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-search.svg">
+            </div>
+        </div>
+
+        <div class="cart-done">
+            <p class="color222">
+                <span>ご注文ありがとうございました！</span>
+                <span>取引中画面からステータスを確認できます</span>
+            </p>
+            <div class="col-sm-12 col-xs-12">
+                <div
+            <button class="btn btn-success" id="cart-done-button">取引状況を確認する</button>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock main %}

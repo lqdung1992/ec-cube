@@ -83,7 +83,11 @@
                 <span class="profile-name-medium color222 title16">{{ Cart.total_price|price }} <label class="title10">（税込）</label></span>
             </div>
             <div class="float-right">
-                <button class="btn btn-success">注文を確定する</button>
+                <form action="?" method="post" name="cart-complete">
+                    <input type="hidden" name="date_id" value="{{ reception_date|date('N') }}">
+                    <input type="hidden" name="mode" value="complete">
+                <button class="btn btn-success" type="submit">注文を確定する</button>
+                </form>
             </div>
         </div>
         </div>

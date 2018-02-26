@@ -48,6 +48,7 @@ class FrontControllerProvider implements ControllerProviderInterface
 
         // cart
         $c->match('/cart', '\Eccube\Controller\CartController::index')->bind('cart');
+        $c->match('/cart/complete', '\Eccube\Controller\CartController::complete')->bind('cart_complete');
         $c->post('/cart/add', '\Eccube\Controller\CartController::add')->bind('cart_add');
         $c->post('/cart/modify', '\Eccube\Controller\CartController::modify')->bind('cart_modify');
         $c->put('/cart/up/{productClassId}', '\Eccube\Controller\CartController::up')->bind('cart_up')->assert('productClassId', '\d+');

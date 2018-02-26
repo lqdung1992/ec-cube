@@ -796,4 +796,21 @@ class CartService
         return $quantity;
     }
 
+    /**
+     * Check date in cart
+     * @param int $dateId [1->7]
+     * @return false
+     */
+    public function isExistCartDate($dateId)
+    {
+        $date = DateUtil::getDay($dateId);
+        $date = $date->format('Y/m/d');
+        foreach ($this->getCart()->getCartItems() as $cartItem) {
+            if ($date == $cartItem->getReceptionDate()->format('Y/m/d')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
