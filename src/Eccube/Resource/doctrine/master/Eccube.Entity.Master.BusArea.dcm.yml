@@ -1,0 +1,19 @@
+Eccube\Entity\Master\BusArea:
+    type: entity
+    table: mtb_bus_area
+    repositoryClass: Eccube\Repository\Master\BusAreaRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

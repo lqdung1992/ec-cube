@@ -1,0 +1,40 @@
+Eccube\Entity\RouteSchedule:
+    type: entity
+    table: dtb_route_schedule
+    repositoryClass: Eccube\Repository\RouteScheduleRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: id
+            generator:
+                strategy: AUTO
+    fields:
+        date:
+            type: datetime
+            nullable: true
+        schedule_status:
+            type: text
+            nullable: true
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+        del_flg:
+            type: smallint
+            nullable: false
+            unsigned: false
+            options:
+                default: '0'
+    manyToOne:
+        Bus:
+            targetEntity: Eccube\Entity\Bus
+            joinColumn:
+                name: bus_id
+                referencedColumnName: bus_id
+
+    lifecycleCallbacks: {  }
