@@ -40,6 +40,7 @@ use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
 use Eccube\Exception\ShoppingException;
+use Eccube\Util\DateUtil;
 use Eccube\Util\Str;
 
 
@@ -125,12 +126,12 @@ class ShoppingService
     }
 
     /**
-     * 受注情報を作成
-     *
      * @param $Customer
-     * @return \Eccube\Entity\Order
+     * @param null $dateId
+     * @return Order
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createOrder($Customer)
+    public function createOrder($Customer, $dateId = null)
     {
         // ランダムなpre_order_idを作成
         do {
@@ -142,9 +143,7 @@ class ShoppingService
         } while ($Order);
 
         // 受注情報、受注明細情報、お届け先情報、配送商品情報を作成
-        $Order = $this->registerPreOrder(
-            $Customer,
-            $preOrderId);
+        $Order = $this->registerPreOrder($Customer, $preOrderId, $dateId);
 
         $this->cartService->setPreOrderId($preOrderId);
         $this->cartService->save();
@@ -153,17 +152,14 @@ class ShoppingService
     }
 
     /**
-     * 仮受注情報作成
-     *
-     * @param $Customer
+     * @param Customer $Customer
      * @param $preOrderId
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @param null $dateId
+     * @return Order
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function registerPreOrder(Customer $Customer, $preOrderId)
+    public function registerPreOrder(Customer $Customer, $preOrderId, $dateId = null)
     {
-
         $this->em = $this->app['orm.em'];
 
         // 受注情報を作成
@@ -181,13 +177,13 @@ class ShoppingService
         $this->em->persist($Order);
 
         // 配送業者情報を取得
-        $deliveries = $this->getDeliveriesCart();
+//        $deliveries = $this->getDeliveriesCart();
 
         // お届け先情報を作成
-        $Order = $this->getNewShipping($Order, $Customer, $deliveries);
+//        $Order = $this->getNewShipping($Order, $Customer, $deliveries);
 
         // 受注明細情報、配送商品情報を作成
-        $Order = $this->getNewDetails($Order);
+        $Order = $this->getNewDetails($Order, $dateId);
 
         // 小計
         $subTotal = $this->orderService->getSubTotal($Order);
@@ -196,29 +192,29 @@ class ShoppingService
         $tax = $this->orderService->getTotalTax($Order);
 
         // 配送料合計金額
-        $Order->setDeliveryFeeTotal($this->getShippingDeliveryFeeTotal($Order->getShippings()));
+//        $Order->setDeliveryFeeTotal($this->getShippingDeliveryFeeTotal($Order->getShippings()));
 
         // 小計
         $Order->setSubTotal($subTotal);
 
         // 配送料無料条件(合計金額)
-        $this->setDeliveryFreeAmount($Order);
+//        $this->setDeliveryFreeAmount($Order);
 
         // 配送料無料条件(合計数量)
-        $this->setDeliveryFreeQuantity($Order);
+//        $this->setDeliveryFreeQuantity($Order);
 
         // 初期選択の支払い方法をセット
-        $payments = $this->app['eccube.repository.payment']->findAllowedPayments($deliveries);
-        $payments = $this->getPayments($payments, $subTotal);
+//        $payments = $this->app['eccube.repository.payment']->findAllowedPayments($deliveries);
+//        $payments = $this->getPayments($payments, $subTotal);
 
-        if (count($payments) > 0) {
-            $payment = $payments[0];
-            $Order->setPayment($payment);
-            $Order->setPaymentMethod($payment->getMethod());
-            $Order->setCharge($payment->getCharge());
-        } else {
-            $Order->setCharge(0);
-        }
+//        if (count($payments) > 0) {
+//            $payment = $payments[0];
+//            $Order->setPayment($payment);
+//            $Order->setPaymentMethod($payment->getMethod());
+//            $Order->setCharge($payment->getCharge());
+//        } else {
+//            $Order->setCharge(0);
+//        }
 
         $Order->setTax($tax);
 
@@ -228,7 +224,6 @@ class ShoppingService
         $this->em->flush();
 
         return $Order;
-
     }
 
     /**
@@ -459,16 +454,23 @@ class ShoppingService
 
 
     /**
-     * 受注明細情報、配送商品情報を作成
+     * Create new cart detail
      *
      * @param Order $Order
+     * @param null $dateId
      * @return Order
      */
-    public function getNewDetails(Order $Order)
+    public function getNewDetails(Order $Order, $dateId = null)
     {
+        if ($dateId) {
+            $dateTime = DateUtil::getDay($dateId);
+            $Cart = $this->cartService->getCartByDate($dateTime);
+        } else {
+            $Cart = $this->cartService->getCart();
+        }
 
         // 受注詳細, 配送商品
-        foreach ($this->cartService->getCart()->getCartItems() as $item) {
+        foreach ($Cart->getCartItems() as $item) {
             /* @var $ProductClass \Eccube\Entity\ProductClass */
             $ProductClass = $item->getObject();
             /* @var $Product \Eccube\Entity\Product */
@@ -481,8 +483,9 @@ class ShoppingService
             $OrderDetail->setOrder($Order);
             $Order->addOrderDetail($OrderDetail);
 
+            // Don't use shipping + shipment item
             // 配送商品情報を作成
-            $this->getNewShipmentItem($Order, $Product, $ProductClass, $quantity);
+//            $this->getNewShipmentItem($Order, $Product, $ProductClass, $quantity);
         }
 
         return $Order;
@@ -1141,9 +1144,8 @@ class ShoppingService
 
 
     /**
-     * 購入処理を行う
-     *
      * @param Order $Order
+     * @throws Application\AuthenticationCredentialsNotFoundException
      * @throws ShoppingException
      */
     public function processPurchase(Order $Order)
@@ -1160,8 +1162,9 @@ class ShoppingService
             throw new ShoppingException('front.shopping.stock.error');
         }
 
+        // Remove delivery + shipping
         // 受注情報、配送情報を更新
-        $Order = $this->calculateDeliveryFee($Order);
+//        $Order = $this->calculateDeliveryFee($Order);
         $this->setOrderUpdateData($Order);
         // 在庫情報を更新
         $this->setStockUpdate($em, $Order);

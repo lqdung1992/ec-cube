@@ -32,18 +32,23 @@ use Eccube\Entity\Customer;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
+use Eccube\Exception\ShoppingException;
 use Eccube\Service\CartService;
+use Eccube\Service\ShoppingService;
 use Eccube\Util\DateUtil;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CartController extends AbstractController
 {
     /**
-     * カート画面.
+     * Cart screen
      *
      * @param Application $app
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
+     * @throws \Doctrine\DBAL\ConnectionException
      */
     public function index(Application $app, Request $request)
     {
@@ -58,17 +63,6 @@ class CartController extends AbstractController
         );
         $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CART_INDEX_INITIALIZE, $event);
 
-        // FRONT_CART_INDEX_COMPLETE
-        $event = new EventArgs(
-            array(),
-            $request
-        );
-        $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CART_INDEX_COMPLETE, $event);
-
-        if ($event->hasResponse()) {
-            return $event->getResponse();
-        }
-
         /** @var EntityManager $em */
         $em = $app['orm.em'];
 
@@ -78,48 +72,123 @@ class CartController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        $mode = $request->get('mode');
-        switch ($mode) {
-            case 'confirm':
-                $dateId = $request->get('date_id');
-                $dateTime = DateUtil::getDay($dateId);
-                /** @var Cart $CartByDate */
-                $CartByDate = $cartService->getCartByDate($dateTime);
+        if ('POST' == $request->getMethod()) {
+            $mode = $request->get('mode');
+            $dateId = $request->get('date_id');
+            if (!$this->checkDateId($dateId)) {
+                throw new NotFoundHttpException();
+            }
+            switch ($mode) {
+                case 'confirm':
+                    $dateTime = DateUtil::getDay($dateId);
+                    /** @var Cart $CartByDate */
+                    $CartByDate = $cartService->getCartByDate($dateTime);
 
-                /** @var  Customer[] $arrCreator */
-                $arrCreator = array();
-                /** @var  CartItem $cart */
-                foreach ($CartByDate->getCartItems() as $cart) {
-                    $Creator = $cart->getObject()->getProduct()->getCreator();
-                    $arrCreator[$Creator->getId()] = $Creator;
-                }
+                    /** @var  Customer[] $arrCreator */
+                    $arrCreator = array();
+                    /** @var  CartItem $cart */
+                    foreach ($CartByDate->getCartItems() as $cart) {
+                        $Creator = $cart->getObject()->getProduct()->getCreator();
+                        $arrCreator[$Creator->getId()] = $Creator;
+                    }
 
-                $arrTotal = array();
-                foreach ($arrCreator as $creator) {
-                    $arrTotal[$creator->getId()] = 0;
-                    foreach ($CartByDate->getCartItems() as $cartItem) {
-                        if ($cartItem->getObject()->getProduct()->getCreator()->getId() == $creator->getId()) {
-                            $arrTotal[$creator->getId()] += $cartItem->getTotalPrice();
+                    $arrTotal = array();
+                    foreach ($arrCreator as $creator) {
+                        $arrTotal[$creator->getId()] = 0;
+                        foreach ($CartByDate->getCartItems() as $cartItem) {
+                            if ($cartItem->getObject()->getProduct()->getCreator()->getId() == $creator->getId()) {
+                                $arrTotal[$creator->getId()] += $cartItem->getTotalPrice();
+                            }
                         }
                     }
-                }
 
-                return $app->render(
-                    'Cart/confirm.twig',
-                    array(
-                        'Cart' => $CartByDate,
-                        'reception_date' => $dateTime,
-                        'Creators' => $arrCreator,
-                        'creator_total' => $arrTotal,
-                        'date_id' => $dateId,
-                        'master_date' => $masterDate
-                    )
-                );
+                    return $app->render(
+                        'Cart/confirm.twig',
+                        array(
+                            'Cart' => $CartByDate,
+                            'reception_date' => $dateTime,
+                            'Creators' => $arrCreator,
+                            'creator_total' => $arrTotal,
+                            'date_id' => $dateId,
+                            'master_date' => $masterDate
+                        )
+                    );
+                case 'complete':
+                    if (!$cartService->isExistCartDate($dateId)) {
+                        throw new NotFoundHttpException();
+                    }
+                    /** @var ShoppingService $shoppingService */
+                    $shoppingService = $app['eccube.service.shopping'];
+//                $Order = $shoppingService->getOrder($app['config']['order_processing']);
+
+                    $Customer = $app->user();
+                    if (is_null($Customer)) {
+                        return $app->redirect($app->url('shopping_login'));
+                    }
+
+                    try {
+                        $Order = $shoppingService->createOrder($Customer, $dateId);
+                    } catch (CartException $e) {
+                        log_error('初回受注情報作成エラー', array($e->getMessage()));
+                        $app->addRequestError($e->getMessage());
+
+                        return $app->redirect($app->url('cart'));
+                    } catch (\Exception $exception) {
+                        $app->addRequestError($exception->getMessage());
+
+                        return $app->redirect($app->url('cart'));
+                    }
+
+                    $em->refresh($Order);
+                    $em->getConnection()->beginTransaction();
+                    try {
+                        // 購入処理
+                        $shoppingService->processPurchase($Order);
+                        $em->flush();
+                        $em->getConnection()->commit();
+                        log_info('Complete order with orderId: ', array($Order->getId()));
+                    } catch (ShoppingException $e) {
+                        log_error('購入エラー', array($e->getMessage()));
+                        $em->getConnection()->rollback();
+                        $app->log($e);
+                        $app->addError($e->getMessage());
+
+                        return $app->redirect($app->url('shopping_error'));
+                    } catch (\Exception $e) {
+                        log_error('予期しないエラー', array($e->getMessage()));
+                        $em->getConnection()->rollback();
+                        $app->log($e);
+                        $app->addError('front.shopping.system.error');
+
+                        return $app->redirect($app->url('shopping_error'));
+                    }
+                    $dateTime = DateUtil::getDay($dateId);
+                    // Remove cart item that complete
+                    $CartByDate = $cartService->getCartByDate($dateTime);
+                    foreach ($CartByDate->getCartItems() as $cartItem) {
+                        $Cart->removeCartItemByIdentifier($cartItem->getClassName(), $cartItem->getClassId(), $dateTime);
+                    }
+                    $cartService->lock();
+                    $cartService->save();
+
+                    return $app->redirect($app->url('cart_complete'));
+            }
         }
 
         $receptionDate = array();
         foreach ($Cart->getCartItems() as $CartItem) {
             $receptionDate[$CartItem->getReceptionDate()->format('Y/m/d')] = $CartItem->getReceptionDate();
+        }
+
+        // FRONT_CART_INDEX_COMPLETE
+        $event = new EventArgs(
+            array(),
+            $request
+        );
+        $app['eccube.event.dispatcher']->dispatch(EccubeEvents::FRONT_CART_INDEX_COMPLETE, $event);
+
+        if ($event->hasResponse()) {
+            return $event->getResponse();
         }
 
         return $app->render(
@@ -468,5 +537,35 @@ class CartController extends AbstractController
         }
 
         return $app->redirect($app->url('cart'));
+    }
+
+    /**
+     * Complete cart
+     *
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function complete(Application $app, Request $request)
+    {
+        return $app->render('Cart/complete.twig');
+    }
+
+    /**
+     * @param int $dateId [1->7]
+     * @return bool
+     */
+    private function checkDateId($dateId)
+    {
+        if (!is_numeric($dateId)) {
+            echo 321;
+            return false;
+        }
+
+        if ($dateId < 1 or $dateId > 7) {
+            return false;
+        }
+
+        return true;
     }
 }
