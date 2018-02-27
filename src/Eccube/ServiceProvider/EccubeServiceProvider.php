@@ -285,6 +285,33 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.plugin_event_handler'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\PluginEventHandler');
         });
+
+        //Schedule
+        $app['eccube.repository.bus'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Bus');
+        });
+        $app['eccube.repository.bus_stop'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\BusStop');
+        });
+        $app['eccube.repository.route_detail'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\RouteDetail');
+        });
+        $app['eccube.repository.route_schedule'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\RouteSchedule');
+        });
+        $app['eccube.repository.bus_area'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\BusArea');
+        });
+        $app['eccube.repository.bus_status'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\BusStatus');
+        });
+        $app['eccube.repository.route'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\Route');
+        });
+        $app['eccube.repository.route_schedule_status'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\RouteScheduleStatus');
+        });
+
         // em
         if (isset($app['orm.em'])) {
             $app['orm.em'] = $app->share($app->extend('orm.em', function (\Doctrine\ORM\EntityManager $em, \Silex\Application $app) {
@@ -424,6 +451,10 @@ class EccubeServiceProvider implements ServiceProviderInterface
 
             $types[] = new \Eccube\Form\Type\Admin\PluginLocalInstallType();
             $types[] = new \Eccube\Form\Type\Admin\PluginManagementType();
+
+            //schedule
+            $types[] = new \Eccube\Form\Type\Admin\BusType($app);
+            $types[] = new \Eccube\Form\Type\Admin\BusStopType($app);
 
             return $types;
         }));

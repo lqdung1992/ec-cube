@@ -34,4 +34,41 @@ use Doctrine\ORM\EntityRepository;
  */
 class BusStopRepository extends EntityRepository
 {
+    public function save(\Eccube\Entity\BusStop $BusStop)
+    {
+        $em = $this->getEntityManager();
+        $em->getConnection()->beginTransaction();
+        try {
+            if (!$BusStop->getId()) {
+                $rank = $this->createQueryBuilder('c')
+                    ->select('MAX(c.rank)')
+                    ->getQuery()
+                    ->getSingleScalarResult();
+                if (!$rank) {
+                    $rank = 0;
+                }
+                $BusStop->setRank($rank + 1);
+                $BusStop->setDelFlg(0);
+
+                $em->createQueryBuilder()
+                    ->update('Eccube\Entity\BusStop', 'c')
+                    ->set('c.rank', 'c.rank + 1')
+                    ->where('c.rank > :rank')
+                    ->setParameter('rank', $rank)
+                    ->getQuery()
+                    ->execute();
+            }
+
+            $em->persist($BusStop);
+            $em->flush();
+
+            $em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+
+            return false;
+        }
+
+        return true;
+    }
 }

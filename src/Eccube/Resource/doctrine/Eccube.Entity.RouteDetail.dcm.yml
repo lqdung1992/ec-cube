@@ -12,9 +12,6 @@ Eccube\Entity\RouteDetail:
             generator:
                 strategy: AUTO
     fields:
-        route_id:
-            type: integer
-            nullable: true
         rank:
             type: smallint
             nullable: true
@@ -45,5 +42,10 @@ Eccube\Entity\RouteDetail:
             joinColumn:
                 name: bus_stop_id
                 referencedColumnName: bus_stop_id
+        Route:
+            targetEntity: Eccube\Entity\Master\Route
+            joinColumn:
+                name: route_id
+                referencedColumnName: id
 
     lifecycleCallbacks: {  }

@@ -3,6 +3,7 @@
 namespace Eccube\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Eccube\Entity\Master\Route;
 
 /**
  * RouteDetail
@@ -13,11 +14,6 @@ class RouteDetail extends \Eccube\Entity\AbstractEntity
      * @var integer
      */
     private $id;
-
-    /**
-     * @var integer
-     */
-    private $route_id;
 
     /**
      * @var integer
@@ -58,6 +54,11 @@ class RouteDetail extends \Eccube\Entity\AbstractEntity
      * @var BusStop
      */
     private $BusStop;
+
+    /**
+     * @var Route
+     */
+    private $Route;
 
     /**
      * @return integer
@@ -105,22 +106,6 @@ class RouteDetail extends \Eccube\Entity\AbstractEntity
     public function setUpdateDate($update_date)
     {
         $this->update_date = $update_date;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getRouteId()
-    {
-        return $this->route_id;
-    }
-
-    /**
-     * @param integer $route_id
-     */
-    public function setRouteId($route_id)
-    {
-        $this->route_id = $route_id;
     }
 
     /**
@@ -218,4 +203,21 @@ class RouteDetail extends \Eccube\Entity\AbstractEntity
     {
         $this->del_flg = $del_flg;
     }
+
+    /**
+     * @return Route
+     */
+    public function getRoute()
+    {
+        return $this->Route;
+    }
+
+    /**
+     * @param Route $Route
+     */
+    public function setRoute($Route)
+    {
+        $this->Route = $Route;
+    }
+
 }

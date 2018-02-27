@@ -49,6 +49,21 @@ class AdminControllerProvider implements ControllerProviderInterface
         // change password
         $c->match('/change_password', '\Eccube\Controller\Admin\AdminController::changePassword')->bind('admin_change_password');
 
+        //bus schedule
+        $c->match('/schedule', '\Eccube\Controller\Admin\Schedule\ScheduleController::index')->bind('admin_schedule_list');
+        $c->match('/schedule/new', '\Eccube\Controller\Admin\Schedule\ScheduleController::edit')->bind('admin_schedule_new');
+        $c->match('/schedule/{id}/edit', '\Eccube\Controller\Admin\Schedule\ScheduleController::edit')->assert('id', '\d+')->bind('admin_schedule_edit');
+        //bus
+        $c->match('/schedule/bus', '\Eccube\Controller\Admin\Schedule\ScheduleController::bus')->bind('admin_schedule_bus');
+        $c->match('/schedule/bus/{id}/edit', '\Eccube\Controller\Admin\Schedule\ScheduleController::bus')->assert('id', '\d+')->bind('admin_schedule_bus_edit');
+        $c->match('/schedule/bus/{id}/delete', '\Eccube\Controller\Admin\Schedule\ScheduleController::deleteBus')->assert('id', '\d+')->bind('admin_schedule_bus_delete');
+
+        //bus stop
+        $c->match('/schedule/bus_stop/{id}/edit', '\Eccube\Controller\Admin\Schedule\ScheduleController::busStop')->assert('id', '\d+')->bind('admin_schedule_bus_stop_edit');
+        $c->match('/schedule/bus_stop/{id}/delete', '\Eccube\Controller\Admin\Schedule\ScheduleController::deleteBusStop')->assert('id', '\d+')->bind('admin_schedule_bus_stop_delete');
+        $c->match('/schedule/bus_stop', '\Eccube\Controller\Admin\Schedule\ScheduleController::busStop')->bind('admin_schedule_bus_stop');
+        $c->post('/schedule/bus_stop/rank/move', '\Eccube\Controller\Admin\Schedule\ScheduleController::moveRank')->bind('admin_schedule_bus_stop_rank_move');
+
         // product
         $c->match('/product', '\Eccube\Controller\Admin\Product\ProductController::index')->bind('admin_product');
         $c->match('/product/export', '\Eccube\Controller\Admin\Product\ProductController::export')->bind('admin_product_export');
