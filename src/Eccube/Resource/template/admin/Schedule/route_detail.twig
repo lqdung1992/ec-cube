@@ -21,10 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #}
 {% extends 'default_frame.twig' %}
 
-{% set menus = ['schedule', 'bus_stop'] %}
+{% set menus = ['schedule', 'schedule_new'] %}
 
 {% block title %}運行スケジュール{% endblock %}
-{% block sub_title %}停留所情報管理{% endblock %}
+{% block sub_title %}ルート詳細情報管理{% endblock %}
 
 {% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
 
@@ -73,7 +73,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             var newRanks = {};
             var i = 0;
             $("div.tableish > .item_box").each(function() {
-                newRanks[this.dataset.categoryId] = oldRanks[i];
+                newRanks[this.dataset.busId] = oldRanks[i];
                 i++;
             });
 
@@ -100,59 +100,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             <div id="detail_wrap" class="col-md-9">
                 <div id="detail_box" class="box">
                     <div id="detail_box__header" class="box-header">
-                        <h3 class="box-title">停留所情報登録・編集</h3>
+                        <h3 class="box-title">ルート詳細情報登録・編集</h3>
                     </div><!-- /.box-header -->
                     <div id="detail_box__body" class="box-body">
-                        {{ form_row(form.name) }}
-                        {{ form_row(form.address) }}
-                        {{ form_row(form.BusArea) }}
-                        {{ form_row(form.BusStatus) }}
+                        {{ form_row(form.Route) }}
+                        {{ form_row(form.BusStop) }}
+                        {{ form_row(form.move_time) }}
+                        {{ form_row(form.work_time) }}
+                        {{ form_row(form.arrive_time) }}
                     </div><!-- /.box-body -->
                 </div><!-- /.box -->
-
-                {% if BusStops|length > 0 %}
-                    <div id="sortable_list" class="box-body no-padding no-border box">
-                        <div id="sortable_list_box" class="sortable_list">
-                            <div id="sortable_list_box__list" class="tableish">
-                                {% for Bus in BusStops %}
-                                    <div id="sortable_list__item--{{ Bus.id }}" data-rank="{{ Bus.rank }}" class="item_box tr" data-bus-id="{{ Bus.id }}">
-                                        <div class="icon_sortable td">
-                                            <svg class="cb cb-ellipsis-v"> <use xlink:href="#cb-ellipsis-v" /></svg>
-                                        </div>
-                                        <div id="sortable_list__item_body--{{ Bus.id }}" class="item_pattern td">
-                                            <a href="{{ url('admin_schedule_bus_stop_edit',  { id : Bus.id }) }}">{{ Bus.name }} --- {{ Bus.address }}</a>
-                                        </div>
-                                        <div id="sortable_list__item_menu_box--{{ Bus.id }}" class="icon_edit td">
-                                            <div id="sortable_list__item_menu_toggle--{{ Bus.id }}" class="dropdown">
-                                                <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
-                                                <ul id="sortable_list__menu--{{ Bus.id }}" class="dropdown-menu dropdown-menu-right">
-                                                    {% if Bus.id != CurrentBusStop.id %}
-                                                        <li><a href="{{ url('admin_schedule_bus_stop_edit', {id: Bus.id}) }}">編集</a></li>
-                                                    {% else %}
-                                                        <li><a>編集中</a></li>
-                                                    {% endif %}
-
-                                                    <li>
-                                                        <a href="{{ url('admin_schedule_bus_stop_delete', {id: Bus.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete">
-                                                            削除
-                                                        </a>
-                                                    </li>
-
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div><!-- /.item_box -->
-                                {% endfor %}
-
-                            </div>
-                        </div>
-                    </div><!-- /.box-body -->
-                {% else %}
-                    <div id="list_box" class="box-body no-padding">
-                        <div id="list_box__not_find_Bus" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
-                    </div><!-- /.box-body -->
-                {% endif %}
-                <!-- ▲ データがある時 ▲ -->
             </div><!-- /.col -->
             
             <div id="detail_list_footer" class="col-md-3">
@@ -167,11 +124,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         </div><!-- /.box-body -->
                     </div><!-- /.box -->
                 </div>
-            </div><!-- /.col --> 
-
+            </div><!-- /.col -->
         </div>
-
     </form>
-
 
 {% endblock %}

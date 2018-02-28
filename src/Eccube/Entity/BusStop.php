@@ -142,6 +142,11 @@ class BusStop extends \Eccube\Entity\AbstractEntity
         return $this->address;
     }
 
+    public function getAddressAndName()
+    {
+        return $this->name .' --- '. $this->address;
+    }
+
     /**
      * @param string $address
      */

@@ -28,13 +28,27 @@ use Eccube\Application;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\Bus;
 use Eccube\Entity\BusStop;
+use Eccube\Entity\RouteDetail;
 use Symfony\Component\HttpFoundation\Request;
 
 class ScheduleController extends AbstractController
 {
-    public function index(Application $app, Request $request, $parent_id = null, $id = null)
+    public function index(Application $app, Request $request)
     {
+        $builder = $app['form.factory']->createBuilder('admin_schedule_route_search');
+        $form = $builder->getForm();
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+        }
+        $RouteDetails = $app['eccube.repository.route_detail']->findBy(array(), array('Route' => 'DESC', 'rank' => 'DESC'));
+
+        return $app->render('Schedule/index.twig', array(
+            'searchForm' => $form->createView(),
+            'RouteDetails' => $RouteDetails,
+        ));
     }
 
     public function bus(Application $app, Request $request, $id = null)
@@ -63,6 +77,37 @@ class ScheduleController extends AbstractController
             'form' => $form->createView(),
             'Buses'  => $Buses,
             'CurrentBus'  => $Bus
+        ));
+    }
+
+    public function route(Application $app, Request $request, $id = null)
+    {
+        if ($id) {
+            $RouteDetail = $app['eccube.repository.route_detail']->find($id);
+        } else {
+            $RouteDetail = new RouteDetail();
+        }
+        $builder = $app['form.factory']->createBuilder('admin_schedule_route_detail', $RouteDetail);
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $RouteDetail = $form->getData();
+            $status = $app['eccube.repository.route_detail']->save($RouteDetail);
+            if ($status)
+                $app->addSuccess('admin.schedule.route_detail.save.complete', 'admin');
+            else
+                $app->addSuccess('admin.schedule.route_detail.save.error', 'admin');
+
+            return $app->redirect($app->url('admin_schedule_list'));
+        }
+
+        $RouteDetails = $app['eccube.repository.route_detail']->findBy(array(), array('rank' => 'DESC'));
+
+        return $app->render('Schedule/route_detail.twig', array(
+            'form' => $form->createView(),
+            'RouteDetails'  => $RouteDetails,
+            'CurrentRouteDetail'  => $RouteDetail
         ));
     }
 
@@ -148,6 +193,7 @@ class ScheduleController extends AbstractController
             }
             $app['orm.em']->flush();
         }
+
         return true;
     }
 

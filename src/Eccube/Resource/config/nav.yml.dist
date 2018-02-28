@@ -75,7 +75,7 @@
         url : admin_schedule_list
       - id: schedule_new
         name: 運行スケジュール登録
-        url: admin_schedule_new
+        url: admin_schedule_route
       - id: bus_stop
         name: 停留所情報登録
         url: admin_schedule_bus_stop

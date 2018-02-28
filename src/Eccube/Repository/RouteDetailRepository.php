@@ -34,4 +34,60 @@ use Doctrine\ORM\EntityRepository;
  */
 class RouteDetailRepository extends EntityRepository
 {
+    public function save(\Eccube\Entity\RouteDetail $RouteDetail)
+    {
+        $em = $this->getEntityManager();
+        $em->getConnection()->beginTransaction();
+        try {
+            if (!$RouteDetail->getId()) {
+                $rank = $this->createQueryBuilder('c')
+                    ->select('MAX(c.rank)')
+                    ->getQuery()
+                    ->getSingleScalarResult();
+                if (!$rank) {
+                    $rank = 0;
+                }
+                $RouteDetail->setRank($rank + 1);
+                $RouteDetail->setDelFlg(0);
+
+                $em->createQueryBuilder()
+                    ->update('Eccube\Entity\RouteDetail', 'c')
+                    ->set('c.rank', 'c.rank + 1')
+                    ->where('c.rank > :rank')
+                    ->setParameter('rank', $rank)
+                    ->getQuery()
+                    ->execute();
+            }
+
+            $em->persist($RouteDetail);
+            $em->flush();
+
+            $em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getRoute() {
+        $em = $this->getEntityManager();
+        $em->getConnection()->beginTransaction();
+        try {
+            $qb = $em
+                ->createQueryBuilder('c')
+                ->select('count(c.id)')
+                ->where('c.del_flg = 0');
+
+
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+
+            return false;
+        }
+
+        return true;
+    }
 }

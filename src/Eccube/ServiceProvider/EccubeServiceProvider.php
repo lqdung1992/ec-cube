@@ -455,6 +455,8 @@ class EccubeServiceProvider implements ServiceProviderInterface
             //schedule
             $types[] = new \Eccube\Form\Type\Admin\BusType($app);
             $types[] = new \Eccube\Form\Type\Admin\BusStopType($app);
+            $types[] = new \Eccube\Form\Type\Admin\RouteDetailType($app);
+            $types[] = new \Eccube\Form\Type\Admin\SearchRouteType($app);
 
             return $types;
         }));

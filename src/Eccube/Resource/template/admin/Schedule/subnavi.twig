@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 <a class="toggle"><svg class="cb cb-tag"> <use xlink:href="#cb-tag" /></svg>運行スケジュール管理<svg class="cb cb-angle-down"> <use xlink:href="#cb-angle-down" /></svg></a>
                 <ul {% if active_menus(menus)[0] == 'schedule' %}class="active" style="display: block;"{% endif %}>
                     <li id="navi-schedule-index" class="{% if active_menus(menus)[1] == 'schedule_master' %}active{% endif %}"><a href="{{ url('admin_schedule_list') }}">運行スケジュールマスタ</a></li>
-                    <li id="navi-schedule-edit" class="{% if active_menus(menus)[1] == 'schedule_edit' %}active{% endif %}"><a href="{{ url('admin_schedule_new') }}">運行スケジュール登録</a></li>
+                    <li id="navi-schedule-new" class="{% if active_menus(menus)[1] == 'schedule_new' %}active{% endif %}"><a href="{{ url('admin_schedule_route') }}">運行スケジュール登録</a></li>
                     <li id="navi-schedule-bus-stop" class="{% if active_menus(menus)[1] == 'schedule_bus_stop' %}active{% endif %}"><a href="{{ url('admin_schedule_bus_stop') }}">停留所情報登録</a></li>
                     <li id="navi-schedule-bus" class="{% if active_menus(menus)[1] == 'schedule_bus' %}active{% endif %}"><a href="{{ url('admin_schedule_bus') }}">号車情報登録</a></li>aa
                 </ul>

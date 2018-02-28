@@ -131,6 +131,11 @@ admin.schedule.bus_stop.update.complete: 停留所情報を更新しました。
 admin.schedule.bus_stop.save.error: 停留所情報を保存できませんでした。
 admin.schedule.bus_stop.delete.complete: 停留所情報を削除しました。
 
+admin.schedule.route_detail.save.complete: ルート詳細情報を保存しました。
+admin.schedule.route_detail.update.complete: ルート詳細情報を更新しました。
+admin.schedule.route_detail.save.error: ルート詳細情報を保存できませんでした。
+admin.schedule.route_detail.delete.complete: ルート詳細情報を削除しました。
+
 admin.product.search.stock: 在庫なし
 admin.product.product_class.save.complete: 商品規格を登録しました。
 admin.product.product_class.update.complete: 商品規格を更新しました。
