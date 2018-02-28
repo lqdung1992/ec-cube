@@ -66,11 +66,7 @@ class CartController extends AbstractController
         /** @var EntityManager $em */
         $em = $app['orm.em'];
 
-        $masterDate = $em->createQueryBuilder()
-            ->select('rd')
-            ->from('Eccube\Entity\Master\ReceiptableDate', 'rd', 'rd.id')
-            ->getQuery()
-            ->getResult();
+        $masterDate = $app['eccube.repository.master.receiptable_date']->findAllWithKeyAsId();
 
         if ('POST' == $request->getMethod()) {
             $mode = $request->get('mode');
@@ -171,7 +167,7 @@ class CartController extends AbstractController
                     $cartService->lock();
                     $cartService->save();
 
-                    return $app->redirect($app->url('cart_complete'));
+                    return $app->redirect($app->url('cart_complete', array('id' => $Order->getId())));
             }
         }
 
@@ -544,11 +540,12 @@ class CartController extends AbstractController
      *
      * @param Application $app
      * @param Request $request
+     * @param int $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function complete(Application $app, Request $request)
+    public function complete(Application $app, Request $request, $id = null)
     {
-        return $app->render('Cart/complete.twig');
+        return $app->render('Cart/complete.twig', array('id' => $id));
     }
 
     /**
@@ -558,7 +555,6 @@ class CartController extends AbstractController
     private function checkDateId($dateId)
     {
         if (!is_numeric($dateId)) {
-            echo 321;
             return false;
         }
 

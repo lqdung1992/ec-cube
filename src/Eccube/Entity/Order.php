@@ -1564,4 +1564,39 @@ class Order extends \Eccube\Entity\AbstractEntity
     {
         return $this->OrderStatusColor;
     }
+
+    /** @var \DateTime */
+    private $receiptable_date;
+
+    /**
+     * @return \DateTime
+     */
+    public function getReceiptableDate()
+    {
+        return $this->receiptable_date;
+    }
+
+    /**
+     * @param \DateTime $receiptable_date
+     */
+    public function setReceiptableDate($receiptable_date)
+    {
+        $this->receiptable_date = $receiptable_date;
+    }
+
+    /**
+     * Get farm
+     *
+     * @return Customer[]
+     */
+    public function getFarm()
+    {
+        $arrCreator = array();
+        /** @var OrderDetail $orderDetail */
+        foreach ($this->getOrderDetails() as $orderDetail) {
+            $arrCreator[] = $orderDetail->getProduct()->getCreator();
+        }
+
+        return $arrCreator;
+    }
 }

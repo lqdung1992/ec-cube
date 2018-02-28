@@ -221,6 +221,11 @@ class ShoppingService
         // 合計金額の計算
         $this->calculatePrice($Order);
 
+        if ($dateId) {
+            $date = DateUtil::getDay($dateId);
+            $Order->setReceiptableDate($date);
+        }
+
         $this->em->flush();
 
         return $Order;
