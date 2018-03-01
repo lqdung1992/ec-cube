@@ -41,6 +41,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             margin-bottom: 20px !important;
             margin-left: 20px;
         }
+
+        #search_button {
+            margin-top: 20px;
+        }
     </style>
 {% endblock stylesheet %}
 
@@ -60,14 +64,22 @@ $(function() {
 {% block main %}
             <!--検索条件設定テーブルここから-->
             <div id="search_wrap" class="search-box">
-                <form name="search_form" id="search_form" method="post" action="{{ url('admin_product') }}">
+                <form name="search_form" id="search_form" method="post" action="{{ url('admin_schedule_list') }}">
                 	{{ form_widget(searchForm._token) }}
                     <div id="search_box" class="row">
                         <div class="col-md-12 accordion">
-                            {{ form_widget(searchForm.Route) }}
+                            <div class="col-md-6">
+                                {{ form_label(searchForm.Bus) }}
+                                {{ form_widget(searchForm.Bus) }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form_label(searchForm.date) }}
+                                {{ form_widget(searchForm.date) }}
+                            </div>
                             <div id="search_box__footer" class="row btn_area">
                                 <div id="search_box__search_button" class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4 text-center">
-                                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="search_button">
                                         検索する <svg class="cb cb-angle-right"><use xlink:href="#cb-angle-right"></svg>
                                     </button>
                                 </div>
@@ -80,66 +92,66 @@ $(function() {
 
             <div class="row">
                 <button type="button" class="btn btn-primary btn-block go-to-route-detail">ルート詳細追加</button>
-                <div id="detail_wrap" class="col-md-12">
-                    {% if RouteDetails|length > 0 %}
-                        <div id="sortable_list" class="box-body no-padding no-border box">
-                            <div id="sortable_list_box" class="sortable_list">
-                                <div id="sortable_list_box__list" class="tableish">
-                                    {% for Route in RouteDetails %}
-                                        <div id="sortable_list__item--{{ Route.id }}" data-rank="{{ Route.rank }}" class="item_box tr" data-Route-id="{{ Route.id }}">
-                                            <div id="sortable_list__item_body--{{ Route.id }}" class="item_pattern td">
-                                                <a href="#">{{ Route.Route.name }} </a>
-                                            </div>
-                                            <div id="sortable_list__item_menu_box--{{ Route.id }}" class="icon_edit td">
-                                                <div id="sortable_list__item_menu_toggle--{{ Route.id }}" class="dropdown">
-                                                    <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
-                                                    <ul id="sortable_list__menu--{{ Route.id }}" class="dropdown-menu dropdown-menu-right">
-                                                        <li>
-                                                            <a href="{{ url('admin_schedule_route_delete', {id: Route.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete">
-                                                                削除
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
+                {#<div id="detail_wrap" class="col-md-12">#}
+                    {#{% if Routes|length > 0 %}#}
+                        {#<div id="sortable_list" class="box-body no-padding no-border box">#}
+                            {#<div id="sortable_list_box" class="sortable_list">#}
+                                {#<div id="sortable_list_box__list" class="tableish">#}
+                                    {#{% for Route in Routes %}#}
+                                        {#<div id="sortable_list__item--{{ Route.id }}" data-rank="{{ Route.rank }}" class="item_box tr" data-Route-id="{{ Route.id }}">#}
+                                            {#<div id="sortable_list__item_body--{{ Route.id }}" class="item_pattern td">#}
+                                                {#<h3>{{ Route.name }} <h3>#}
+                                            {#</div>#}
+                                            {#<div id="sortable_list__item_menu_box--{{ Route.id }}" class="icon_edit td">#}
+                                                {#<div id="sortable_list__item_menu_toggle--{{ Route.id }}" class="dropdown">#}
+                                                    {#<a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>#}
+                                                    {#<ul id="sortable_list__menu--{{ Route.id }}" class="dropdown-menu dropdown-menu-right">#}
+                                                        {#<li>#}
+                                                            {#<a href="{{ url('admin_schedule_route_delete', {id: Route.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete">#}
+                                                                {#削除#}
+                                                            {#</a>#}
+                                                        {#</li>#}
+                                                    {#</ul>#}
+                                                {#</div>#}
+                                            {#</div>#}
 
-                                        </div><!-- /.item_box -->
+                                        {#</div><!-- /.item_box -->#}
 
 
-                                        <table class="table table-bordered table-hover">
-                                            <thead>
-                                                <th>停留所</th>
-                                                <th>移動時間</th>
-                                                <th>作業時間</th>
-                                                <th>到着時間</th>
-                                                <th></th>
-                                            </thead>
-                                            <tbody>
-                                                {% for RouteDetail in RouteDetails %}
-                                                    {% if RouteDetail.Route.id == Route.Route.id %}
-                                                        <tr>
-                                                            <td>{{ RouteDetail.BusStop.name }} --- {{ RouteDetail.BusStop.address }}</td>
-                                                            <td>{{ RouteDetail.move_time }}</td>
-                                                            <td>{{ RouteDetail.work_time }}</td>
-                                                            <td>{{ RouteDetail.arrive_time }}</td>
-                                                            <td>
-                                                                <a href="{{ url('admin_schedule_route_edit', {id: Route.id}) }}">編集</a>
-                                                            </td>
-                                                        </tr>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div><!-- /.box-body -->
-                    {% else %}
-                        <div id="list_box" class="box-body no-padding">
-                            <div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
-                        </div><!-- /.box-body -->
-                    {% endif %}
-                </div>
+                                        {#<table class="table table-bordered table-hover">#}
+                                            {#<thead>#}
+                                                {#<th>停留所</th>#}
+                                                {#<th>移動時間</th>#}
+                                                {#<th>作業時間</th>#}
+                                                {#<th>到着時間</th>#}
+                                                {#<th></th>#}
+                                            {#</thead>#}
+                                            {#<tbody>#}
+                                                {#{% for RouteDetail in RouteDetails %}#}
+                                                    {#{% if RouteDetail.Route.id == Route.id %}#}
+                                                        {#<tr>#}
+                                                            {#<td>{{ RouteDetail.BusStop.name }} --- {{ RouteDetail.BusStop.address }}</td>#}
+                                                            {#<td>{{ RouteDetail.move_time }}</td>#}
+                                                            {#<td>{{ RouteDetail.work_time }}</td>#}
+                                                            {#<td>{{ RouteDetail.arrive_time }}</td>#}
+                                                            {#<td>#}
+                                                                {#<a href="{{ url('admin_schedule_route_edit', {id: RouteDetail.id}) }}">編集</a>#}
+                                                            {#</td>#}
+                                                        {#</tr>#}
+                                                    {#{% endif %}#}
+                                                {#{% endfor %}#}
+                                            {#</tbody>#}
+                                        {#</table>#}
+                                    {#{% endfor %}#}
+                                {#</div>#}
+                            {#</div>#}
+                        {#</div><!-- /.box-body -->#}
+                    {#{% else %}#}
+                        {#<div id="list_box" class="box-body no-padding">#}
+                            {#<div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>#}
+                        {#</div><!-- /.box-body -->#}
+                    {#{% endif %}#}
+                {#</div>#}
                 <!--検索条件設定テーブルここまで-->
             </div>
 

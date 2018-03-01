@@ -44,8 +44,8 @@ class RouteDetailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('move_time', 'integer', array(
-                'label' => '移動時間',
+            ->add('move_time', 'text', array(
+                'label' => '予定時刻',
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),

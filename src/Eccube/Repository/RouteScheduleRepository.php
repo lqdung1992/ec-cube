@@ -34,4 +34,34 @@ use Doctrine\ORM\EntityRepository;
  */
 class RouteScheduleRepository extends EntityRepository
 {
+    public function getRoute($data) {
+        try {
+            $qb = $this->createQueryBuilder('rs')
+                ->select('r.id')
+                ->leftJoin('rs.Bus', 'b')
+                ->leftJoin('b.Route', 'r');
+
+            if (!is_null($data['date'])) {
+                $date = $data['date']->format('Y/m/d');
+                $qb->where('rs.date = :date')->setParameter('date', $date);
+            }
+
+            if (!is_null($data['Bus'])) {
+                $qb->andWhere('rs.Bus = :Bus')->setParameter('Bus', $data['Bus']);
+            }
+
+
+
+            $result = $qb->getQuery()
+                ->getResult();
+
+            foreach ($result as $id) {
+
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

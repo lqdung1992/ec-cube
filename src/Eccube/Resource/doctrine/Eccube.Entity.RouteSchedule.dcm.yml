@@ -13,7 +13,7 @@ Eccube\Entity\RouteSchedule:
                 strategy: AUTO
     fields:
         date:
-            type: datetime
+            type: text
             nullable: true
         schedule_status:
             type: text

@@ -25,6 +25,7 @@
 namespace Eccube\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Eccube\Entity\Master\Route;
 
 /**
  * RouteDetailRepository
@@ -72,22 +73,33 @@ class RouteDetailRepository extends EntityRepository
         return true;
     }
 
-    public function getRoute() {
-        $em = $this->getEntityManager();
-        $em->getConnection()->beginTransaction();
+    public function getRoute($Route) {
+        $result = null;
         try {
-            $qb = $em
-                ->createQueryBuilder('c')
-                ->select('count(c.id)')
-                ->where('c.del_flg = 0');
+            $qb = $this->createQueryBuilder('rd')
+                ->select('r.id, r.name, r.rank')
+                ->leftJoin('rd.Route', 'r')
+                ->orderBy('r.rank', 'DESC')
+                ->groupBy('rd.Route');
 
+            if (!is_null($Route)) {
+                $qb->where('rd.Route = :Route')->setParameter('Route', $Route);
+            }
 
+            $Routes = $qb->getQuery()
+                        ->getResult();
+
+            foreach ($Routes as $item) {
+                $Route = new Route();
+                $Route->setName($item['name']);
+                $Route->setId($item['id']);
+                $Route->setRank($item['rank']);
+                $result[] = $Route;
+            }
+
+            return $result;
         } catch (\Exception $e) {
-            $em->getConnection()->rollback();
-
-            return false;
+            return null;
         }
-
-        return true;
     }
 }

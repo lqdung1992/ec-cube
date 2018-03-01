@@ -35,6 +35,11 @@ class Bus extends \Eccube\Entity\AbstractEntity
     private $Customer;
 
     /**
+     * @var \Eccube\Entity\Master\Route
+     */
+    private $Route;
+
+    /**
      * @return integer
      */
     public function getId()
@@ -56,6 +61,11 @@ class Bus extends \Eccube\Entity\AbstractEntity
     public function getBusNo()
     {
         return $this->bus_no;
+    }
+
+    public function getBusName()
+    {
+        return $this->bus_no . '号車';
     }
 
     /**
@@ -112,6 +122,22 @@ class Bus extends \Eccube\Entity\AbstractEntity
     public function setCustomer($Customer)
     {
         $this->Customer = $Customer;
+    }
+
+    /**
+     * @return \Eccube\Entity\Master\Route
+     */
+    public function getRoute()
+    {
+        return $this->Route;
+    }
+
+    /**
+     * @param \Eccube\Entity\Master\Route $Route
+     */
+    public function setRoute($Route)
+    {
+        $this->Route = $Route;
     }
 
 

@@ -44,10 +44,19 @@ class SearchRouteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('Route', 'entity', array(
-                'class' => 'Eccube\Entity\Master\Route',
-                'label' => 'ルート',
-                'mapped' => true
+            ->add('Bus', 'entity', array(
+                'class' => 'Eccube\Entity\Bus',
+                'label' => '号車',
+                'mapped' => true,
+                'required' => true,
+                'property' => 'BusName',
+            ))
+            ->add('date', 'date', array(
+                'label' => '日付',
+                'required' => true,
+                'input' => 'datetime',
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
             ));
     }
 

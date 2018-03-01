@@ -38,16 +38,18 @@ class ScheduleController extends AbstractController
         $builder = $app['form.factory']->createBuilder('admin_schedule_route_search');
         $form = $builder->getForm();
         $form->handleRequest($request);
-
+        $RouteSchedule = null;
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-
+            $RouteSchedule = $app['eccube.repository.route_schedule']->getRoute($data);
         }
-        $RouteDetails = $app['eccube.repository.route_detail']->findBy(array(), array('Route' => 'DESC', 'rank' => 'DESC'));
+
+        $RouteDetails = $app['eccube.repository.route_detail']->findBy(array(), array('rank' => 'DESC'));
 
         return $app->render('Schedule/index.twig', array(
             'searchForm' => $form->createView(),
             'RouteDetails' => $RouteDetails,
+            'RouteSchedule' => $RouteSchedule,
         ));
     }
 

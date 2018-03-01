@@ -16,7 +16,7 @@ Eccube\Entity\RouteDetail:
             type: smallint
             nullable: true
         move_time:
-            type: integer
+            type: text
             nullable: true
         work_time:
             type: integer

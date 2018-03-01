@@ -15,7 +15,7 @@ class RouteSchedule extends \Eccube\Entity\AbstractEntity
     private $id;
 
     /**
-     * @var \DateTime
+     * @var string
      */
     private $date;
 
@@ -93,7 +93,7 @@ class RouteSchedule extends \Eccube\Entity\AbstractEntity
     }
 
     /**
-     * @return \DateTime
+     * @return string
      */
     public function getDate()
     {
@@ -101,7 +101,7 @@ class RouteSchedule extends \Eccube\Entity\AbstractEntity
     }
 
     /**
-     * @param \DateTime $date
+     * @param string $date
      */
     public function setDate($date)
     {

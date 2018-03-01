@@ -58,6 +58,11 @@ class BusType extends AbstractType
                 'mapped' => true,
                 // Choices list (overdrive mapped)
                 'choices' => $arrDriver,
+            ))
+            ->add('Route', 'entity', array(
+                'class' => 'Eccube\Entity\Master\Route',
+                'label' => 'ルート',
+                'mapped' => true
             ));
     }
 
