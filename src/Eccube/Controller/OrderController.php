@@ -55,8 +55,10 @@ class OrderController extends AbstractController
                 if ($app->isGranted('ROLE_FARMER') && $farms[0]->getId() == $customer->getId() && $Order->getOrderStatus()->getId() != $app['config']['order_deliv']) {
                     $OrderStatus = $app['eccube.repository.master.order_status']->find($app['config']['order_deliv']);
                     $orderRepo->changeStatus($id, $OrderStatus);
+                    return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
+                } else {
+                    $app->addError('You have not permission to do this, please login as farmer', 'front');
                 }
-                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
             case "pickup":
                 break;
