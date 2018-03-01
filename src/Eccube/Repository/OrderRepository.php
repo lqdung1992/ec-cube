@@ -24,6 +24,7 @@
 
 namespace Eccube\Repository;
 
+use Eccube\Entity\Master\OrderStatus;
 use Eccube\Util\Str;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -512,5 +513,15 @@ class OrderRepository extends EntityRepository
             ->getResult();
 
         return $result;
+    }
+
+    /**
+     * @param int $id
+     * @param int|OrderStatus $status
+     * @return null|object
+     */
+    public function findWithStatus($id, $status)
+    {
+        return $this->findOneBy(array('id' => $id, 'OrderStatus' => $status));
     }
 }

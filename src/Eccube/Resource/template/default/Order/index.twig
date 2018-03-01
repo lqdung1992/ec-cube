@@ -85,7 +85,11 @@
             {% endfor %}
 
             <p class="float-right margin-top10 margin-right10"><a href="#" class="color888 title11">商品の出荷が難しい場合</a></p>
-            <button class="btn btn-success" id="farmer-status-order-button">出荷登録に進む</button>
+            <form method="post" action="?" name="form-shipping">
+                <input type="hidden" name="mode" value="shipping"/>
+                <input type="hidden" name="id" value="{{ Order.id }}">
+                <button type="submit" class="btn btn-success" id="farmer-status-order-button">出荷登録に進む</button>
+            </form>
         </div>
 
     </div>

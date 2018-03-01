@@ -176,11 +176,8 @@ class ShoppingService
 
         $this->em->persist($Order);
 
-        // 配送業者情報を取得
-//        $deliveries = $this->getDeliveriesCart();
-
         // お届け先情報を作成
-//        $Order = $this->getNewShipping($Order, $Customer, $deliveries);
+        $Order = $this->getNewShipping($Order, $Customer);
 
         // 受注明細情報、配送商品情報を作成
         $Order = $this->getNewDetails($Order, $dateId);
@@ -368,30 +365,18 @@ class ShoppingService
      *
      * @param Order $Order
      * @param Customer $Customer
-     * @param $deliveries
      * @return Order
      */
-    public function getNewShipping(Order $Order, Customer $Customer, $deliveries)
+    public function getNewShipping(Order $Order, Customer $Customer)
     {
-        $productTypes = array();
-        foreach ($deliveries as $Delivery) {
-            if (!in_array($Delivery->getProductType()->getId(), $productTypes)) {
-                $Shipping = new Shipping();
+        $Shipping = new Shipping();
 
-                $this->copyToShippingFromCustomer($Shipping, $Customer)
-                    ->setOrder($Order)
-                    ->setDelFlg(Constant::DISABLED);
+        $this->copyToShippingFromCustomer($Shipping, $Customer)
+            ->setOrder($Order)
+            ->setDelFlg(Constant::DISABLED);
 
-                // 配送料金の設定
-                $this->setShippingDeliveryFee($Shipping, $Delivery);
-
-                $this->em->persist($Shipping);
-
-                $Order->addShipping($Shipping);
-
-                $productTypes[] = $Delivery->getProductType()->getId();
-            }
-        }
+        $this->em->persist($Shipping);
+        $Order->addShipping($Shipping);
 
         return $Order;
     }
@@ -488,9 +473,8 @@ class ShoppingService
             $OrderDetail->setOrder($Order);
             $Order->addOrderDetail($OrderDetail);
 
-            // Don't use shipping + shipment item
             // 配送商品情報を作成
-//            $this->getNewShipmentItem($Order, $Product, $ProductClass, $quantity);
+            $this->getNewShipmentItem($Order, $Product, $ProductClass, $quantity);
         }
 
         return $Order;
@@ -549,28 +533,7 @@ class ShoppingService
         $ShipmentItem = new ShipmentItem();
         $shippings = $Order->getShippings();
 
-        // 選択された商品がどのお届け先情報と関連するかチェック
-        $Shipping = null;
-        foreach ($shippings as $s) {
-            if ($s->getDelivery()->getProductType()->getId() == $ProductClass->getProductType()->getId()) {
-                // 商品種別が同一のお届け先情報と関連させる
-                $Shipping = $s;
-                break;
-            }
-        }
-
-        if (is_null($Shipping)) {
-            // お届け先情報と関連していない場合、エラー
-            throw new CartException('shopping.delivery.not.producttype');
-        }
-
-        // 商品ごとの配送料合計
-        $productDeliveryFeeTotal = 0;
-        if ($this->BaseInfo->getOptionProductDeliveryFee() === Constant::ENABLED) {
-            $productDeliveryFeeTotal = $ProductClass->getDeliveryFee() * $quantity;
-        }
-
-        $Shipping->setShippingDeliveryFee($Shipping->getShippingDeliveryFee() + $productDeliveryFeeTotal);
+        $Shipping = $shippings->first();
 
         $ShipmentItem->setShipping($Shipping)
             ->setOrder($Order)
@@ -1167,20 +1130,19 @@ class ShoppingService
             throw new ShoppingException('front.shopping.stock.error');
         }
 
-        // Remove delivery + shipping
+        // Remove delivery
         // 受注情報、配送情報を更新
 //        $Order = $this->calculateDeliveryFee($Order);
         $this->setOrderUpdateData($Order);
         // 在庫情報を更新
         $this->setStockUpdate($em, $Order);
 
-        if ($this->app->isGranted('ROLE_USER')) {
+        if ($this->app->isGranted('IS_AUTHENTICATED_FULLY')) {
             // 会員の場合、購入金額を更新
             $this->setCustomerUpdate($Order, $this->app->user());
         }
 
     }
-
 
     /**
      * 値引き可能かチェック

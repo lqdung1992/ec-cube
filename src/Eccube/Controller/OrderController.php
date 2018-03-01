@@ -10,6 +10,7 @@ namespace Eccube\Controller;
 
 
 use Eccube\Application;
+use Eccube\Entity\Order;
 use Eccube\Repository\OrderRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,11 +28,42 @@ class OrderController extends AbstractController
     {
         /** @var OrderRepository $orderRepo */
         $orderRepo = $app['eccube.repository.order'];
-        $Order = $orderRepo->findOneBy(array('id' => $id, 'OrderStatus' => $app['config']['order_new']));
+        // Todo: check permission: ROLE_FARMER|ALL
+        /** @var Order $Order */
+        $Order = $orderRepo->findWithStatus($id, $app['config']['order_new']);
+        $mode = $request->get('mode');
         if (!$Order) {
-            throw new NotFoundHttpException();
+            $Order = $orderRepo->find($id);
+            switch ($Order->getOrderStatus()->getId()) {
+                case $app['config']['order_deliv']:
+                    $mode = 'shipping';
+                    break;
+                case 9:
+                    break;
+            }
+//            throw new NotFoundHttpException();
         }
         $masterDate = $app['eccube.repository.master.receiptable_date']->findAllWithKeyAsId();
+
+        switch ($mode) {
+            // for role recipient
+            case "check_status":
+            case "shipping":
+                $customer = $app->user();
+                $farms = $Order->getFarm();
+                // is farmer and creator
+                if ($app->isGranted('ROLE_FARMER') && $farms[0]->getId() == $customer->getId() && $Order->getOrderStatus()->getId() != $app['config']['order_deliv']) {
+                    $OrderStatus = $app['eccube.repository.master.order_status']->find($app['config']['order_deliv']);
+                    $orderRepo->changeStatus($id, $OrderStatus);
+                }
+                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
+                break;
+            case "pickup":
+                break;
+            default:
+                break;
+        }
+
 
         return $app->render('Order/index.twig', array('Order' => $Order, 'days' => $masterDate));
     }
