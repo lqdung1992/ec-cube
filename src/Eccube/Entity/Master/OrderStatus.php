@@ -29,6 +29,11 @@ namespace Eccube\Entity\Master;
  */
 class OrderStatus extends \Eccube\Entity\AbstractEntity
 {
+    const ORDER_PREPARE = 9;
+    const ORDER_PICKUP = 10;
+    const ORDER_RECEIVE = 11;
+    const ORDER_DONE = 12;
+
     /**
      * @return string
      */

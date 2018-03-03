@@ -10,6 +10,7 @@ namespace Eccube\Controller;
 
 
 use Eccube\Application;
+use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Order;
 use Eccube\Repository\OrderRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,42 +31,46 @@ class OrderController extends AbstractController
         $orderRepo = $app['eccube.repository.order'];
         // Todo: check permission: ROLE_FARMER|ALL
         /** @var Order $Order */
-        $Order = $orderRepo->findWithStatus($id, $app['config']['order_new']);
-        $mode = $request->get('mode');
+        $Order = $orderRepo->find($id);
         if (!$Order) {
-            $Order = $orderRepo->find($id);
+            throw new NotFoundHttpException();
+        }
+
+        $mode = $request->get('mode');
+        if (!$mode) {
             switch ($Order->getOrderStatus()->getId()) {
-                case $app['config']['order_deliv']:
-                    $mode = 'shipping';
+                case OrderStatus::ORDER_PREPARE:
+                    $mode = 'prepare';
                     break;
-                case 9:
+                case OrderStatus::ORDER_PICKUP:
+                    $mode = 'pickup';
                     break;
             }
-//            throw new NotFoundHttpException();
         }
         $masterDate = $app['eccube.repository.master.receiptable_date']->findAllWithKeyAsId();
 
         switch ($mode) {
             // for role recipient
             case "check_status":
-            case "shipping":
+            // for role farmer
+            case "prepare":
                 $customer = $app->user();
                 $farms = $Order->getFarm();
                 // is farmer and creator
                 if ($app->isGranted('ROLE_FARMER') && $farms[0]->getId() == $customer->getId() && $Order->getOrderStatus()->getId() != $app['config']['order_deliv']) {
-                    $OrderStatus = $app['eccube.repository.master.order_status']->find($app['config']['order_deliv']);
+                    $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PREPARE);
                     $orderRepo->changeStatus($id, $OrderStatus);
-                    return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
-                } else {
-                    $app->addError('You have not permission to do this, please login as farmer', 'front');
                 }
+
+                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
+
             case "pickup":
+                return $app->render('Order/pickup_done.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
             default:
                 break;
         }
-
 
         return $app->render('Order/index.twig', array('Order' => $Order, 'days' => $masterDate));
     }
