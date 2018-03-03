@@ -34,7 +34,7 @@ body {
 }
 
 #driver-wrapper {
-    background-color: #f7f7f7;
+    background-color: #f7f7f7 !important;
 }
 
 .header {
@@ -97,36 +97,12 @@ body {
     margin: 20px 0;
 }
 
-.rectangle-content {
-    width: 345px;
-    height: 88px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 0.5px #cccccc;
-    margin: auto;
-    margin-bottom: 10px;
-}
-
 .text-left {
     font-size: 16px;
     font-weight: bold;
     text-align: left;
     color: #00c42b;
     margin-right: 10px;
-}
-
-.text-center {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: left;
-    color: #222222;
-}
-
-.text-tiny {
-    font-size: 10px;
-    font-weight: bold;
-    text-align: center;
-    color: #888888;
 }
 
 .text-align-right {
