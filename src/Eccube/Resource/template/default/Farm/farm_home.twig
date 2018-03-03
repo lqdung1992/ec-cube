@@ -28,8 +28,6 @@
                 height: 350px;
             }
         }
-
-
     </style>
 {% endblock stylesheet %}
 
@@ -66,75 +64,124 @@
                     modal.style.display = "none";
                 };
             };
-            //openModal('image-review');
+            openModal('image-review');
+
+            $(".exhibition li").click(function () {
+                var $class = $(this).data('text');
+                $(this).parent().find('li').each(function (index, value) {
+                    $(value).removeClass('enable').addClass('disable');
+                    $('.'+$(value).data('text')).hide();
+                });
+                $(this).addClass('enable').removeClass('disable');
+                $('.'+$class).show();
+            });
         });
     </script>
 {% endblock %}
 {% block main %}
     <div id="reicever-wrapper" class="wrapper">
-            <div class="farmer-new-header">
-                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-                <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
-                <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
-            </div>
+        <div class="farmer-new-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+        </div>
 
-            <div class="exhibition">
-                <div class="row">
-                    <div class="col-sm-12 col-xs-12">
-                        <ul class="list-inline">
-                            <li class="col-sm-3 col-xs-3 text-alight-center enable " id="selling">出品</li>
-                            <li class="col-sm-3 col-xs-3 text-alight-center disable" id="transaction">出荷登録</li>
-                            <li class="col-sm-3 col-xs-3 text-alight-center disable" id="delivery">集荷・配送</li>
-                            <li class="col-sm-3 col-xs-3 text-alight-center disable" id="complete">取引終了</li>
-                        </ul>
-                    </div>
+        <div class="exhibition">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <ul class="list-inline">
+                        <li class="col-sm-3 col-xs-3 text-alight-center enable " id="product-section" data-text="product-section">出品</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="transaction-section" data-text="transaction-section">出荷登録</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="delivery-section">集荷・配送</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="complete-section">取引終了</li>
+                    </ul>
                 </div>
             </div>
+        </div>
 
-            <div class="product-section">
-                <div class="row">
-                    <div class="col-sm-12 col-xs-12">
-                        {% if products %}
-                            {% for product in products %}
-                                <div class="col-sm-3 col-xs-6 thumbnail">
-                                    <a href="{{ url('farm_item_detail', {'id': product.id} ) }}"><img class="image-review" src="{{ app.config.image_save_urlpath }}/{{ product.main_list_image|no_image_product }}" alt="no imgae"></a>
-                                    <div class="caption">
-                                        <h5 class="font-weight mg10">{{ product.name }}</h5>
-                                        <div class="row mg20">
-                                            <div class="col-sm-12 col-xs-12">
-                                                <div class="col-sm-6 col-xs-6">
-                                                    <h5 class="font-weight">{{ product.getPrice02IncTaxMin|price }}</h5>
-                                                </div>
-                                                <div class="col-sm-6 col-xs-6">
-                                                    <h5 class="font-weight">{{ product.getAmountFollowPrice02Min }}{{ product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
-                                                </div>
+        <div class="product-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Products|length > 0 %}
+                        {% for Product in Products %}
+                            <div class="col-sm-3 col-xs-6 thumbnail">
+                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}" alt="no image"></a>
+                                <div class="caption">
+                                    <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                    <div class="row mg20">
+                                        <div class="col-sm-12 col-xs-12">
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
                                             </div>
                                         </div>
-                                        <p>
-                                            <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
-                                            <span class="profile-name">{{ TargetCustomer.__toString }}</span>
-                                            <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
-                                        </p>
                                     </div>
+                                    <p>
+                                        <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                        <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                        <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                    </p>
                                 </div>
-                            {% endfor %}
-                        {% else %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
                         <div class="fav-empty">
                             <p>
                                 <span class="title12 display-block">出品されている商品はありません</span>
                                 <span class="title12">出品ボタンから商品の登録ができます</span>
                             </p>
-
                         </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12 col-xs-12 text-alight-center">
-                        <a href="{{ url('farm_item_new') }}"><button class="btn btn-success" id="action-button">出品する</button></a>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
+            <div class="row">
+                <div class="col-sm-12 col-xs-12 text-alight-center">
+                    <a href="{{ url('farm_item_new') }}"><button class="btn btn-success" id="action-button">出品する</button></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="transaction-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Orders|length > 0 %}
+                    <button class="btn btn-danger display-block shipped-button">本日出荷の商品があります</button>
+                    {% for receipt_date, arrOrder in Orders %}
+                    <label class="display-block margin-left13">{{ receipt_date }} 集荷</label>
+                        {% for Order in arrOrder %}
+                            <div class="farmer-trans-detail clearfix">
+                                <div class="clearfix">
+                                    <div class="order-detail-profile float-left">
+                                        <p class="title15 width120">
+                                            {{ Order.name01 }}{{ Order.name02 }}
+                                            <label class="badge float-right wait-approve">出荷登録待ち</label>
+                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/box-min.svg" class="float-right margin-left20">
+                                        </p>
+                                        {% for OrderDetail in Order.OrderDetails %}
+                                            {% set Product = OrderDetail.Product %}
+                                            <img class="image-review order-profile" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}">
+                                        {% endfor %}
+                                    </div>
+                                    <div class="float-right arrow-right">
+                                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span class="title12 display-block">取引中の商品はありません</span>
+                                <span class="title12">商品が購入されると、ここに並びます</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- The Modal -->

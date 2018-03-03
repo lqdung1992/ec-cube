@@ -609,16 +609,9 @@ img {
     cursor: pointer;
 }
 
-.receiver-history-main {
-    height: 870px;
-    background-color: #f7f7f7;
-    padding-top: 20px;
-    margin-top: 10px;
-    border-bottom: 1px solid #c3c3c3;
-}
 
 .receiver-history-main select {
-    width: 345px;
+    /*width: 345px;*/
     height: 50px;
     border-radius: 3px;
     background-color: #ffffff;
@@ -1390,23 +1383,6 @@ img {
     position: absolute;
     top: 65%;
     left: 10%;
-}
-
-.farmer-trans-detail {
-    height: 99px;
-    width: 345px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 0.5px #cccccc;
-    margin: auto;
-    margin-bottom: 15px;
-}
-
-#farmer-trans-button {
-    width: 345px;
-    height: 44px;
-    margin: 10px auto;
-    font-weight: bold;
 }
 
 .height141 {
@@ -2525,4 +2501,31 @@ input[readonly], textarea[readonly] {
     .slick-dots li button.thumbnail::before {
         display: none;
     }
+}
+
+/* Home transaction */
+.transaction-section {
+    display: none;
+}
+
+.transaction-section {
+    background-color: #f7f7f7;
+    padding-top: 20px;
+    margin-top: 10px;
+    border-bottom: 1px solid #c3c3c3;
+}
+
+.transaction-section .shipped-button {
+    width: 345px;
+    height: 44px;
+    margin: 10px auto;
+    font-weight: bold;
+}
+.transaction-section .farmer-trans-detail {
+    height: 99px;
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: solid 0.5px #cccccc;
+    margin: auto;
+    margin-bottom: 15px;
 }

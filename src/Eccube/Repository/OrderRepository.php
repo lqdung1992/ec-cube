@@ -24,10 +24,12 @@
 
 namespace Eccube\Repository;
 
+use Eccube\Entity\Customer;
 use Eccube\Entity\Master\OrderStatus;
 use Eccube\Util\Str;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Silex\Tests\Provider\ValidatorServiceProviderTest\Constraint\Custom;
 
 /**
  * OrderRepository
@@ -523,5 +525,20 @@ class OrderRepository extends EntityRepository
     public function findWithStatus($id, $status)
     {
         return $this->findOneBy(array('id' => $id, 'OrderStatus' => $status));
+    }
+
+    public function getQueryBuilderByOwner(Customer $Customer)
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.OrderDetails', 'od')
+            ->leftJoin('od.Product', 'p')
+            ->where('p.Creator = :Customer')
+            ->setParameter('Customer', $Customer)
+            ->groupBy('o.id');
+
+        // Order By
+        $qb->addOrderBy('o.receiptable_date', 'ASC');
+
+        return $qb;
     }
 }

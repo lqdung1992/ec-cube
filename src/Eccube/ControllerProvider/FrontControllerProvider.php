@@ -123,7 +123,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
 
         // farm - home
-        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home')->assert('id', '\d+');
+        $c->match('/farm/home', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home');
+        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home_other')->assert('id', '\d+');
 
         // farm - add item
         $c->match('/farm/item/new', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_new');

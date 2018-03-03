@@ -16,6 +16,7 @@ use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
 use Eccube\Entity\Master\ReceiptableDate;
+use Eccube\Entity\Order;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
@@ -24,6 +25,7 @@ use Eccube\Entity\ProductTag;
 use Eccube\Exception\CartException;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
+use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductRepository;
 use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
@@ -313,23 +315,42 @@ class FarmerController
      * @param $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function home(Application $app, Request $request, $id)
+    public function home(Application $app, Request $request, $id = null)
     {
         /** @var Customer $Customer */
         $Customer = $app->user();
-        $TargetCustomer = $app['eccube.repository.customer']->find($id);
+        $TargetCustomer = null;
+        if ($id) {
+            $TargetCustomer = $app['eccube.repository.customer']->find($id);
+            if (!$TargetCustomer) {
+                throw new NotFoundHttpException();
+            }
+        }
         if (!$TargetCustomer) {
-            throw new NotFoundHttpException();
+            $TargetCustomer = $Customer;
         }
 
         /** @var ProductRepository $productRepo */
         $productRepo = $app['eccube.repository.product'];
         $productList = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
+        /** @var OrderRepository $orderRepos */
+        $orderRepos = $app['eccube.repository.order'];
+        /** @var Order[] $orders */
+        $orders = $orderRepos->getQueryBuilderByOwner($TargetCustomer)->getQuery()->getResult();
+
+        $orderByDate = array();
+        if ($orders) {
+            foreach ($orders as $order) {
+                if ($order->getReceiptableDate()) {
+                    $orderByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
+                }
+            }
+        }
 
         return $app->render('Farm/farm_home.twig', array(
-            'items' => array(),
-            'products' => $productList,
+            'Products' => $productList,
             'TargetCustomer' => $TargetCustomer,
+            'Orders' => $orderByDate
         ));
     }
 
