@@ -297,7 +297,9 @@ class EccubeServiceProvider implements ServiceProviderInterface
             return $app['orm.em']->getRepository('Eccube\Entity\RouteDetail');
         });
         $app['eccube.repository.route_schedule'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Eccube\Entity\RouteSchedule');
+            $RouteScheduleRepository = $app['orm.em']->getRepository('Eccube\Entity\RouteSchedule');
+            $RouteScheduleRepository->setApplication($app);
+            return $RouteScheduleRepository;
         });
         $app['eccube.repository.bus_area'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\BusArea');

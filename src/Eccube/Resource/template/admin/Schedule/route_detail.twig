@@ -73,12 +73,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             var newRanks = {};
             var i = 0;
             $("div.tableish > .item_box").each(function() {
-                newRanks[this.dataset.busId] = oldRanks[i];
+                newRanks[this.dataset.RouteId] = oldRanks[i];
                 i++;
             });
 
             $.ajax({
-                url: '{{ url('admin_schedule_bus_stop_rank_move') }}',
+                url: '{{ url('admin_schedule_route_rank_move') }}',
                 type: 'POST',
                 data: newRanks,
             }).done(function(data) {
@@ -126,6 +126,55 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 </div>
             </div><!-- /.col -->
         </div>
+
+        {% if RouteDetails|length > 0 %}
+            <div id="sortable_list" class="box-body no-padding no-border box">
+                <div id="sortable_list_box" class="sortable_list">
+                    <div id="sortable_list_box__list" class="tableish">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <th>ルート</th>
+                                <th>予定時刻</th>
+                                <th>地図</th>
+                                <th>停留所</th>
+                                <th>作業時間</th>
+                                <th>到着時間</th>
+                                <th></th>
+                            </thead>
+                        {% for Route in RouteDetails %}
+                            <tr id="sortable_list__item--{{ Route.id }}" data-rank="{{ Route.rank }}" class="item_box" data-route-id="{{ Route.id }}">
+                                <td >
+                                    {{ Route.Route.name }}
+                                </td>
+                                <td>{{ Route.move_time }}</td>
+                                <td>{{ Route.BusStop.BusArea.name }}</td>
+                                <td>{{ Route.BusStop.name }}</td>
+                                <td>{{ Route.work_time }}</td>
+                                <td>{{ Route.arrive_time }}</td>
+                                <td>
+                                    {% if Route.id != CurrentRouteDetail.id %}
+                                        <a href="{{ url('admin_schedule_route_edit', {id: Route.id}) }}">編集</a>
+                                    {% else %}
+                                        <a>編集中</a>
+                                    {% endif %}
+
+                                    <a href="{{ url('admin_schedule_route_delete', {id: Route.id}) }}" {{ csrf_token_for_anchor() }}
+                                       data-method="delete">
+                                        削除
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        {% else %}
+            <div id="list_box" class="box-body no-padding">
+                <div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
+            </div><!-- /.box-body -->
+        {% endif %}
+        <!-- ▲ データがある時 ▲ -->
     </form>
 
 {% endblock %}

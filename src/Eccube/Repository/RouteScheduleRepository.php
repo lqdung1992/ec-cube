@@ -25,6 +25,7 @@
 namespace Eccube\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Eccube\Application;
 
 /**
  * RouteScheduleRepository
@@ -34,11 +35,22 @@ use Doctrine\ORM\EntityRepository;
  */
 class RouteScheduleRepository extends EntityRepository
 {
+    /**
+     * @var \Eccube\Application
+     */
+    protected $app;
+
+    public function setApplication(Application $app)
+    {
+        $this->app = $app;
+    }
+
     public function getRoute($data) {
         try {
             $qb = $this->createQueryBuilder('rs')
-                ->select('r.id')
+                ->select('r.id, c.name01, c.name02')
                 ->leftJoin('rs.Bus', 'b')
+                ->leftJoin('b.Customer', 'c')
                 ->leftJoin('b.Route', 'r');
 
             if (!is_null($data['date'])) {
@@ -50,17 +62,17 @@ class RouteScheduleRepository extends EntityRepository
                 $qb->andWhere('rs.Bus = :Bus')->setParameter('Bus', $data['Bus']);
             }
 
-
-
-            $result = $qb->getQuery()
-                ->getResult();
-
-            foreach ($result as $id) {
-
+            $result = $qb->getQuery()->getResult();
+            if (count($result) > 0) {
+                $Route = $this->app['eccube.repository.route']->find($result[0]['id']);
+                $RouteDetail['driver_name'] = $result[0]['name01'] . ' ' . $result[0]['name02'] ;
+                $RouteDetail['detail'] = $this->app['eccube.repository.route_detail']->getRouteDetailByRouteId($Route);
+                return $RouteDetail;
             }
 
-            return $result;
+            return null;
         } catch (\Exception $e) {
+            dump($e);
             return null;
         }
     }

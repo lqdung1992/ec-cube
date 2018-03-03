@@ -55,6 +55,7 @@ class AdminControllerProvider implements ControllerProviderInterface
         $c->match('/schedule/bus', '\Eccube\Controller\Admin\Schedule\ScheduleController::bus')->bind('admin_schedule_bus');
         $c->match('/schedule/bus/{id}/edit', '\Eccube\Controller\Admin\Schedule\ScheduleController::bus')->assert('id', '\d+')->bind('admin_schedule_bus_edit');
         $c->match('/schedule/bus/{id}/delete', '\Eccube\Controller\Admin\Schedule\ScheduleController::deleteBus')->assert('id', '\d+')->bind('admin_schedule_bus_delete');
+        $c->post('/schedule/route/rank/move', '\Eccube\Controller\Admin\Schedule\ScheduleController::moveRankRoute')->bind('admin_schedule_route_rank_move');
 
         //bus stop
         $c->match('/schedule/bus_stop/{id}/edit', '\Eccube\Controller\Admin\Schedule\ScheduleController::busStop')->assert('id', '\d+')->bind('admin_schedule_bus_stop_edit');
@@ -64,7 +65,7 @@ class AdminControllerProvider implements ControllerProviderInterface
 
         //route detail
         $c->match('/schedule/route/{id}/edit', '\Eccube\Controller\Admin\Schedule\ScheduleController::route')->assert('id', '\d+')->bind('admin_schedule_route_edit');
-        $c->match('/schedule/route/{id}/delete', '\Eccube\Controller\Admin\Schedule\ScheduleController::deleteRoute')->assert('id', '\d+')->bind('admin_schedule_route_delete');
+        $c->match('/schedule/route/{id}/delete', '\Eccube\Controller\Admin\Schedule\ScheduleController::deleteRouteDetail')->assert('id', '\d+')->bind('admin_schedule_route_delete');
         $c->match('/schedule/route', '\Eccube\Controller\Admin\Schedule\ScheduleController::route')->bind('admin_schedule_route');
         $c->post('/schedule/route/rank/move', '\Eccube\Controller\Admin\Schedule\ScheduleController::moveRank')->bind('admin_schedule_route_rank_move');
 

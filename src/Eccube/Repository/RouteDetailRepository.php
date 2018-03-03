@@ -102,4 +102,20 @@ class RouteDetailRepository extends EntityRepository
             return null;
         }
     }
+
+    public function getRouteDetailByRouteId($Route) {
+        $result = null;
+        try {
+            $qb = $this->createQueryBuilder('rd')
+                ->select('rd')
+                ->leftJoin('rd.Route', 'r')
+                ->orderBy('rd.move_time', 'DESC')
+                ->where('rd.Route = :Route')
+                ->setParameter('Route', $Route);
+            $RouteDetails = $qb->getQuery()->getResult();
+            return $RouteDetails;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

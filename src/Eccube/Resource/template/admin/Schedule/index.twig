@@ -34,12 +34,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
         .go-to-route-detail {
             width: 200px;
             margin-bottom: 10px;
-            margin-left: 15px;
+            margin-right: 15px;
+            float: right;
         }
 
-        table {
-            margin-bottom: 20px !important;
-            margin-left: 20px;
+        table th {
+            background-color: #5d8fc2;
+            color: white;
+        }
+
+        table caption {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #5d8fc2;
         }
 
         #search_button {
@@ -52,13 +60,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/moment.min.js"></script>
 <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/moment-ja.js"></script>
 <script src="{{ app.config.admin_urlpath }}/assets/js/vendor/bootstrap-datetimepicker.min.js"></script>
-<script>
-$(function() {
-    $('.go-to-route-detail').click(function () {
-        window.location.href = "{{ url('admin_schedule_route') }}";
-    });
-});
-</script>
 {% endblock javascript %}
 
 {% block main %}
@@ -91,67 +92,46 @@ $(function() {
             </div>
 
             <div class="row">
-                <button type="button" class="btn btn-primary btn-block go-to-route-detail">ルート詳細追加</button>
-                {#<div id="detail_wrap" class="col-md-12">#}
-                    {#{% if Routes|length > 0 %}#}
-                        {#<div id="sortable_list" class="box-body no-padding no-border box">#}
-                            {#<div id="sortable_list_box" class="sortable_list">#}
-                                {#<div id="sortable_list_box__list" class="tableish">#}
-                                    {#{% for Route in Routes %}#}
-                                        {#<div id="sortable_list__item--{{ Route.id }}" data-rank="{{ Route.rank }}" class="item_box tr" data-Route-id="{{ Route.id }}">#}
-                                            {#<div id="sortable_list__item_body--{{ Route.id }}" class="item_pattern td">#}
-                                                {#<h3>{{ Route.name }} <h3>#}
-                                            {#</div>#}
-                                            {#<div id="sortable_list__item_menu_box--{{ Route.id }}" class="icon_edit td">#}
-                                                {#<div id="sortable_list__item_menu_toggle--{{ Route.id }}" class="dropdown">#}
-                                                    {#<a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>#}
-                                                    {#<ul id="sortable_list__menu--{{ Route.id }}" class="dropdown-menu dropdown-menu-right">#}
-                                                        {#<li>#}
-                                                            {#<a href="{{ url('admin_schedule_route_delete', {id: Route.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete">#}
-                                                                {#削除#}
-                                                            {#</a>#}
-                                                        {#</li>#}
-                                                    {#</ul>#}
-                                                {#</div>#}
-                                            {#</div>#}
-
-                                        {#</div><!-- /.item_box -->#}
-
-
-                                        {#<table class="table table-bordered table-hover">#}
-                                            {#<thead>#}
-                                                {#<th>停留所</th>#}
-                                                {#<th>移動時間</th>#}
-                                                {#<th>作業時間</th>#}
-                                                {#<th>到着時間</th>#}
-                                                {#<th></th>#}
-                                            {#</thead>#}
-                                            {#<tbody>#}
-                                                {#{% for RouteDetail in RouteDetails %}#}
-                                                    {#{% if RouteDetail.Route.id == Route.id %}#}
-                                                        {#<tr>#}
-                                                            {#<td>{{ RouteDetail.BusStop.name }} --- {{ RouteDetail.BusStop.address }}</td>#}
-                                                            {#<td>{{ RouteDetail.move_time }}</td>#}
-                                                            {#<td>{{ RouteDetail.work_time }}</td>#}
-                                                            {#<td>{{ RouteDetail.arrive_time }}</td>#}
-                                                            {#<td>#}
-                                                                {#<a href="{{ url('admin_schedule_route_edit', {id: RouteDetail.id}) }}">編集</a>#}
-                                                            {#</td>#}
-                                                        {#</tr>#}
-                                                    {#{% endif %}#}
-                                                {#{% endfor %}#}
-                                            {#</tbody>#}
-                                        {#</table>#}
-                                    {#{% endfor %}#}
-                                {#</div>#}
-                            {#</div>#}
-                        {#</div><!-- /.box-body -->#}
-                    {#{% else %}#}
-                        {#<div id="list_box" class="box-body no-padding">#}
-                            {#<div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>#}
-                        {#</div><!-- /.box-body -->#}
-                    {#{% endif %}#}
-                {#</div>#}
+                <button type="button" class="btn btn-primary btn-block go-to-route-detail">印刷</button>
+                <div id="detail_wrap" class="col-md-12">
+                    {% if result|length > 0 %}
+                        <div id="sortable_list" class="box-body no-padding no-border box">
+                            <div id="sortable_list_box" class="sortable_list">
+                                <div id="sortable_list_box__list" class="tableish">
+                                    <table class="table table-bordered table-hover">
+                                        <caption>運転手名 : {{ result.driver_name }}</caption>
+                                        <thead>
+                                        <th>予定時刻</th>
+                                        <th>地図</th>
+                                        <th>停留所</th>
+                                        <th>配送(引渡し)</th>
+                                        <th>集荷(受取り)</th>
+                                        <th>積載個数</th>
+                                        <th>積載率</th>
+                                        </thead>
+                                    {% for RouteDetail in result.detail %}
+                                            <tbody>
+                                            <tr>
+                                                <td>{{ RouteDetail.move_time }}</td>
+                                                <td>{{ RouteDetail.BusStop.BusArea.name }}</td>
+                                                <td>{{ RouteDetail.BusStop.name }}</td>
+                                                <td>2</td>
+                                                <td>2</td>
+                                                <td>4</td>
+                                                <td>50%</td>
+                                            </tr>
+                                            </tbody>
+                                    {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    {% else %}
+                        <div id="list_box" class="box-body no-padding">
+                            <div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
+                        </div><!-- /.box-body -->
+                    {% endif %}
+                </div>
                 <!--検索条件設定テーブルここまで-->
             </div>
 

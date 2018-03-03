@@ -38,18 +38,15 @@ class ScheduleController extends AbstractController
         $builder = $app['form.factory']->createBuilder('admin_schedule_route_search');
         $form = $builder->getForm();
         $form->handleRequest($request);
-        $RouteSchedule = null;
+        $result = null;
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $RouteSchedule = $app['eccube.repository.route_schedule']->getRoute($data);
+            $result = $app['eccube.repository.route_schedule']->getRoute($data);
         }
-
-        $RouteDetails = $app['eccube.repository.route_detail']->findBy(array(), array('rank' => 'DESC'));
 
         return $app->render('Schedule/index.twig', array(
             'searchForm' => $form->createView(),
-            'RouteDetails' => $RouteDetails,
-            'RouteSchedule' => $RouteSchedule,
+            'result' => $result,
         ));
     }
 
@@ -101,7 +98,7 @@ class ScheduleController extends AbstractController
             else
                 $app->addSuccess('admin.schedule.route_detail.save.error', 'admin');
 
-            return $app->redirect($app->url('admin_schedule_list'));
+            return $app->redirect($app->url('admin_schedule_route'));
         }
 
         $RouteDetails = $app['eccube.repository.route_detail']->findBy(array(), array('rank' => 'DESC'));
@@ -182,7 +179,43 @@ class ScheduleController extends AbstractController
         return $app->redirect($app->url('admin_schedule_bus_stop'));
     }
 
+    public function deleteRouteDetail(Application $app, Request $request, $id)
+    {
+        $this->isTokenValid($app);
+
+        $RouteDetail = $app['eccube.repository.route_detail']->find($id);
+        if (!$RouteDetail) {
+            $app->deleteMessage();
+            return $app->redirect($app->url('admin_schedule_bus_stop'));
+        }
+
+        log_info('RouteDetail 削除開始', array($id));
+        $app['orm.em']->remove($RouteDetail);
+        $app['orm.em']->flush($RouteDetail);
+        log_info('RouteDetail 削除完了', array($id));
+        $app->addSuccess('admin.schedule.route_detail.delete.complete', 'admin');
+
+        return $app->redirect($app->url('admin_schedule_route'));
+    }
+
     public function moveRank(Application $app, Request $request)
+    {
+        if ($request->isXmlHttpRequest()) {
+            $ranks = $request->request->all();
+            foreach ($ranks as $busStopId => $rank) {
+                /* @var $Category \Eccube\Entity\Category */
+                $BusStop = $app['eccube.repository.bus_stop']
+                    ->find($busStopId);
+                $BusStop->setRank($rank);
+                $app['orm.em']->persist($BusStop);
+            }
+            $app['orm.em']->flush();
+        }
+
+        return true;
+    }
+
+    public function moveRankRoute(Application $app, Request $request)
     {
         if ($request->isXmlHttpRequest()) {
             $ranks = $request->request->all();
