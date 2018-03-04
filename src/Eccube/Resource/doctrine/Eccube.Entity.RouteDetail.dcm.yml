@@ -1,0 +1,51 @@
+Eccube\Entity\RouteDetail:
+    type: entity
+    table: dtb_route_detail
+    repositoryClass: Eccube\Repository\RouteDetailRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: id
+            generator:
+                strategy: AUTO
+    fields:
+        rank:
+            type: smallint
+            nullable: true
+        move_time:
+            type: text
+            nullable: true
+        work_time:
+            type: integer
+            nullable: true
+        arrive_time:
+            type: integer
+            nullable: true
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+        del_flg:
+            type: smallint
+            nullable: false
+            unsigned: false
+            options:
+                default: '0'
+    manyToOne:
+        BusStop:
+            targetEntity: Eccube\Entity\BusStop
+            joinColumn:
+                name: bus_stop_id
+                referencedColumnName: bus_stop_id
+        Route:
+            targetEntity: Eccube\Entity\Master\Route
+            joinColumn:
+                name: route_id
+                referencedColumnName: id
+
+    lifecycleCallbacks: {  }

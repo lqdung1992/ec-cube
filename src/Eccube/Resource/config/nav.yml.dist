@@ -64,6 +64,25 @@
       - id: cache
         name: キャッシュ管理
         url: admin_content_cache
+
+- id: schedule
+  name: 運行スケジュール管理
+  has_child: true
+  icon: cb-clock
+  child:
+      - id: schedule_list
+        name: 運行スケジュールマスタ
+        url : admin_schedule_list
+      - id: schedule_new
+        name: 運行スケジュール登録
+        url: admin_schedule_route
+      - id: bus_stop
+        name: 停留所情報登録
+        url: admin_schedule_bus_stop
+      - id: bus
+        name: 号車情報登録
+        url: admin_schedule_bus
+
 - id: setting
   name: 設定
   has_child: true

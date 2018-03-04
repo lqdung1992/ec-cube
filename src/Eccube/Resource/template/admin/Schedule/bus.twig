@@ -1,0 +1,135 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+
+http://www.lockon.co.jp/
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set menus = ['schedule', 'bus'] %}
+
+{% block title %}運行スケジュール{% endblock %}
+{% block sub_title %}号車情報管理{% endblock %}
+
+{% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+{% endblock stylesheet %}
+
+{% block javascript %}
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/vendor/jquery.ui.widget.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.iframe-transport.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-process.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-validate.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script>
+    var hideSvg = function () {
+        if ($("#thumb li").length > 0) {
+            $("#icon_no_image").css("display", "none");
+        } else {
+            $("#icon_no_image").css("display", "");
+        }
+    };
+</script>tri
+{% endblock %}
+
+{% block main %}
+    <form role="form" class="form-horizontal" name="form1" id="form1" method="post" action="" {{ form_enctype(form) }}>
+        {{ form_widget(form._token) }}
+        <div class="row" id="aside_wrap">
+            <div id="detail_wrap" class="col-md-9">
+                <div id="detail_box" class="box">
+                    <div id="detail_box__header" class="box-header">
+                        <h3 class="box-title">号車情報登録・編集</h3>
+                    </div><!-- /.box-header -->
+                    <div id="detail_box__body" class="box-body">
+                        {{ form_row(form.bus_no) }}
+                        {{ form_row(form.Customer) }}
+                        {{ form_row(form.Route) }}
+                    </div><!-- /.box-body -->
+                </div><!-- /.box -->
+
+                {% if Buses|length > 0 %}
+                    <div id="sortable_list" class="box-body no-padding no-border box">
+                        <div id="sortable_list_box" class="sortable_list">
+                            <div id="sortable_list_box__list" class="tableish">
+                                {% for Bus in Buses %}
+                                    <div id="sortable_list__item--{{ Bus.id }}" class="item_box tr" data-Bus-id="{{ Bus.id }}">
+                                        <div id="sortable_list__item_body--{{ Bus.id }}" class="item_pattern td">
+                                            <a href="{{ url('admin_schedule_bus_edit',  { id : Bus.id }) }}">{{ Bus.Customer.name01 }} {{ Bus.Customer.name02 }}</a>
+                                        </div>
+                                        <div id="sortable_list__item_menu_box--{{ Bus.id }}" class="icon_edit td">
+                                            <div id="sortable_list__item_menu_toggle--{{ Bus.id }}" class="dropdown">
+                                                <a class="dropdown-toggle" data-toggle="dropdown"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
+                                                <ul id="sortable_list__menu--{{ Bus.id }}" class="dropdown-menu dropdown-menu-right">
+                                                    {% if Bus.id != CurrentBus.id %}
+                                                        <li><a href="{{ url('admin_schedule_bus_edit', {id: Bus.id}) }}">編集</a></li>
+                                                    {% else %}
+                                                        <li><a>編集中</a></li>
+                                                    {% endif %}
+
+                                                    <li>
+                                                        <a href="{{ url('admin_schedule_bus_delete', {id: Bus.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete">
+                                                            削除
+                                                        </a>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div><!-- /.item_box -->
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    </div><!-- /.box-body -->
+                {% else %}
+                    <div id="list_box" class="box-body no-padding">
+                        <div id="list_box__not_find_Bus" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
+                    </div><!-- /.box-body -->
+                {% endif %}
+                <!-- ▲ データがある時 ▲ -->
+
+
+
+            </div><!-- /.col -->
+            
+            <div id="detail_list_footer" class="col-md-3">
+                <div class="col_inner" id="aside_column">
+                    <div id="detail_list_footer__body" class="box no-header">
+                        <div id="detail_list_footer__body_inner" class="box-body">
+                            <div id="detail_list_footer__insert_button" class="row text-center">
+                                <div class="col-sm-6 col-sm-offset-3 col-md-12 col-md-offset-0">
+                                    <button class="btn btn-primary btn-block btn-lg" type="submit">登録</button>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                </div>
+            </div><!-- /.col --> 
+
+        </div>
+
+    </form>
+
+
+{% endblock %}
