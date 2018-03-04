@@ -24,10 +24,12 @@
 
 namespace Eccube\Repository;
 
+use Eccube\Entity\Customer;
 use Eccube\Entity\Master\OrderStatus;
 use Eccube\Util\Str;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Silex\Tests\Provider\ValidatorServiceProviderTest\Constraint\Custom;
 
 /**
  * OrderRepository
@@ -52,6 +54,8 @@ class OrderRepository extends EntityRepository
         ;
 
         switch ($Status->getId()) {
+            // Todo: set commit date with new status
+            // Maybe OrderStatus::ORDER_PICKUP
             case '5': // 発送済へ
                 $Order->setCommitDate(new \DateTime());
                 break;
@@ -523,5 +527,31 @@ class OrderRepository extends EntityRepository
     public function findWithStatus($id, $status)
     {
         return $this->findOneBy(array('id' => $id, 'OrderStatus' => $status));
+    }
+
+    /**
+     * @param Customer $Customer
+     * @param array $OrderStatuses
+     * @return QueryBuilder
+     */
+    public function getQueryBuilderByOwner(Customer $Customer, array $OrderStatuses = array())
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.OrderDetails', 'od')
+            ->leftJoin('od.Product', 'p')
+            ->where('p.Creator = :Customer')
+            ->setParameter('Customer', $Customer);
+
+        if (count($OrderStatuses) > 0) {
+            $qb->andWhere('o.OrderStatus in (:OrderStatuses)')
+                ->setParameter('OrderStatuses', $OrderStatuses);
+        }
+
+        $qb->groupBy('o.id');
+
+        // Order By
+        $qb->addOrderBy('o.receiptable_date', 'ASC');
+
+        return $qb;
     }
 }

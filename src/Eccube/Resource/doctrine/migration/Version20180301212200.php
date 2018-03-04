@@ -21,21 +21,26 @@ class Version20180301212200 extends AbstractMigration
         $app = Application::getInstance();
         /** @var EntityManager $em */
         $em = $app['orm.em'];
+
+        $orderStatus = $em->getRepository('Eccube\Entity\Master\OrderStatus')->find(1);
+        $orderStatus->setName('出荷登録待ち');
+        $em->persist($orderStatus);
+
         $orderStatus = new OrderStatus();
         $orderStatus->setId(9)
-            ->setName('準備する')
+            ->setName('集荷待ち')
             ->setRank(9);
         $em->persist($orderStatus);
 
         $orderStatus = new OrderStatus();
         $orderStatus->setId(10)
-            ->setName('動く')
+            ->setName('配送中')
             ->setRank(10);
         $em->persist($orderStatus);
 
         $orderStatus = new OrderStatus();
         $orderStatus->setId(11)
-            ->setName('受け取った')
+            ->setName('配送済み')
             ->setRank(11);
         $em->persist($orderStatus);
 

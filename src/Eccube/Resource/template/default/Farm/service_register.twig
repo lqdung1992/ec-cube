@@ -11,10 +11,6 @@
 {% endblock %}
 {% block main %}
     <div class="wrapper" id="service-regist-receiver-wrapper">
-        <div class="farmer-header">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10">
-        </div>
-
         <div id="service-wrapper">
             <form id="service-form" method="post" action="{{ url('farm_service') }}">
                 <input type="hidden" name="mode" value="complete"/>

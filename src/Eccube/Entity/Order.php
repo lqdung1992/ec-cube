@@ -32,6 +32,8 @@ use Eccube\Util\EntityUtil;
  */
 class Order extends \Eccube\Entity\AbstractEntity
 {
+    const SORT_BY_NEW = 1;
+    const SORT_BY_TOTAL = 2;
     /**
      * isMultiple
      * 
