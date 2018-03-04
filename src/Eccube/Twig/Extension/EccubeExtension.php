@@ -75,6 +75,7 @@ class EccubeExtension extends \Twig_Extension
             new \Twig_SimpleFilter('price', array($this, 'getPriceFilter')),
             new \Twig_SimpleFilter('ellipsis', array($this, 'getEllipsis')),
             new \Twig_SimpleFilter('time_ago', array($this, 'getTimeAgo')),
+            new \Twig_SimpleFilter('diff_time', array($this, 'diffTime')),
         );
     }
 
@@ -261,6 +262,13 @@ class EccubeExtension extends \Twig_Extension
     public function getTimeAgo($date)
     {
         return Str::timeAgo($date);
+    }
+
+    public function diffTime(\DateTime $date1, \DateTime $date2, $format = '%h時%i分')
+    {
+        $interval = $date1->diff($date2);
+
+        return $interval->format($format);
     }
 
 }

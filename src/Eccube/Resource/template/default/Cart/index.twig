@@ -23,173 +23,266 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 {% set body_class = 'cart_page' %}
 
-{% block main %}
-    <h1 class="page-heading">ショッピングカート</h1>
-    <div id="cart" class="container-fluid">
-        <div id="cart_box" class="row">
-            <div id="cart_box__body" class="col-md-10 col-md-offset-1">
-                {% if is_granted('ROLE_USER') %}
-                <div id="cart_box__flow_state" class="flowline step3">
-                {% else %}
-                <div id="cart_box__flow_state" class="flowline step4">
-                {% endif %}
-                    <ul id="cart_box__flow_state_list" class="clearfix">
-                        <li class="active"><span class="flow_number">1</span><br>カートの商品</li>
-                    {% if is_granted('ROLE_USER') %}
-                        <li><span class="flow_number">2</span><br>ご注文内容確認</li>
-                        <li><span class="flow_number">3</span><br>完了</li>
-                    {% else %}
-                        <li><span class="flow_number">2</span><br>お客様情報</li>
-                        <li><span class="flow_number">3</span><br>ご注文内容確認</li>
-                        <li><span class="flow_number">4</span><br>完了</li>
-                    {% endif %}
-                    </ul>
-                </div>
+{% block stylesheet %}
+    <style type="text/css">
+        .modal .modal-header .close {
+            float: right;
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            filter: alpha(opacity=20);
+            opacity: .2;
+        }
+    </style>
+{% endblock stylesheet %}
 
-                {% set productStr = app.session.flashbag.get('eccube.front.request.product') %}
-                {% for error in app.session.flashbag.get('eccube.front.request.error')  %}
-                    {% set idx = loop.index0 %}
-                    {% if productStr[idx] is defined %}
+{% block javascript %}
+    <script
+            type="text/javascript">
+        $(function() {
+            $(".plus").on("click", function() {
+                var $button = $(this);
+                var oldValue = $button.parent().find("input").val();
+
+                var newVal = parseInt(oldValue) + 1;
+
+                var priceSpan = $button.parent().parent().find(".count-price").find("span");
+                console.log(priceSpan);
+                var priceOld = parseInt(priceSpan.text());
+                console.log(priceOld);
+                var priceNew = priceOld / oldValue * newVal;
+                console.log(priceNew);
+                priceSpan.text(priceNew);
+                $button.parent().find("input").val(newVal);
+            });
+
+            $(".minus").on("click", function() {
+                var $button = $(this);
+                var oldValue = $button.parent().find("input").val();
+
+                if (oldValue > 0) {
+                    var newVal = parseInt(oldValue) - 1;
+                } else return false;
+
+                var priceSpan = $button.parent().parent().find(".count-price").find("span");
+                var priceOld = parseInt(priceSpan.text());
+                var priceNew = priceOld / oldValue * newVal;
+                priceSpan.text(priceNew);
+
+                $button.parent().find("input").val(newVal);
+            });
+
+            var createForm = function (action, data) {
+                var $form = $('<form action="' + action + '" method="post"></form>');
+                for (input in data) {
+                    if (data.hasOwnProperty(input)) {
+                        $form.append('<input name="' + input + '" value="' + data[input] + '">');
+                    }
+                }
+                return $form;
+            };
+
+            $('a[token-for-anchor]').click(function (e) {
+                e.preventDefault();
+                var $this = $(this);
+                var data = $this.data();
+                if (data.confirm != false) {
+                    if (!confirm(data.message ? data.message : '削除してもよろしいですか?')) {
+                        return false;
+                    }
+                }
+
+                var $form = createForm($this.attr('href'), {
+                    _token: $this.attr('token-for-anchor'),
+                    _method: data.method
+                }).hide();
+
+                $('body').append($form); // Firefox requires form to be on the page to allow submission
+                $form.submit();
+            });
+
+            // reset modal
+            $('.modal').on('hidden.bs.modal', function(){
+                $(this).find('form')[0].reset();
+                $('.old-price').each(function () {
+                    var old_price = $(this).val();
+                    $(this).parent().find('.count-price').find('span').text(old_price);
+                });
+            });
+        })
+    </script>
+{% endblock javascript %}
+
+{% block main %}
+    <div id="receiver-cart-wrapper" class="wrapper">
+        <div class="container">
+            <div class="header receiver-header">
+                <div class="float-left">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg">
+                </div>
+                <div class="logo float-left">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg">
+                </div>
+                <div class="float-right">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-cart.svg">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-search.svg">
+                </div>
+            </div>
+
+            <div class="exhibition">
+                <div class="row">
+                    <div class="col-sm-12 col-xs-12">
+                        <ul class="list-inline">
+                            <li class="left_enable list-2item">注文票</li>
+                            <li class="right_disable list-2item">注文履歴</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            {% set productStr = app.session.flashbag.get('eccube.front.request.product') %}
+            {% for error in app.session.flashbag.get('eccube.front.request.error')  %}
+                {% set idx = loop.index0 %}
+                {% if productStr[idx] is defined %}
                     <div id="cart_box__message--{{ loop.index }}" class="message">
                         <p class="errormsg bg-danger">
-                            <svg class="cb cb-warning"><use xlink:href="#cb-warning" /></svg>
                             {{ error|trans({'%product%':productStr[idx]})|nl2br }}
                         </p>
                     </div>
-                    {% else %}
+                {% else %}
                     <div id="cart_box__message--{{ loop.index }}" class="message">
                         <p class="errormsg bg-danger">
-                            <svg class="cb cb-warning"><use xlink:href="#cb-warning" /></svg>{{ error|trans|nl2br }}
+                            {{ error|trans|nl2br }}
                         </p>
                     </div>
-                    {% endif %}
-                {% endfor %}
-                {% for error in app.session.flashbag.get('eccube.front.cart.error')  %}
-                    <div id="cart_box__message_error--{{ loop.index }}" class="message">
-                        <p class="errormsg bg-danger">
-                            <svg class="cb cb-warning"><use xlink:href="#cb-warning" /></svg>{{ error|trans|nl2br }}
-                        </p>
-                    </div>
-                {% endfor %}
-
-                {% if Cart.CartItems|length > 0 %}
-                <form name="form" id="form_cart" method="post" action="{{ url('cart') }}">
-                    <p id="cart_item__info" class="message">
-                        商品の合計金額は「<strong>{{ Cart.total_price|price }}</strong>」です。
-                        {% if BaseInfo.delivery_free_amount and BaseInfo.delivery_free_quantity %}
-                            <br />
-                            {% if is_delivery_free %}
-                                現在送料無料です。
-                            {% else %}
-                                あと「<strong>{{ least|price }}</strong>」または「<strong>{{ quantity|number_format }}個</strong>」のお買い上げで<strong class="text-primary">送料無料</strong>になります。
-                            {% endif %}
-                        {% elseif BaseInfo.delivery_free_amount %}
-                            <br />
-                            {% if is_delivery_free %}
-                                現在送料無料です。
-                            {% else %}
-                                あと「<strong>{{ least|price }}</strong>」のお買い上げで<strong class="text-primary">送料無料</strong>になります。
-                            {% endif %}
-                        {% elseif BaseInfo.delivery_free_quantity %}
-                            <br />
-                            {% if is_delivery_free %}
-                                現在送料無料です。
-                            {% else %}
-                                あと「<strong>{{ quantity|number_format }}個</strong>」のお買い上げで<strong class="text-primary">送料無料</strong>になります。
-                            {% endif %}
-                        {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% for error in app.session.flashbag.get('eccube.front.cart.error')  %}
+                <div id="cart_box__message_error--{{ loop.index }}" class="message">
+                    <p class="errormsg bg-danger">
+                        {{ error|trans|nl2br }}
                     </p>
-                    <div id="cart_item_list" class="cart_item table">
-                        <div class="thead">
-                            <ol id="cart_item_list__header">
-                                <li id="cart_item_list__header_cart_remove">削除</li>
-                                <li id="cart_item_list__header_product_detail">商品内容</li>
-                                <li id="cart_item_list__header_total">数量</li>
-                                <li id="cart_item_list__header_sub_total">小計</li>
-                            </ol>
-                        </div>
-                        <div id="cart_item_list__body" class="tbody">
+                </div>
+            {% endfor %}
 
+            {% if Cart.CartItems|length > 0 %}
+                <div class="cart-section row">
+                    <div class="col-sm-12 col-xs-12">
+                        <div class="backgroundf7f7f7">
+                            <div class="title-section-small backgroundf7f7f7">
+                                <p>お届け先バス停</p>
+                            </div>
+
+                            <div class="title-section-white">
+                                <p>エスパルスドリームプラザ</p>
+                                <span>静岡県静岡市清水区入船町13-15</span>
+                            </div>
+
+                            {% for reception_date in reception_dates %}
+                                <div class="cart-title">
+                                    <p>
+                                        <span class="cart-main-title">{{ reception_date|date('m月d日') }}({{ master_date[reception_date|date('N')].name }})</span>
+                                        <span class="cart-sub-title">お届け予定</span>
+                                    </p>
+                                </div>
+
+                                <div class="cart-content" id="cart-main-content">
+                                    <form method="post" action="?">
+                                        <input type="hidden" name="mode" value="confirm">
+                                        <input type="hidden" name="date_id" value="{{ reception_date|date('N') }}">
+                                    {% for CartItem in Cart.CartItems %}
+                                        {% if CartItem.reception_date|date('U') == reception_date|date('U') %}
+                                            {% set ProductClass = CartItem.Object %}
+                                            {% set Product = ProductClass.Product %}
+                                            {% set Customer = Product.Creator %}
+                                            <div class="receiver-cart clearfix">
+                                                <div>
+                                                    <div class="order-detail-profile float-left">
+                                                        <img src="{{ app.config.image_save_urlpath }}/{{ Product.MainListImage|no_image_product }}" class="cart-profile">
+                                                        <span class="profile-name-medium">{{ Product.name }}</span>
+                                                        <span class="profile-address-medium">{{ Customer.__toString }}</span>
+                                                        <span class="profile-order-medium">注文点数：{{ CartItem.quantity }}</span>
+                                                    </div>
+                                                    <div class="float-right arrow-right">
+                                                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" >
+                                                    </div>
+                                                </div>
+
+                                                <div class="cart-detail-info">
+                                                    <div class="float-left">
+                                                        <p>小計：{{ CartItem.total_price|number_format }}</p>
+                                                    </div>
+                                                    <div class="float-right">
+                                                        <a href="#" class="cart-link" data-toggle="modal" data-target="#exampleModal">注文内容の変更</a>
+                                                        <a href="{{ url('cart_remove', {'productClassId': ProductClass.id, 'date_id': reception_date|date('N') }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="カートから商品を削除してもよろしいですか?" class="delete-link">削除</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="product-cart-button">
+                                        {#<p>あと2時間30分で自動的に注文が確定されます</p>#}
+                                        <button class="cart-button-confirm btn btn-success" type="submit">注文内容を確認する</button>
+                                    </div>
+                                    </form>
+                                </div>
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <div id="cart_box__message" class="message">
+                    <p class="errormsg bg-danger">
+                        現在カート内に商品はございません。
+                    </p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    {% if Cart.CartItems|length > 0 %}
+        <div class="modal fade" id="exampleModal" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form name="modify-cart" id="modify-cart" method="post" action="{{ url('cart_modify') }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">配送日をお選びください</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
                             {% for CartItem in Cart.CartItems %}
                                 {% set ProductClass = CartItem.Object %}
                                 {% set Product = ProductClass.Product %}
-
-                                <div id="cart_item_list__item" class="item_box tr">
-                                    <div id="cart_item_list__cart_remove" class="icon_edit td">
-                                        <a href="{{ url('cart_remove', {'productClassId': ProductClass.id }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="カートから商品を削除してもよろしいですか?">
-                                            <svg class="cb cb-close"><use xlink:href="#cb-close" /></svg>
-                                        </a>
-                                    </div>
-                                    <div class="td table">
-                                        <div id="cart_item_list__product_image" class="item_photo">
-                                            <a  target="_blank" href="{{ url('product_detail', {id : Product.id} ) }}">
-                                                <img src="{{ app.config.image_save_urlpath }}/{{ Product.MainListImage|no_image_product }}" alt="{{ Product.name }}" />
-                                            </a>
+                                <div class="row">
+                                    <div class="col-sm-12 col-xs-12 count-modal">
+                                        <div class="col-sm-8 col-xs-8 float-left">
+                                            <span class="count-date">{{ CartItem.reception_date|date('m月d日') }}({{ master_date[CartItem.reception_date|date('N')].name }})</span>
+                                            <input type="hidden" class="old-price" value="{{ CartItem.total_price }}">
+                                            <p class="count-price">小計：<span class="price_{{ ProductClass.id }}_{{ CartItem.reception_date|date('N') }}">{{ CartItem.total_price }}</span>円</p>
                                         </div>
-                                        <dl class="item_detail">
-                                            <dt id="cart_item_list__product_detail" class="item_name text-default">
-                                                <a target="_blank" href="{{ url('product_detail', {id : Product.id} ) }}">{{ Product.name }}</a>
-                                            </dt>
-                                            <dd id="cart_item_list__class_category" class="item_pattern small">
-                                                {% if ProductClass.ClassCategory1 and ProductClass.ClassCategory1.id %}
-                                                    {{ ProductClass.ClassCategory1.ClassName }}：{{ ProductClass.ClassCategory1 }}
-                                                {% endif %}
-                                                {% if ProductClass.ClassCategory2 and ProductClass.ClassCategory2.id %}
-                                                    <br>{{ ProductClass.ClassCategory2.ClassName }}：{{ ProductClass.ClassCategory2 }}
-                                                {% endif %}
-                                            </dd>
-                                            <dd id="cart_item_list__item_price" class="item_price">￥{{ CartItem.price|number_format }}</dd>
-                                            <dd id="cart_item_list__item_subtotal" class="item_subtotal">小計：￥{{ CartItem.total_price|number_format }}</dd>
-                                        </dl>
+                                        <div class="col-sm-4 col-xs-4 float-right count-right">
+                                            <img class="minus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-minus-inactive.svg">
+                                            <input type="number" min="0" step="1" pattern="[0-9]*" class="count-number" name="quantity[{{ ProductClass.id }}][{{ CartItem.reception_date|date('N') }}]" value="{{ CartItem.quantity }}">
+                                            <img class="plus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-plus-active.svg">
+                                        </div>
                                     </div>
-                                    <div id="cart_item_list__quantity" class="item_quantity td">
-                                        {{ CartItem.quantity|number_format }}
-                                        <ul id="cart_item_list__quantity_edit">
-                                            <li>
-                                                {% if CartItem.quantity > 1 %}
-                                                    <a id="cart_item_list__down" href="{{ url('cart_down', {'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} data-method="put" data-confirm="false"><svg class="cb cb-minus"><use xlink:href="#cb-minus" /></svg></a>
-                                                {% else %}
-                                                    <span><svg class="cb cb-minus"><use xlink:href="#cb-minus" /></svg></span>
-                                                {% endif %}
-                                            </li>
-                                            <li>
-                                                <a id="cart_item_list__up" href="{{ url('cart_up', {'productClassId': ProductClass.id}) }}" {{ csrf_token_for_anchor() }} data-method="put" data-confirm="false"><svg class="cb cb-plus"><use xlink:href="#cb-plus" /></svg></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div id="cart_item_list__subtotal" class="item_subtotal td">￥{{ CartItem.total_price|number_format }}</div>
-                                </div><!--/item_box-->
+                                </div>
                             {% endfor %}
-
                         </div>
-                    </div><!--/cart_item-->
-                    <div class="total_box">
-                        <dl id="total_box__total_price" class="total_price">
-                            <dt>合計：</dt>
-                            <dd class="text-primary">￥{{ Cart.total_price|number_format }}</dd>
-                        </dl>
-                        <div id="total_box__user_action_menu" class="btn_group">
-
-                            <p id="total_box__next_button" >
-                                <a href="{{ path('cart_buystep') }}" class="btn btn-primary btn-block">レジに進む</a>
-                            </p>
-                            <p id="total_box__top_button">
-                                <a  href="{{ url('top') }}" class="btn btn-info btn-block">お買い物を続ける</a>
-                            </p>
+                        <div class="modal-footer">
+                            <button id="order_button" class="btn btn-success" type="submit">注文内容を変更する</button>
                         </div>
-                    </div>
-
-                </form>
-                {% else %}
-                <div id="cart_box__message" class="message">
-                    <p class="errormsg bg-danger">
-                        <svg class="cb cb-warning"><use xlink:href="#cb-warning" /></svg>現在カート内に商品はございません。
-                    </p>
+                    </form>
                 </div>
-                {% endif %}
-
-            </div><!-- /.col -->
-        </div><!-- /.row -->
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

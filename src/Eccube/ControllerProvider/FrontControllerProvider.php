@@ -48,7 +48,9 @@ class FrontControllerProvider implements ControllerProviderInterface
 
         // cart
         $c->match('/cart', '\Eccube\Controller\CartController::index')->bind('cart');
+        $c->match('/cart/complete/{id}', '\Eccube\Controller\CartController::complete')->bind('cart_complete')->assert('id', '\d+');
         $c->post('/cart/add', '\Eccube\Controller\CartController::add')->bind('cart_add');
+        $c->post('/cart/modify', '\Eccube\Controller\CartController::modify')->bind('cart_modify');
         $c->put('/cart/up/{productClassId}', '\Eccube\Controller\CartController::up')->bind('cart_up')->assert('productClassId', '\d+');
         $c->put('/cart/down/{productClassId}', '\Eccube\Controller\CartController::down')->bind('cart_down')->assert('productClassId', '\d+');
         // setquantity deprecated since 3.0.0, to be removed in 3.1
@@ -135,6 +137,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         //farm guide
         $c->match('/farm/guide', '\Eccube\Controller\Farm\FarmerController::guide')->bind('farm_guide');
 
+        // order status step 1
+        $c->match('/order/{id}', '\Eccube\Controller\OrderController::index')->bind('order')->assert('id', '\d+');
 
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');
