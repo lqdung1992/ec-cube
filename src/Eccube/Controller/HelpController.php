@@ -38,11 +38,18 @@ class HelpController extends AbstractController
         ));
     }
 
+    /**
+     * Farm guide
+     *
+     * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function guide(Application $app)
     {
-        return $app->render('Help/guide.twig');
+        return $app->render('Help/guide.twig', array(
+            'TargetCustomer' => $app['user']
+        ));
     }
-
     public function about(Application $app)
     {
         return $app->render('Help/about.twig');
