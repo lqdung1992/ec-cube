@@ -59,8 +59,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/cart/buystep', '\Eccube\Controller\CartController::buystep')->bind('cart_buystep');
 
         // contact
-//        $c->match('/contact', '\Eccube\Controller\ContactController::index')->bind('contact');
-//        $c->match('/contact/complete', '\Eccube\Controller\ContactController::complete')->bind('contact_complete');
+        $c->match('/contact', '\Eccube\Controller\ContactController::index')->bind('contact');
+        $c->match('/contact/complete', '\Eccube\Controller\ContactController::complete')->bind('contact_complete');
 
         // entry
         $c->match('/entry', '\Eccube\Controller\EntryController::index')->bind('entry');
@@ -123,19 +123,13 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
 
         // farm - home
-        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home')->assert('id', '\d+');
+        $c->match('/farm/home', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home');
+        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home_other')->assert('id', '\d+');
 
         // farm - add item
         $c->match('/farm/item/new', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_new');
         $c->match('/farm/item/{id}/edit', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_edit')->assert('id', '\d+');
         $c->match('/farm/item/detail/{id}', '\Eccube\Controller\Farm\FarmerController::detail')->bind('farm_item_detail')->assert('id', '\d+');
-
-        //farm - contact
-        $c->match('/farm/contact', '\Eccube\Controller\Farm\FarmerController::contact')->bind('farm_contact');
-        $c->match('/farm/contact/complete', '\Eccube\Controller\Farm\FarmerController::complete')->bind('farm_contact_complete');
-
-        //farm guide
-        $c->match('/farm/guide', '\Eccube\Controller\Farm\FarmerController::guide')->bind('farm_guide');
 
         // order status step 1
         $c->match('/order/{id}', '\Eccube\Controller\OrderController::index')->bind('order')->assert('id', '\d+');

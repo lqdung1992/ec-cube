@@ -15,7 +15,9 @@ use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
+use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Master\ReceiptableDate;
+use Eccube\Entity\Order;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
@@ -24,6 +26,7 @@ use Eccube\Entity\ProductTag;
 use Eccube\Exception\CartException;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
+use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductRepository;
 use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
@@ -43,6 +46,8 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 class FarmerController
 {
     /**
+     * Profile page
+     *
      * @param Application $app
      * @param Request $request
      * @param $id
@@ -99,11 +104,16 @@ class FarmerController
         $voiceRepo = $app['eccube.repository.customer_voice'];
         $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer, 'Product' => null), array('create_date' => 'ASC'));
 
+        /** @var ProductRepository $productRepo */
+        $productRepo = $app['eccube.repository.product'];
+        $products = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
+
         return $app->render('Farm/farm_profile.twig', array(
             'TargetCustomer' => $TargetCustomer,
             'CustomerVoice' => $CustomerVoice,
             'form' => $form->createView(),
             'is_owner' => $isOwner,
+            'Products' => $products
         ));
     }
 
@@ -313,23 +323,94 @@ class FarmerController
      * @param $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function home(Application $app, Request $request, $id)
+    public function home(Application $app, Request $request, $id = null)
     {
         /** @var Customer $Customer */
         $Customer = $app->user();
-        $TargetCustomer = $app['eccube.repository.customer']->find($id);
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+        $TargetCustomer = null;
+        if ($id) {
+            $TargetCustomer = $app['eccube.repository.customer']->find($id);
+            if (!$TargetCustomer) {
+                throw new NotFoundHttpException();
+            }
+        }
         if (!$TargetCustomer) {
-            throw new NotFoundHttpException();
+            $TargetCustomer = $Customer;
         }
 
         /** @var ProductRepository $productRepo */
         $productRepo = $app['eccube.repository.product'];
         $productList = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
+        /** @var OrderRepository $orderRepos */
+        $orderRepos = $app['eccube.repository.order'];
+        $arrStatusTransaction = array(
+            $app['config']['order_new'],
+        );
+        /** @var Order[] $orderTransaction */
+        $orderTransaction = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusTransaction)->getQuery()->getResult();
+        $orderTransactionByDate = array();
+        if ($orderTransaction) {
+            foreach ($orderTransaction as $order) {
+                if ($order->getReceiptableDate()) {
+                    $orderTransactionByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
+                }
+            }
+        }
+
+        $arrStatusDelivery = array(
+            OrderStatus::ORDER_PREPARE,
+            OrderStatus::ORDER_PICKUP,
+        );
+        /** @var Order[] $orderDelivery */
+        $orderDelivery = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusDelivery)->getQuery()->getResult();
+        $orderDeliveryByDate = array();
+        if ($orderDelivery) {
+            foreach ($orderDelivery as $order) {
+                if ($order->getReceiptableDate()) {
+                    $orderDeliveryByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
+                }
+            }
+        }
+
+        $arrStatusComplete = array(
+            OrderStatus::ORDER_DONE,
+        );
+
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createNamedBuilder('', 'home_complete');
+        if ($request->getMethod() === 'GET') {
+            $builder->setMethod('GET');
+        }
+
+        $formOrderBy = $builder->getForm();
+        $formOrderBy->handleRequest($request);
+        $queryBuilder = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusComplete);
+        $queryBuilder->resetDQLPart('orderBy');
+        $data = $formOrderBy->getData();
+        $orderBy = isset($data['order_by']) ? $data['order_by'] : Order::SORT_BY_NEW;
+        switch ($orderBy) {
+            case Order::SORT_BY_TOTAL:
+                $queryBuilder->orderBy('o.total', 'DESC');
+                break;
+            case Order::SORT_BY_NEW:
+            default:
+                $queryBuilder->orderBy('o.update_date', 'DESC');
+                break;
+
+        }
+        /** @var Order[] $orderComplete */
+        $orderComplete = $queryBuilder->getQuery()->getResult();
 
         return $app->render('Farm/farm_home.twig', array(
-            'items' => array(),
-            'products' => $productList,
+            'Products' => $productList,
             'TargetCustomer' => $TargetCustomer,
+            'OrderTransactionByDate' => $orderTransactionByDate,
+            'OrderDeliveryByDate' => $orderDeliveryByDate,
+            'formOrderBy' => $formOrderBy->createView(),
+            'OrderComplete' => $orderComplete,
         ));
     }
 
@@ -692,88 +773,5 @@ class FarmerController
         $ProductCategory->setRank($count);
 
         return $ProductCategory;
-    }
-
-    /**
-     * お問い合わせ画面.
-     *
-     * @param Application $app
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function contact(Application $app, Request $request)
-    {
-        $builder = $app['form.factory']->createBuilder('contact');
-        $form = $builder->getForm();
-        $form->handleRequest($request);
-        $user = $app['user'];
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            switch ($request->get('mode')) {
-                case 'confirm':
-                    //$builder->setAttribute('freeze', true);
-                    $form = $builder->getForm();
-                    $form->handleRequest($request);
-
-                    return $app->render('Farm/farm_contact_confirm.twig', array(
-                        'form' => $form->createView(),
-                        'TargetCustomer' => $app['user']
-                    ));
-
-                case 'complete':
-                    $data = $form->getData();
-                    $data = array(
-                            'name01' => $user->getName01(),
-                            'name02' => $user->getName02(),
-                            'kana01' => $user->getKana01(),
-                            'kana02' => $user->getKana02(),
-                            'zip01' => $user->getZip01(),
-                            'zip02' => $user->getZip02(),
-                            'pref' => $user->getPref(),
-                            'addr01' => $user->getAddr01(),
-                            'addr02' => $user->getAddr02(),
-                            'tel01' => $user->getTel01(),
-                            'tel02' => $user->getTel02(),
-                            'tel03' => $user->getTel03(),
-                            'email' => $user->getEmail(),
-                            'title' => $data['title'],
-                            'contents' => $data['contents']
-                    );
-                    // メール送信
-                    $app['eccube.service.mail']->sendContactMail($data);
-                    return $app->redirect($app->url('farm_contact_complete'));
-            }
-        }
-
-        return $app->render('Farm/farm_contact.twig', array(
-            'form' => $form->createView(),
-            'TargetCustomer' => $app['user']
-        ));
-    }
-
-    /**
-     * お問い合わせ完了画面.
-     *
-     * @param Application $app
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function complete(Application $app)
-    {
-        return $app->render('Farm/farm_contact_complete.twig', array(
-            'TargetCustomer' => $app['user']
-        ));
-    }
-
-    /**
-     * Farm guide
-     *
-     * @param Application $app
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function guide(Application $app)
-    {
-        return $app->render('Farm/farm_guide.twig', array(
-            'TargetCustomer' => $app['user']
-        ));
     }
 }
