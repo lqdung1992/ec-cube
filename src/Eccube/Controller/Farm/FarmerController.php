@@ -46,6 +46,8 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 class FarmerController
 {
     /**
+     * Profile page
+     *
      * @param Application $app
      * @param Request $request
      * @param $id
@@ -102,11 +104,16 @@ class FarmerController
         $voiceRepo = $app['eccube.repository.customer_voice'];
         $CustomerVoice = $voiceRepo->findBy(array('TargetCustomer' => $TargetCustomer, 'Product' => null), array('create_date' => 'ASC'));
 
+        /** @var ProductRepository $productRepo */
+        $productRepo = $app['eccube.repository.product'];
+        $products = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
+
         return $app->render('Farm/farm_profile.twig', array(
             'TargetCustomer' => $TargetCustomer,
             'CustomerVoice' => $CustomerVoice,
             'form' => $form->createView(),
             'is_owner' => $isOwner,
+            'Products' => $products
         ));
     }
 
