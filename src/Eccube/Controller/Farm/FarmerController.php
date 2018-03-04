@@ -327,6 +327,9 @@ class FarmerController
     {
         /** @var Customer $Customer */
         $Customer = $app->user();
+        if (!($Customer instanceof Customer)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
         $TargetCustomer = null;
         if ($id) {
             $TargetCustomer = $app['eccube.repository.customer']->find($id);
