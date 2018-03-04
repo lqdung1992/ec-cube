@@ -54,6 +54,8 @@ class OrderRepository extends EntityRepository
         ;
 
         switch ($Status->getId()) {
+            // Todo: set commit date with new status
+            // Maybe OrderStatus::ORDER_PICKUP
             case '5': // 発送済へ
                 $Order->setCommitDate(new \DateTime());
                 break;

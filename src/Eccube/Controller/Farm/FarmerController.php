@@ -365,11 +365,42 @@ class FarmerController
             }
         }
 
+        $arrStatusComplete = array(
+            OrderStatus::ORDER_DONE,
+        );
+
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createNamedBuilder('', 'home_complete');
+        if ($request->getMethod() === 'GET') {
+            $builder->setMethod('GET');
+        }
+
+        $formOrderBy = $builder->getForm();
+        $formOrderBy->handleRequest($request);
+        $queryBuilder = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusComplete);
+        $queryBuilder->resetDQLPart('orderBy');
+        $data = $formOrderBy->getData();
+        $orderBy = isset($data['order_by']) ? $data['order_by'] : Order::SORT_BY_NEW;
+        switch ($orderBy) {
+            case Order::SORT_BY_TOTAL:
+                $queryBuilder->orderBy('o.total', 'DESC');
+                break;
+            case Order::SORT_BY_NEW:
+            default:
+                $queryBuilder->orderBy('o.update_date', 'DESC');
+                break;
+
+        }
+        /** @var Order[] $orderComplete */
+        $orderComplete = $queryBuilder->getQuery()->getResult();
+
         return $app->render('Farm/farm_home.twig', array(
             'Products' => $productList,
             'TargetCustomer' => $TargetCustomer,
             'OrderTransactionByDate' => $orderTransactionByDate,
-            'OrderDeliveryByDate' => $orderDeliveryByDate
+            'OrderDeliveryByDate' => $orderDeliveryByDate,
+            'formOrderBy' => $formOrderBy->createView(),
+            'OrderComplete' => $orderComplete,
         ));
     }
 
