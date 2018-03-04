@@ -527,14 +527,25 @@ class OrderRepository extends EntityRepository
         return $this->findOneBy(array('id' => $id, 'OrderStatus' => $status));
     }
 
-    public function getQueryBuilderByOwner(Customer $Customer)
+    /**
+     * @param Customer $Customer
+     * @param array $OrderStatuses
+     * @return QueryBuilder
+     */
+    public function getQueryBuilderByOwner(Customer $Customer, array $OrderStatuses = array())
     {
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.OrderDetails', 'od')
             ->leftJoin('od.Product', 'p')
             ->where('p.Creator = :Customer')
-            ->setParameter('Customer', $Customer)
-            ->groupBy('o.id');
+            ->setParameter('Customer', $Customer);
+
+        if (count($OrderStatuses) > 0) {
+            $qb->andWhere('o.OrderStatus in (:OrderStatuses)')
+                ->setParameter('OrderStatuses', $OrderStatuses);
+        }
+
+        $qb->groupBy('o.id');
 
         // Order By
         $qb->addOrderBy('o.receiptable_date', 'ASC');

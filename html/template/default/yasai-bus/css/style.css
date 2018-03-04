@@ -2504,11 +2504,11 @@ input[readonly], textarea[readonly] {
 }
 
 /* Home transaction */
-.transaction-section {
+.transaction-section, .delivery-section {
     display: none;
 }
 
-.transaction-section {
+.transaction-section, .delivery-section {
     background-color: #f7f7f7;
     padding-top: 20px;
     margin-top: 10px;
@@ -2521,7 +2521,7 @@ input[readonly], textarea[readonly] {
     margin: 10px auto;
     font-weight: bold;
 }
-.transaction-section .farmer-trans-detail {
+.transaction-section .trans-detail, .delivery-section .delivery-detail {
     height: 99px;
     border-radius: 3px;
     background-color: #ffffff;

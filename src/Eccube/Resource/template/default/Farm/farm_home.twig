@@ -92,8 +92,8 @@
                     <ul class="list-inline">
                         <li class="col-sm-3 col-xs-3 text-alight-center enable " id="product-section" data-text="product-section">出品</li>
                         <li class="col-sm-3 col-xs-3 text-alight-center disable" id="transaction-section" data-text="transaction-section">出荷登録</li>
-                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="delivery-section">集荷・配送</li>
-                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="complete-section">取引終了</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="delivery-section" data-text="delivery-section">集荷・配送</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="complete-section" data-text="complete-section">取引終了</li>
                     </ul>
                 </div>
             </div>
@@ -146,17 +146,17 @@
         <div class="transaction-section">
             <div class="row">
                 <div class="col-sm-12 col-xs-12">
-                    {% if Orders|length > 0 %}
+                    {% if OrderTransactionByDate|length > 0 %}
                     <button class="btn btn-danger display-block shipped-button">本日出荷の商品があります</button>
-                    {% for receipt_date, arrOrder in Orders %}
+                    {% for receipt_date, arrOrder in OrderTransactionByDate %}
                     <label class="display-block margin-left13">{{ receipt_date }} 集荷</label>
                         {% for Order in arrOrder %}
-                            <div class="farmer-trans-detail clearfix">
+                            <div class="trans-detail clearfix">
                                 <div class="clearfix">
                                     <div class="order-detail-profile float-left">
                                         <p class="title15 width120">
                                             {{ Order.name01 }}{{ Order.name02 }}
-                                            <label class="badge float-right wait-approve">出荷登録待ち</label>
+                                            <label class="badge float-right wait-approve">{{ Order.OrderStatus.name }}</label>
                                             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/box-min.svg" class="float-right margin-left20">
                                         </p>
                                         {% for OrderDetail in Order.OrderDetails %}
@@ -165,12 +165,59 @@
                                         {% endfor %}
                                     </div>
                                     <div class="float-right arrow-right">
+                                        <a href="{{ url('order', {'id': Order.id}) }}">
                                         <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span class="title12 display-block">取引中の商品はありません</span>
+                                <span class="title12">商品が購入されると、ここに並びます</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="delivery-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if OrderDeliveryByDate|length > 0 %}
+                        {% for receipt_date, arrOrder in OrderDeliveryByDate %}
+                            <label class="display-block margin-left13">{{ receipt_date }} 集荷</label>
+                            {% for Order in arrOrder %}
+                                <div class="delivery-detail clearfix">
+                                    <div class="clearfix">
+                                        <div class="order-detail-profile float-left">
+                                            <p class="title15 width120">
+                                                {{ Order.name01 }}{{ Order.name02 }}
+                                                {% if Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::ORDER_PREPARE') %}
+                                                    <label class="badge float-right wait-order">{{ Order.OrderStatus.name }}</label>
+                                                {% else %}
+                                                    <label class="badge float-right delivery-now">{{ Order.OrderStatus.name }}</label>
+                                                {% endif %}
+                                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/box-min.svg" class="float-right margin-left20">
+                                            </p>
+                                            {% for OrderDetail in Order.OrderDetails %}
+                                                {% set Product = OrderDetail.Product %}
+                                                <img class="image-review order-profile" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}">
+                                            {% endfor %}
+                                        </div>
+                                        <div class="float-right arrow-right">
+                                            <a href="{{ url('order', {'id': Order.id}) }}">
+                                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
                     {% else %}
                         <div class="fav-empty">
                             <p>

@@ -15,6 +15,7 @@ use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
+use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Master\ReceiptableDate;
 use Eccube\Entity\Order;
 use Eccube\Entity\Product;
@@ -335,14 +336,31 @@ class FarmerController
         $productList = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
         /** @var OrderRepository $orderRepos */
         $orderRepos = $app['eccube.repository.order'];
-        /** @var Order[] $orders */
-        $orders = $orderRepos->getQueryBuilderByOwner($TargetCustomer)->getQuery()->getResult();
-
-        $orderByDate = array();
-        if ($orders) {
-            foreach ($orders as $order) {
+        $arrStatusTransaction = array(
+            $app['config']['order_new'],
+        );
+        /** @var Order[] $orderTransaction */
+        $orderTransaction = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusTransaction)->getQuery()->getResult();
+        $orderTransactionByDate = array();
+        if ($orderTransaction) {
+            foreach ($orderTransaction as $order) {
                 if ($order->getReceiptableDate()) {
-                    $orderByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
+                    $orderTransactionByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
+                }
+            }
+        }
+
+        $arrStatusDelivery = array(
+            OrderStatus::ORDER_PREPARE,
+            OrderStatus::ORDER_PICKUP,
+        );
+        /** @var Order[] $orderDelivery */
+        $orderDelivery = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusDelivery)->getQuery()->getResult();
+        $orderDeliveryByDate = array();
+        if ($orderDelivery) {
+            foreach ($orderDelivery as $order) {
+                if ($order->getReceiptableDate()) {
+                    $orderDeliveryByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
                 }
             }
         }
@@ -350,7 +368,8 @@ class FarmerController
         return $app->render('Farm/farm_home.twig', array(
             'Products' => $productList,
             'TargetCustomer' => $TargetCustomer,
-            'Orders' => $orderByDate
+            'OrderTransactionByDate' => $orderTransactionByDate,
+            'OrderDeliveryByDate' => $orderDeliveryByDate
         ));
     }
 
