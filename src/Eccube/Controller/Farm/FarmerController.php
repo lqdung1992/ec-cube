@@ -757,6 +757,39 @@ class FarmerController
         ));
     }
 
+    public function history(Application $app, Request $request)
+    {
+        if (!$app->isGranted('ROLE_FARMER')) {
+            throw new NotFoundHttpException();
+        }
+        $Customer = $app->user();
+
+        /** @var OrderRepository $orderRepo */
+        $orderRepo = $app['eccube.repository.order'];
+        $history = $orderRepo->getQueryBuilderByOwner($Customer, array(OrderStatus::ORDER_DONE))->getQuery()->getResult();
+
+        return $app->render('Farm/history.twig', array(
+            'history' => $history
+        ));
+    }
+
+    public function historyDetail(Application $app, Request $request, $id)
+    {
+        if (!$app->isGranted('ROLE_FARMER')) {
+            throw new NotFoundHttpException();
+        }
+        /** @var OrderRepository $orderRepo */
+        $orderRepo = $app['eccube.repository.order'];
+        $Order = $orderRepo->find($id);
+        if (!$Order) {
+            throw new NotFoundHttpException();
+        }
+
+        return $app->render('Farm/history_detail.twig', array(
+            'Order' => $Order
+        ));
+    }
+
     /*
      * ProductCategory作成
      * @param \Eccube\Entity\Product $Product
