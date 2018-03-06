@@ -10,6 +10,7 @@ namespace Eccube\Controller\Farm;
 use Doctrine\ORM\EntityManager;
 use Eccube\Application;
 use Eccube\Common\Constant;
+use Eccube\Controller\AbstractController;
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
@@ -43,7 +44,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
  * Class FarmerController
  * @package Eccube\Controller\Farm
  */
-class FarmerController
+class FarmerController extends AbstractController
 {
     /**
      * Profile page
@@ -784,6 +785,11 @@ class FarmerController
         $Product = $productRepository->find($id);
         if (!$Product) {
             throw new NotFoundHttpException();
+        }
+
+        if ($request->getMethod() == 'PUT') {
+            $this->isTokenValid($app);
+
         }
 
         return $app->render('Farm/history_detail.twig', array(

@@ -91,7 +91,7 @@
                 </p>
             </div>
             <div class="float-right">
-                <button id="farmer-history-detail" class="btn btn-success">商品を再出品する</button>
+                <a href="{{ url('farm_history_detail', {'id': Product.id }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="この製品を更新してもよろしいですか？" class="btn btn-success">商品を再出品する</a>
             </div>
         </div>
     </div>
