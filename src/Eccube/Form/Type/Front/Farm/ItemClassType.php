@@ -174,7 +174,7 @@ class ItemClassType extends AbstractType
             ))
             ->add('production_start_date', 'date', array(
                 'label' => '生産予定期間',
-                'required' => false,
+                'required' => true,
                 'input' => 'datetime',
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd',
@@ -182,7 +182,7 @@ class ItemClassType extends AbstractType
             ))
             ->add('production_end_date', 'date', array(
                 'label' => '生産予定期間',
-                'required' => false,
+                'required' => true,
                 'input' => 'datetime',
                 'widget' => 'single_text',
                 'format' => 'yyyy-MM-dd',

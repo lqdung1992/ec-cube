@@ -324,8 +324,8 @@ class ProductRepository extends EntityRepository
             ->innerJoin('Eccube\Entity\ProductClass', 'pc', Join::WITH, 'pc.Product = p.id')
             ->where('p.Creator = :Customer AND p.Status = 1')
             ->setParameter('Customer', $Customer)
-            ->andWhere('pc.production_start_date <= :start_date')
-            ->andWhere('pc.production_end_date  >= :end_date')
+            ->andWhere('pc.production_start_date IS NULL or pc.production_start_date <= :start_date')
+            ->andWhere('pc.production_end_date IS NULL or pc.production_end_date >= :end_date')
             ->setParameter('start_date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME)
             ->setParameter('end_date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);
 
