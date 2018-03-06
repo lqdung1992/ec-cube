@@ -637,6 +637,7 @@ class Product extends \Eccube\Entity\AbstractEntity
             $this->addProductReceiptableDate($CloneProductReceiptableDate);
             $CloneProductReceiptableDate->setProduct($this);
         }
+        $this->ProductRate = null;
 
         return $this;
     }
