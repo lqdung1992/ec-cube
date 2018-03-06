@@ -764,9 +764,10 @@ class FarmerController
         }
         $Customer = $app->user();
 
-        /** @var OrderRepository $orderRepo */
-        $orderRepo = $app['eccube.repository.order'];
-        $history = $orderRepo->getQueryBuilderByOwner($Customer, array(OrderStatus::ORDER_DONE))->getQuery()->getResult();
+        /** @var ProductRepository $productRepository */
+        $productRepository = $app['eccube.repository.product'];
+        $queryBuilder = $productRepository->getProductQueryBuilderForHistory($Customer);
+        $history = $queryBuilder->getQuery()->getResult();
 
         return $app->render('Farm/history.twig', array(
             'history' => $history
@@ -778,15 +779,15 @@ class FarmerController
         if (!$app->isGranted('ROLE_FARMER')) {
             throw new NotFoundHttpException();
         }
-        /** @var OrderRepository $orderRepo */
-        $orderRepo = $app['eccube.repository.order'];
-        $Order = $orderRepo->find($id);
-        if (!$Order) {
+        /** @var ProductRepository $productRepository */
+        $productRepository = $app['eccube.repository.product'];
+        $Product = $productRepository->find($id);
+        if (!$Product) {
             throw new NotFoundHttpException();
         }
 
         return $app->render('Farm/history_detail.twig', array(
-            'Order' => $Order
+            'Product' => $Product
         ));
     }
 
