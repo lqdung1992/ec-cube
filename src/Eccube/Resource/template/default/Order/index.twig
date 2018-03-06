@@ -6,6 +6,19 @@
  #}{% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
+    <style type="text/css">
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+        }
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+        }
+    </style>
 {% endblock stylesheet %}
 {% block javascript %}
 {% endblock javascript %}
@@ -79,7 +92,7 @@
             {% endfor %}
 
             {% if is_granted("ROLE_FARMER") and app.user.id == Order.farm[0].id %}
-            <p class="float-right margin-top10 margin-right10"><a href="#" class="color888 title11">商品の出荷が難しい場合</a></p>
+            <p class="float-right margin-top10 margin-right10"><a href="{{ url('contact') }}" target="_blank" class="color888 title11">商品の出荷が難しい場合</a></p>
             <form method="post" action="?" name="form-prepare">
                 <input type="hidden" name="mode" value="prepare"/>
                 <input type="hidden" name="id" value="{{ Order.id }}">
