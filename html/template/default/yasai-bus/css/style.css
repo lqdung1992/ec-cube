@@ -198,10 +198,6 @@ body {
     color: #888888;
 }
 
-.Rectangle-8 {
-    margin-left: 12px;
-}
-
 .pagination {
     margin-left: 60px !important;
 }
@@ -294,13 +290,6 @@ body {
 img {
     cursor: pointer;
 }
-
-.thumb-image {
-    padding: 15px;
-    margin-left: 15%;
-    margin-bottom: 15px;
-}
-
 
 #profile-description {
     width: 345px;
@@ -1495,8 +1484,8 @@ img {
 
 .tag-done {
     position: absolute;
-    top: 1.4%;
-    left: 2%;
+    top: 4px;
+    left: 4px;
 }
 
 .Rectangle-12 {

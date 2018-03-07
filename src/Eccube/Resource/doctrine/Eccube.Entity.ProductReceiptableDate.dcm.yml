@@ -26,7 +26,7 @@ Eccube\Entity\ProductReceiptableDate:
                 referencedColumnName: product_id
         ReceiptableDate:
             targetEntity: Eccube\Entity\Master\ReceiptableDate
-            inversedBy: ProductReceiptableDates
+            mappedBy: ReceiptableDate
             joinColumn:
                 name: date_id
                 referencedColumnName: id
