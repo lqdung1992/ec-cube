@@ -301,6 +301,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         <thead>
                         <tr id="result_list_main__header">
                             <th id="result_list_main__header_id">会員ID</th>
+                            <th id="result_list_main__header_customer_role">申し込み分類</th>
                             <th id="result_list_main__header_profile">プロフィール画像</th>
                             <th id="result_list_main__header_name">会員名</th>
                             <th id="result_list_main__header_approval_status">承認状況</th>
@@ -313,6 +314,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                         {% for Customer in pagination %}
                         <tr id="result_list_main__item--{{ Customer.id }}">
                             <td id="result_list_main__id--{{ Customer.id }}" class="member_id">{{ Customer.id }}</td>
+                            <td id="result_list_main__customer_role--{{ Customer.id }}" class="member_role">{{ Customer.CustomerRole.name_jp }}</td>
                             <td id="result_list_main__profile--{{ Customer.id }}" class="member_profile">
                                 {% if Customer.profile_image %}
                                     <img src="{{ app.config.image_save_urlpath }}/{{ Customer.profile_image }}" style="width: 60px; height: 60px;">
