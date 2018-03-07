@@ -147,7 +147,17 @@ class CustomerType extends AbstractType
                         'mimeTypes' => 'image/*'
                     ))
                 )
-            ));;
+            ))
+            ->add('customer_role', 'entity', array(
+                'required' => true,
+                'class' => 'Eccube\Entity\Master\CustomerRole',
+                'empty_value' => '----------',
+                'property' => 'name_jp',
+                'label' => '申し込み分類',
+                'constraints' => array(
+                    new Assert\NotBlank(),
+                )
+            ));
     }
 
     /**
