@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class FarmServiceController
@@ -74,6 +75,9 @@ class FarmServiceController
 
                     $app['orm.em']->persist($Customer);
                     $app['orm.em']->flush();
+                    // Save session for service profile
+                    $session = $request->getSession();
+                    $session->set('customer_id', $Customer->getId());
 
                     $activateUrl = $app->url('entry_activate', array('secret_key' => $Customer->getSecretKey()));
 
@@ -118,8 +122,16 @@ class FarmServiceController
     {
         /** @var Customer $Customer */
         $Customer = $app->user();
+        $session = $request->getSession();
         if (!($Customer instanceof Customer)) {
-            return $app->redirect($app->url('mypage_login'));
+            if ($session->has('customer_id')) {
+                $Customer = $app['eccube.repository.customer']->find($session->get('customer_id'));
+                if (!$Customer) {
+                    throw new NotFoundHttpException();
+                }
+            } else {
+                return $app->redirect($app->url('mypage_login'));
+            }
         }
         // load image
         $profileImage = null;
@@ -156,6 +168,10 @@ class FarmServiceController
             $Customer->setProfileImage($filename);
             $app['orm.em']->persist($Customer);
             $app['orm.em']->flush();
+
+            if ($session->has('customer_id')) {
+                $session->remove('customer_id');
+            }
 
             return $app->redirect($app->url('farm_profile', array('id' => $Customer->getId())));
         }
