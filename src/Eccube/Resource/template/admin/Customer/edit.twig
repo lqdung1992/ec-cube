@@ -341,6 +341,18 @@
                         </div>
                         <div class="row">
                             <div class="col-xs-12">
+                                <label>{{ form.customer_role.vars.label }}</label>
+                            </div>
+                            <div class="col-xs-12">
+                                <div id="button_box__customer_role" class="form-group">
+                                    {{ form_widget(form.customer_role) }}
+                                    {{ form_errors(form.customer_role) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
                                 <label>{{ form.approval_status.vars.label }}</label>
                             </div>
                             {#<div class="">#}
