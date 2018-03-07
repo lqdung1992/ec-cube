@@ -21,7 +21,7 @@
                     <span class="button-x">X</span>
                 </li>
                 <li class="list-group-item"><a href="{{ url('farm_profile', {'id': app.user.id}) }}">プロフィール</a></li>
-                <li class="list-group-item"><a href="#">過去の出品</a></li>
+                <li class="list-group-item"><a href="{{ url('farm_history') }}">過去の出品</a></li>
                 <li class="list-group-item"><a href="#"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
                 <li class="list-group-item" id="setting"><a href="{{ url('farm_service_profile_setting') }}">設定</a></li>
             {% endif %}
