@@ -91,17 +91,26 @@ class Cart extends \Eccube\Entity\AbstractEntity
 
     /**
      * @param  \Eccube\Entity\CartItem $AddCartItem
+     * @param  \DateTime $date
      * @return \Eccube\Entity\Cart
      */
-    public function setCartItem(\Eccube\Entity\CartItem $AddCartItem)
+    public function setCartItem(\Eccube\Entity\CartItem $AddCartItem, $date = null)
     {
         $find = false;
+        /** @var CartItem $CartItem */
         foreach ($this->CartItems as $CartItem) {
-            if ($CartItem->getClassName() === $AddCartItem->getClassName() && $CartItem->getClassId() === $AddCartItem->getClassId()) {
+            $expr = $CartItem->getClassName() === $AddCartItem->getClassName() && $CartItem->getClassId() === $AddCartItem->getClassId();
+            if ($date) {
+                $addDate = $date->format('Y/m/d');
+                $cartDate = $CartItem->getReceptionDate()->format('Y/m/d');
+                $expr = $CartItem->getClassName() === $AddCartItem->getClassName() && $CartItem->getClassId() === $AddCartItem->getClassId() && $addDate == $cartDate;
+            }
+            if ($expr) {
                 $find = true;
                 $CartItem
                     ->setPrice($AddCartItem->getPrice())
-                    ->setQuantity($AddCartItem->getQuantity());
+                    ->setQuantity($AddCartItem->getQuantity())
+                    ->setReceptionDate($AddCartItem->getReceptionDate());
             }
         }
 
@@ -124,14 +133,22 @@ class Cart extends \Eccube\Entity\AbstractEntity
     }
 
     /**
-     * @param  string                  $class_name
-     * @param  string                  $class_id
+     * @param  string    $class_name
+     * @param  string    $class_id
+     * @param  \DateTime $date
      * @return \Eccube\Entity\CartItem
      */
-    public function getCartItemByIdentifier($class_name, $class_id)
+    public function getCartItemByIdentifier($class_name, $class_id, $date = null)
     {
+        /** @var CartItem $CartItem */
         foreach ($this->CartItems as $CartItem) {
-            if ($CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id) {
+            $expr = $CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id;
+            if ($date) {
+                $addDate = $date->format('Y/m/d');
+                $cartDate = $CartItem->getReceptionDate()->format('Y/m/d');
+                $expr = $CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id && $addDate == $cartDate;
+            }
+            if ($expr) {
                 return $CartItem;
             }
         }
@@ -139,10 +156,22 @@ class Cart extends \Eccube\Entity\AbstractEntity
         return null;
     }
 
-    public function removeCartItemByIdentifier($class_name, $class_id)
+    /**
+     * @param $class_name
+     * @param $class_id
+     * @param null|\DateTime $date
+     * @return $this
+     */
+    public function removeCartItemByIdentifier($class_name, $class_id, $date = null)
     {
         foreach ($this->CartItems as $CartItem) {
-            if ($CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id) {
+            $expr = $CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id;
+            if ($date) {
+                $addDate = $date->format('Y/m/d');
+                $cartDate = $CartItem->getReceptionDate()->format('Y/m/d');
+                $expr = $CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id && $addDate == $cartDate;
+            }
+            if ($expr) {
                 $this->CartItems->removeElement($CartItem);
             }
         }

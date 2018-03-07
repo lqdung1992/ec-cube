@@ -20,7 +20,6 @@
         <div class="farmer-header">
             <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="margin-top10"></a>
         </div>
-
         <div id="service-wrapper" class="row">
             <p class="title12">やさいバスは現在、静岡県内の方のみ</p>
             <p class="title12">利用申請を受け付けております</p>
@@ -63,7 +62,7 @@
 
                 <div class="col-lg-12 col-sm-12 col-xs-12 inline-block" >
                     <div class="form-group">
-                        <label class="display-block">{{ form_label(form.zip) }}
+                        <label class="display-block">{{ form_label(form.zip) }}</label>
                         {{ form_errors(form.zip.zip01) }}
                         {{ form_errors(form.zip.zip02) }}
                         <div class="row">

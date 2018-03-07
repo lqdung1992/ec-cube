@@ -1,0 +1,44 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/5/2018
+ # Time: 8:58 PM
+ #}{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+{% endblock javascript %}
+{% block main %}
+    {% if history|length > 0 %}
+        <div id="reicever-profile-farmer" class="wrapper">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% for Product in history %}
+                        {% set TargetCustomer = Product.Creator %}
+                        <div class="col-sm-3 col-xs-6 thumbnail">
+                            <a href="{{ url('farm_history_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}" alt="no image"></a>
+                            <div class="caption">
+                                <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                <div class="mg20">
+                                    <div class="col-sm-6 col-xs-6">
+                                        <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                    </div>
+                                    <div class="col-sm-6 col-xs-6">
+                                        <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>
+                                <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/tag-done.png" alt="profile" class="tag-done">
+                                <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock main %}

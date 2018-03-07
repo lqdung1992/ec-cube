@@ -52,7 +52,9 @@ class FrontControllerProvider implements ControllerProviderInterface
 
         // cart
         $c->match('/cart', '\Eccube\Controller\CartController::index')->bind('cart');
+        $c->match('/cart/complete/{id}', '\Eccube\Controller\CartController::complete')->bind('cart_complete')->assert('id', '\d+');
         $c->post('/cart/add', '\Eccube\Controller\CartController::add')->bind('cart_add');
+        $c->post('/cart/modify', '\Eccube\Controller\CartController::modify')->bind('cart_modify');
         $c->put('/cart/up/{productClassId}', '\Eccube\Controller\CartController::up')->bind('cart_up')->assert('productClassId', '\d+');
         $c->put('/cart/down/{productClassId}', '\Eccube\Controller\CartController::down')->bind('cart_down')->assert('productClassId', '\d+');
         // setquantity deprecated since 3.0.0, to be removed in 3.1
@@ -61,8 +63,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/cart/buystep', '\Eccube\Controller\CartController::buystep')->bind('cart_buystep');
 
         // contact
-//        $c->match('/contact', '\Eccube\Controller\ContactController::index')->bind('contact');
-//        $c->match('/contact/complete', '\Eccube\Controller\ContactController::complete')->bind('contact_complete');
+        $c->match('/contact', '\Eccube\Controller\ContactController::index')->bind('contact');
+        $c->match('/contact/complete', '\Eccube\Controller\ContactController::complete')->bind('contact_complete');
 
         // entry
         $c->match('/entry', '\Eccube\Controller\EntryController::index')->bind('entry');
@@ -125,20 +127,20 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
 
         // farm - home
-        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home')->assert('id', '\d+');
+        $c->match('/farm/home', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home');
+        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home_other')->assert('id', '\d+');
 
         // farm - add item
         $c->match('/farm/item/new', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_new');
         $c->match('/farm/item/{id}/edit', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_edit')->assert('id', '\d+');
         $c->match('/farm/item/detail/{id}', '\Eccube\Controller\Farm\FarmerController::detail')->bind('farm_item_detail')->assert('id', '\d+');
 
-        //farm - contact
-        $c->match('/farm/contact', '\Eccube\Controller\Farm\FarmerController::contact')->bind('farm_contact');
-        $c->match('/farm/contact/complete', '\Eccube\Controller\Farm\FarmerController::complete')->bind('farm_contact_complete');
+        // order status step 1
+        $c->match('/order/{id}', '\Eccube\Controller\OrderController::index')->bind('order')->assert('id', '\d+');
 
-        //farm guide
-        $c->match('/farm/guide', '\Eccube\Controller\Farm\FarmerController::guide')->bind('farm_guide');
-
+        // Farm order history
+        $c->match('/farm/history', '\Eccube\Controller\Farm\FarmerController::history')->bind('farm_history');
+        $c->match('/farm/history/{id}', '\Eccube\Controller\Farm\FarmerController::historyDetail')->bind('farm_history_detail')->assert('id', '\d+');
 
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');

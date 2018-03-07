@@ -1,0 +1,26 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 2/26/2018
+ # Time: 10:47 PM
+ #}{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+{% endblock javascript %}
+{% block main %}
+    <div id="reicever-cart-done" class="wrapper">
+        <div class="cart-done">
+            <p class="color222">
+                <span>ご注文ありがとうございました！</span>
+                <span>取引中画面からステータスを確認できます</span>
+            </p>
+            <div class="col-sm-12 col-xs-12">
+                <a href="{{ url('order', {'id': id}) }}" class="btn btn-success" id="cart-done-button">取引状況を確認する</a>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock main %}

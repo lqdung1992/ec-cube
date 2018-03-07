@@ -168,6 +168,9 @@ Eccube\Entity\Order:
         payment_date:
             type: datetime
             nullable: true
+        receiptable_date:
+            type: datetime
+            nullable: true
         del_flg:
             type: smallint
             nullable: false

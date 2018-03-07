@@ -29,6 +29,15 @@ namespace Eccube\Entity\Master;
  */
 class OrderStatus extends \Eccube\Entity\AbstractEntity
 {
+    /** 集荷待ち = pickup wait */
+    const ORDER_PREPARE = 9;
+    /** 配送中 = on delivery */
+    const ORDER_PICKUP = 10;
+    /** 配送済み = delivery finish */
+    const ORDER_RECEIVE = 11;
+    /** 完了 = done */
+    const ORDER_DONE = 12;
+
     /**
      * @return string
      */

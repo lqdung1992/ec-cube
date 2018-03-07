@@ -32,6 +32,8 @@ class CartItem extends \Eccube\Entity\AbstractEntity
     private $price;
     private $quantity;
     private $object;
+    /** @var \DateTime */
+    private $reception_date;
 
     public function __construct()
     {
@@ -39,7 +41,23 @@ class CartItem extends \Eccube\Entity\AbstractEntity
 
     public function __sleep()
     {
-        return array('class_name', 'class_id', 'price', 'quantity');
+        return array('class_name', 'class_id', 'price', 'quantity', 'reception_date');
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getReceptionDate()
+    {
+        return $this->reception_date;
+    }
+
+    /**
+     * @param mixed $reception_date
+     */
+    public function setReceptionDate(\DateTime $reception_date)
+    {
+        $this->reception_date = $reception_date;
     }
 
     /**

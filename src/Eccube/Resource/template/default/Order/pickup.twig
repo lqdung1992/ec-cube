@@ -1,0 +1,115 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/1/2018
+ # Time: 9:42 PM
+ #}{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+{% endblock javascript %}
+{% block main %}
+    <div id="receiver-status-wrapper" class="wrapper">
+        <div class="stepwizard">
+            <div class="stepwizard-row">
+                <div class="stepwizard-step">
+                    <span class="circle-symbol color-primary">&#x25CF;</span>
+                    <p class="color888 title12 color-primary">出荷登録</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="color888 title12">集荷</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="title12">配送</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="title12">受領確認</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="map-content-wrapper">
+            <div id="map-content" class="cart-content">
+                <div class="title-section-medium">
+                    <p>
+                        <span class="title18">{{ Order.receiptable_date|date('m月d日') }} ({{ days[Order.receiptable_date|date('N')] }}) ！ {{ Order.order_date|diff_time(Order.receiptable_date) }}</span>
+                        <span>までに</span>
+                    </p>
+                    <p>
+                        <span class="title18">{{ Order.farm[0].__toString }}</span>
+                        <span>へお持ちください</span>
+                    </p>
+                    {% set Shipping = Order.Shippings[0] %}
+                    <p class="color888 margin-top15">{{ Shipping.Pref.name }}{{ Shipping.addr01 }}{{ Shipping.addr02 }}</p>
+                </div>
+
+                <div class="map">
+                    {#Todo: map#}
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/map.PNG" width="340">
+                    <button class="btn btn-inactive popup" id="farmer-qr-code">QRコードを読み込んで出荷完了する</button>
+                    <p class="title12 margin-top10 color888">QRコードは持ち込みの◯時間前から表示できます-15</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="float-right margin-right13"><a class="color888 title11" href="{{ url('contact') }}" target="_blank">商品の出荷が難しい場合</a></p>
+
+        <div id="cart-confirm-main">
+            <div class="cart-content" id="cart-main-content3">
+                <p class="title14 margin-left10 margin-top10 order-title">注文情報</p>
+                <div class="receiver-status-profile clearfix">
+                    <p>お届け先</p>
+                    <img src="{{ app.config.image_save_urlpath }}/{{ Order.Customer.profile_image|no_image_product }}" class="profile50 img-circle">
+                    <span class="profile-name-medium padding-top15">{{ Shipping.name01 }}{{ Shipping.name02 }}</span>
+                </div>
+
+                <div class="margin-left10 order-title2">
+                    <p class="title12">配達予定日</p>
+                    <p class="title18">{{ Order.receiptable_date|date('m月d日') }} ({{ days[Order.receiptable_date|date('N')] }})</p>
+                </div>
+
+                <p class="title12 margin-left10 margin-top15">折りたたみコンテナの数</p>
+                <div class="margin-left10 clearfix cart-container margin-right10 margin-bottom15 padding-bottom15">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg">
+                </div>
+
+                <p class="status-done-th">
+                    <span class="title10 margin-right160">品目</span>
+                    <span class="title10 margin-left10 margin-right15">点数</span>
+                    <span class="title10">価格</span>
+                </p>
+
+                {% for orderDetail in Order.OrderDetails %}
+                    <div class="receiver-cart-confirm clearfix">
+                        <div class="receiver-status-done float-left">
+                            <img src="{{ app.config.image_save_urlpath }}/{{ orderDetail.Product.MainListImage|no_image_product }}" class="profile50">
+                            <span class="title16 profile-name-medium">{{ orderDetail.product_name }}</span>
+                            <span class="profile-address-medium">{{ orderDetail.Product.getAmountFollowPrice02Min }}{{ orderDetail.Product.getAmountUnitTypeFollowPrice02Min.name }}</span>
+                        </div>
+                        <div class="float-right">
+                            <p><span class="margin-right15 border-left-right">{{ orderDetail.quantity|number_format }}</span>{{ calc_inc_tax(orderDetail.price, orderDetail.tax_rate, orderDetail.tax_rule)|price }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="x-button hidden" id="qr-code-x-button">&#10060</div>
+    <!-- Modal -->
+    <div class="modal-select-time clearfix hidden" id="qr-code-dialog">
+        <p class="qr-code-p">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/qr-code.PNG">
+        </p>
+        <p class="text-alight-center">
+            QRコードをバス停の
+            バーコードリーダーにかざすと
+            伝票が出力されます
+        </p>
+    </div>
+
+{% endblock main %}

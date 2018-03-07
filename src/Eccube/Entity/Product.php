@@ -606,7 +606,10 @@ class Product extends \Eccube\Entity\AbstractEntity
         $Classes = $this->getProductClasses();
         $this->ProductClasses = new ArrayCollection();
         foreach ($Classes as $Class) {
+            /** @var ProductClass $CopyClass */
             $CopyClass = clone $Class;
+            $CopyClass->setProductionStartDate(null);
+            $CopyClass->setProductionEndDate(null);
             $this->addProductClass($CopyClass);
             $CopyClass->setProduct($this);
         }
@@ -626,6 +629,15 @@ class Product extends \Eccube\Entity\AbstractEntity
             $this->addProductTag($CloneTag);
             $CloneTag->setProduct($this);
         }
+
+        $ProductReceiptableDates = $this->getProductReceiptableDates();
+        $this->ProductReceiptableDates = new ArrayCollection();
+        foreach ($ProductReceiptableDates as $ProductReceiptableDate) {
+            $CloneProductReceiptableDate = clone $ProductReceiptableDate;
+            $this->addProductReceiptableDate($CloneProductReceiptableDate);
+            $CloneProductReceiptableDate->setProduct($this);
+        }
+        $this->ProductRate = null;
 
         return $this;
     }

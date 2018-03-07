@@ -32,6 +32,8 @@ use Eccube\Util\EntityUtil;
  */
 class Order extends \Eccube\Entity\AbstractEntity
 {
+    const SORT_BY_NEW = 1;
+    const SORT_BY_TOTAL = 2;
     /**
      * isMultiple
      * 
@@ -1563,5 +1565,40 @@ class Order extends \Eccube\Entity\AbstractEntity
     public function getOrderStatusColor()
     {
         return $this->OrderStatusColor;
+    }
+
+    /** @var \DateTime */
+    private $receiptable_date;
+
+    /**
+     * @return \DateTime
+     */
+    public function getReceiptableDate()
+    {
+        return $this->receiptable_date;
+    }
+
+    /**
+     * @param \DateTime $receiptable_date
+     */
+    public function setReceiptableDate($receiptable_date)
+    {
+        $this->receiptable_date = $receiptable_date;
+    }
+
+    /**
+     * Get farm
+     *
+     * @return Customer[]
+     */
+    public function getFarm()
+    {
+        $arrCreator = array();
+        /** @var OrderDetail $orderDetail */
+        foreach ($this->getOrderDetails() as $orderDetail) {
+            $arrCreator[] = $orderDetail->getProduct()->getCreator();
+        }
+
+        return $arrCreator;
     }
 }

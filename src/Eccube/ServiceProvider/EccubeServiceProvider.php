@@ -409,6 +409,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\Farm\ChangePasswordType($app['config']);
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemClassType($app);
+            $types[] = new \Eccube\Form\Type\Front\Farm\HomeCompleteType();
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);
