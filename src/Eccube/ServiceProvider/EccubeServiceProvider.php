@@ -119,6 +119,9 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.customer_role'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CustomerRole');
         });
+        $app['eccube.repository.master.safety_percent'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\SafetyPercent');
+        });
         $app['eccube.repository.master.bus_stop'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\BusStop');
         });
