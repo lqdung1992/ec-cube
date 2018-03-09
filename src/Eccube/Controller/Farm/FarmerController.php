@@ -467,7 +467,7 @@ class FarmerController extends AbstractController
         $builder = $app['form.factory']->createBuilder('item_edit', $Product);
         $form = $builder->getForm();
         $ProductType = $app['eccube.repository.master.product_type']->find(1);
-        $ProductClass->setStockUnlimited(true);
+        $ProductClass->setStockUnlimited(false);
 
         $form['class']->setData($ProductClass);
 
@@ -554,36 +554,45 @@ class FarmerController extends AbstractController
                 $Product->removeProductCategory($ProductCategory);
                 $em->remove($ProductCategory);
             }
+            // Remove Receiptable date
+            $ProductRDs = $Product->getProductReceiptableDates();
+            foreach ($ProductRDs as $productRD) {
+                $Product->removeProductReceiptableDate($productRD);
+                $em->remove($productRD);
+            }
+
             $em->persist($Product);
             $em->flush();
 
             $Category = $form->get('Category')->getData();
             $productCate = $this->createProductCategory($Product, $Category);
             $em->persist($productCate);
-            $em->flush();
 
-            // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
             $ReceiptableDates = $form->get('ReceiptableDate')->getData();
-
-            $ProductRDs = $Product->getProductReceiptableDates();
-            foreach ($ProductRDs as $productRD) {
-                $Product->removeProductReceiptableDate($productRD);
-                $em->remove($productRD);
-            }
-            $em->flush();
-
+            // Loop step
+            $interval = \DateInterval::createFromDateString('1 day');
+            $dateEnd = clone $ProductClass->getProductionEndDate();
+            $period = new \DatePeriod($ProductClass->getProductionStartDate(), $interval, $dateEnd->modify('+1 day'));
+            $arrDateId = array();
             foreach ($ReceiptableDates as $receiptableDate) {
-                $productRD = new ProductReceiptableDate();
-                $productRD->setProduct($Product);
-                $productRD->setProductId($Product->getId());
-                $productRD->setReceiptableDate($receiptableDate);
-                $productRD->setDateId($receiptableDate->getId());
-                $productRD->setMaxQuantity(1);
-                $Product->addProductReceiptableDate($productRD);
-                $em->persist($productRD);
+                $arrDateId[$receiptableDate->getId()] = $receiptableDate;
             }
-            $em->persist($Product);
+            foreach ($period as $date) {
+                $dateId = $date->format('N');
+                if (in_array($dateId, array_keys($arrDateId))) {
+                    $productRD = new ProductReceiptableDate();
+                    $productRD->setProduct($Product);
+                    $productRD->setProductId($Product->getId());
+                    $productRD->setDate($date);
+                    $productRD->setReceiptableDate($arrDateId[$dateId]);
+                    $productRD->setDateId($dateId);
+                    $productRD->setMaxQuantity($ProductClass->getStock());
+                    $Product->addProductReceiptableDate($productRD);
+                    $em->persist($productRD);
+                }
+            }
+
             $em->flush();
 
             // 画像の登録
@@ -597,7 +606,6 @@ class FarmerController extends AbstractController
                     ->setCreator($Customer);
                 $Product->addProductImage($ProductImage);
                 $em->persist($ProductImage);
-
                 // 移動
                 $file = new File($app['config']['image_temp_realdir'].'/'.$add_image);
                 $file->move($app['config']['image_save_realdir']);
@@ -608,21 +616,19 @@ class FarmerController extends AbstractController
             foreach ($delete_images as $delete_image) {
                 $ProductImage = $app['eccube.repository.product_image']
                     ->findOneBy(array('file_name' => $delete_image));
-
                 // 追加してすぐに削除した画像は、Entityに追加されない
                 if ($ProductImage instanceof \Eccube\Entity\ProductImage) {
                     $Product->removeProductImage($ProductImage);
                     $em->remove($ProductImage);
 
                 }
-                $em->persist($Product);
-
                 // 削除
                 if (!empty($delete_image)) {
                     $fs = new Filesystem();
                     $fs->remove($app['config']['image_save_realdir'].'/'.$delete_image);
                 }
             }
+
             $em->persist($Product);
             $em->flush();
 
