@@ -225,7 +225,7 @@
 
                 {% set other_customer = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
                 {% for Voice in CustomerVoice %}
-                    <div class="div-comment-profile clearfix">
+                    <div class="div-comment-profile clearfix" id="comment">
                         <div class="row">
                             <div class="col-sm-12 col-xs-12">
                                 {% if Voice.Customer.id == TargetCustomer.id %}

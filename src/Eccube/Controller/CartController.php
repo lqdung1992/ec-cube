@@ -30,13 +30,13 @@ use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Customer;
 use Eccube\Entity\Master\CustomerRole;
+use Eccube\Entity\Notification;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
 use Eccube\Exception\ShoppingException;
 use Eccube\Service\CartService;
 use Eccube\Service\ShoppingService;
-use Eccube\Util\DateUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -169,6 +169,9 @@ class CartController extends AbstractController
                     }
                     $cartService->lock();
                     $cartService->save();
+                    ;
+                    $app['eccube.repository.notification']
+                        ->insertNotice($Customer, $Order->getFarm()[0], Notification::TYPE_ORDER, $Order->getId());
 
                     return $app->redirect($app->url('cart_complete', array('id' => $Order->getId())));
             }

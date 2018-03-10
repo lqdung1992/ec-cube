@@ -142,6 +142,10 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/history', '\Eccube\Controller\Farm\FarmerController::history')->bind('farm_history');
         $c->match('/farm/history/{id}', '\Eccube\Controller\Farm\FarmerController::historyDetail')->bind('farm_history_detail')->assert('id', '\d+');
 
+        // Farm notice
+        $c->match('/farm/notice', '\Eccube\Controller\Farm\NoticeController::index')->bind('farm_notice');
+        $c->match('/farm/notice/{id}', '\Eccube\Controller\Farm\NoticeController::index')->bind('farm_notice_view')->assert('id', '\d+');
+
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');
         $c->match('/shopping/confirm', '\Eccube\Controller\ShoppingController::confirm')->bind('shopping_confirm');

@@ -18,6 +18,7 @@ use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
 use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Master\ReceiptableDate;
+use Eccube\Entity\Notification;
 use Eccube\Entity\Order;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
@@ -52,19 +53,19 @@ class FarmerController extends AbstractController
      *
      * @param Application $app
      * @param Request $request
-     * @param $id
+     * @param null $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function index(Application $app, Request $request, $id = null)
     {
+        if (!$app->isGranted("IS_AUTHENTICATED_FULLY")) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
         $isOwner = false;
         /** @var Customer $Customer */
         $Customer = $app->user();
-        // Todo: check is farmer
-        // || !$app->isGranted(CustomerRole::FARMER)
-        if (!($Customer instanceof Customer)) {
-            return $app->redirect($app->url('mypage_login'));
-        }
         if ($id) {
             /** @var CustomerRepository $repo */
             $repo = $app['eccube.repository.customer'];
@@ -99,6 +100,11 @@ class FarmerController extends AbstractController
             $voice->setTargetCustomer($TargetCustomer);
             $app['orm.em']->persist($voice);
             $app['orm.em']->flush();
+
+            if ($TargetCustomer->getId() != $Customer->getId()) {
+                $app['eccube.repository.notification']
+                    ->insertNotice($Customer, $TargetCustomer, Notification::TYPE_PROFILE, $id);
+            }
 
             return $app->redirect($app->url('farm_profile', array('id' => $TargetCustomer->getId(), 'voice' => 1)));
         }
@@ -672,6 +678,7 @@ class FarmerController extends AbstractController
      * @param Request $request
      * @param $id
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function detail(Application $app, Request $request, $id)
     {
@@ -683,8 +690,6 @@ class FarmerController extends AbstractController
         if (!$Product) {
             throw new NotFoundHttpException();
         }
-        $TargetCustomer = $Product->getCreator();
-        $Customer = $app->user();
 
         $voice = new CustomerVoice();
         /** @var FormBuilder $builder */
@@ -699,7 +704,6 @@ class FarmerController extends AbstractController
         $cartForm = $builderCart->getForm();
 
         $mode = $request->get('mode');
-
         switch ($mode) {
             case 'add_cart':
                 $cartForm->handleRequest($request);
@@ -722,9 +726,12 @@ class FarmerController extends AbstractController
             case 'add_voice':
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
-                    if (!($Customer instanceof Customer)) {
+                    if (!$app->isGranted("IS_AUTHENTICATED_FULLY")) {
                         return $app->redirect($app->url('mypage_login'));
                     }
+                    $Customer = $app->user();
+                    $TargetCustomer = $Product->getCreator();
+
                     /** @var UploadedFile $image */
                     $image = $form['file_name']->getData();
                     if ($image) {
@@ -738,6 +745,10 @@ class FarmerController extends AbstractController
                     $voice->setProduct($Product);
                     $app['orm.em']->persist($voice);
                     $app['orm.em']->flush();
+                    if ($TargetCustomer->getId() != $Customer->getId()) {
+                        $app['eccube.repository.notification']
+                            ->insertNotice($Customer, $TargetCustomer, Notification::TYPE_PRODUCT, $Product->getId(), $Product->getName());
+                    }
                 }
                 break;
             default:

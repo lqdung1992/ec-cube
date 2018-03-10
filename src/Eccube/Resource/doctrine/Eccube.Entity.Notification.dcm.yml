@@ -1,0 +1,48 @@
+Eccube\Entity\Notification:
+    type: entity
+    table: dtb_notification
+    repositoryClass: Eccube\Repository\NotificationRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: notification_id
+            generator:
+                strategy: AUTO
+    fields:
+        notice:
+            type: text
+            nullable: false
+        notice_type:
+            type: smallint
+            nullable: true
+        id_link:
+            type: integer
+            nullable: true
+        del_flg:
+            type: smallint
+            nullable: false
+            options:
+                default: 0
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+    manyToOne:
+        Customer:
+            targetEntity: Eccube\Entity\Customer
+            joinColumn:
+                name: customer_id
+                referencedColumnName: customer_id
+                nullable: false
+        TargetCustomer:
+            targetEntity: Eccube\Entity\Customer
+            joinColumn:
+                name: target_customer_id
+                referencedColumnName: customer_id
+                nullable: false
+    lifecycleCallbacks: {  }

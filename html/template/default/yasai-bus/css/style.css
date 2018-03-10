@@ -2517,3 +2517,6 @@ span.required {
     background-color: #c94242 !important;
     margin-left: 5px;
 }
+.news-section {
+    display: none;
+}
