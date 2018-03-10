@@ -9,9 +9,6 @@
 {% set body_class = ' ' %}
 {% block stylesheet %}
     <style type="text/css">
-        #farm_voice_comment {
-            height: 120px;
-        }
     </style>
 {% endblock stylesheet %}
 
@@ -156,7 +153,7 @@
                             </div>
                             <div class="float-right">
                             {% if is_granted("IS_AUTHENTICATED_FULLY") and app.user.id == TargetCustomer.id %}
-                                <a href="?" id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</a>
+                                <a href="#" id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</a>
                                 <a href="{{ url('farm_item_edit', {'id': Product.id}) }}" id="farmer-button-edit" class="btn btn-success margin-top15">編集</a>
                             {% elseif is_granted("ROLE_RECIPIENT") %}
                                 <form method="post" action="?" id="add-cart-form" name="add-cart-form">
@@ -337,5 +334,24 @@
         <span class="close">&times;</span>
         <img class="modal-content" id="model-image"/>
         <div id="caption"></div>
+    </div>
+
+
+    <div class="x-button hidden">&#10060</div>
+    <!-- Modal -->
+    <div class="modal-select-time clearfix hidden" id="confirm-stock">
+        {% set ProductRDs = Product.ProductReceiptableDates %}
+        {% for ProductRD in ProductRDs %}
+        <div class="count-modal">
+            <div class="float-left">
+                <p>
+                    <span class="count-date">{{ ProductRD.date|date('m月d日') }}({{ ProductRD.ReceiptableDate.name }})
+                        <label class="count-quality ">残り{{ ProductRD.max_quantity }}点</label>
+                    </span>
+                    <span class="count-price">小計：{{ (ProductRD.max_quantity|number_format * Product.getPrice02IncTaxMin|number_format)|price }}</span>
+                </p>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 {% endblock %}

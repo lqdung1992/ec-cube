@@ -29,6 +29,7 @@ use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
 use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductRepository;
+use Eccube\Service\CartService;
 use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
@@ -466,7 +467,6 @@ class FarmerController extends AbstractController
         /** @var FormBuilder $builder */
         $builder = $app['form.factory']->createBuilder('item_edit', $Product);
         $form = $builder->getForm();
-        $ProductType = $app['eccube.repository.master.product_type']->find(1);
         $ProductClass->setStockUnlimited(false);
 
         $form['class']->setData($ProductClass);
@@ -504,7 +504,7 @@ class FarmerController extends AbstractController
             $Product = $form->getData();
             $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_SHOW);
             $Product->setStatus($Disp);
-            // error creator;
+            // set farmer
             $Product->setCreator($Customer);
 
             /** @var EntityManager $em */
@@ -512,6 +512,7 @@ class FarmerController extends AbstractController
 
             /** @var ProductClass $ProductClass */
             $ProductClass = $form['class']->getData();
+            $ProductType = $app['eccube.repository.master.product_type']->find(1);
             $ProductClass->setProductType($ProductType);
 
             // 個別消費税
@@ -522,7 +523,6 @@ class FarmerController extends AbstractController
                         if ($ProductClass->getTaxRule()->getDelFlg() == Constant::ENABLED) {
                             $ProductClass->getTaxRule()->setDelFlg(Constant::DISABLED);
                         }
-
                         $ProductClass->getTaxRule()->setTaxRate($ProductClass->getTaxRate());
                     } else {
                         $taxrule = $app['eccube.repository.tax_rule']->newTaxRule();
@@ -539,14 +539,7 @@ class FarmerController extends AbstractController
                 }
             }
             $em->persist($ProductClass);
-
-            // 在庫情報を作成
-            if (!$ProductClass->getStockUnlimited()) {
-                $ProductStock->setStock($ProductClass->getStock());
-            } else {
-                // 在庫無制限時はnullを設定
-                $ProductStock->setStock(null);
-            }
+            $ProductStock->setStock($ProductClass->getStock());
             $em->persist($ProductStock);
 
             /* @var $Product \Eccube\Entity\Product */
@@ -620,7 +613,6 @@ class FarmerController extends AbstractController
                 if ($ProductImage instanceof \Eccube\Entity\ProductImage) {
                     $Product->removeProductImage($ProductImage);
                     $em->remove($ProductImage);
-
                 }
                 // 削除
                 if (!empty($delete_image)) {
@@ -714,7 +706,9 @@ class FarmerController extends AbstractController
                 if ($cartForm->isSubmitted() && $cartForm->isValid()) {
                     $addCartData = $cartForm->getData();
                     try {
-                        $app['eccube.service.cart']->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
+                        /** @var CartService $cartService */
+                        $cartService = $app['eccube.service.cart'];
+                        $cartService->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
                     } catch (CartException $e) {
                         $app->addRequestError($e->getMessage());
                     }

@@ -16,7 +16,8 @@ $(function () {
         $("#reicever-menu-wrapper").addClass("hidden");
     });
 
-    $("#receiver-cart-button, .popup , .cart-link, .order_again").click(function () {
+    $("#receiver-cart-button, .popup , .cart-link, .order_again").click(function (e) {
+        e.preventDefault();
         $('.x-button').removeClass("hidden");
         $('.modal-select-time').removeClass("hidden");
         $('.wrapper').addClass("shadow");

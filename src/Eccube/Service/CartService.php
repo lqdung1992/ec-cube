@@ -209,7 +209,7 @@ class CartService
     /**
      * @param $productClassId
      * @param int $quantity
-     * @param array $dates array date_id [1->7]
+     * @param array $dates array productReceptionDates
      * @return $this
      * @throws CartException
      */
@@ -226,11 +226,11 @@ class CartService
         }
         foreach ($productReceptionDates as $productReceptionDate) {
             $quantity_tmp = $quantity;
-            $dateId = $productReceptionDate;
-            if ($productReceptionDate instanceof ProductReceiptableDate) {
-                $dateId = $productReceptionDate->getDateId();
-            }
-            $date = DateUtil::getDay($dateId);
+//            $dateId = $productReceptionDate;
+//            if ($productReceptionDate instanceof ProductReceiptableDate) {
+            $date = $productReceptionDate->getDate();
+//            }
+//            $date = DateUtil::getDay($dateId);
             $quantity_tmp += $this->getProductQuantity($productClassId, $date);
             $this->setProductQuantity($productClassId, $quantity_tmp, $date);
         }
@@ -325,7 +325,7 @@ class CartService
         }
 
         // 制限数チェック(在庫不足の場合は、処理の中でカート内商品を削除している)
-        $quantity = $this->setProductLimit($ProductClass, $productName, $tmp_quantity);
+        $quantity = $this->setProductLimit($ProductClass, $productName, $tmp_quantity, $date);
 		// 新しい数量でカート内商品を登録する
         if (0 < $quantity) {
             $CartItem = new CartItem();
@@ -455,15 +455,14 @@ class CartService
 
             if ($ProductClass->getDelFlg() == Constant::DISABLED) {
                 // 商品情報が有効
-
                 if (!$this->isProductDisplay($ProductClass)) {
                     $this->setError('cart.product.not.status');
                 } else {
 
                     $productName = $this->getProductName($ProductClass);
-
+                    $date = $CartItem->getReceptionDate();
                     // 制限数チェック(在庫不足の場合は、処理の中でカート内商品を削除している)
-                    $quantity = $this->setProductLimit($ProductClass, $productName, $CartItem->getQuantity());
+                    $quantity = $this->setProductLimit($ProductClass, $productName, $CartItem->getQuantity(), $date);
 
                     /// 個数が異なれば、新しい数量でカート内商品を更新する
                     if ((0 < $quantity) && ($CartItem->getQuantity() != $quantity)) {
@@ -731,9 +730,10 @@ class CartService
      * @param ProductClass $ProductClass
      * @param $productName
      * @param $quantity
+     * @param \DateTime $date
      * @return int チェック後に更新した個数
      */
-    private function setProductLimit(ProductClass $ProductClass, $productName, $quantity)
+    private function setProductLimit(ProductClass $ProductClass, $productName, $quantity, $date)
     {
 
         /**
@@ -742,7 +742,17 @@ class CartService
          */
 
         // 在庫数(在庫無制限の場合、null)
-        $stock = $ProductClass->getStock();
+//        $stock = $ProductClass->getStock();
+        $stock = 0;
+        $productRDs = $ProductClass->getProduct()->getProductReceiptableDates();
+        $date = $date->format('Y/m/d');
+        foreach ($productRDs as $productRD) {
+            $receiptDate = $productRD->getDate()->format('Y/m/d');
+            if ($date == $receiptDate) {
+                $stock = $productRD->getMaxQuantity();
+            }
+        }
+
         // 在庫無制限(在庫無制限の場合、1)
         $stockUnlimited = $ProductClass->getStockUnlimited();
 
