@@ -26,6 +26,7 @@ namespace Eccube\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -81,22 +82,8 @@ class AddCartType extends AbstractType
             ));
 
         if ($Product->getStockFind()) {
-            $builder
-                ->add('quantity', 'integer', array(
-                    'data' => 1,
-                    'attr' => array(
-                        'min' => 1,
-                        'maxlength' => $this->config['int_len'],
-                    ),
-                    'constraints' => array(
-                        new Assert\NotBlank(),
-                        new Assert\GreaterThanOrEqual(array(
-                            'value' => 1,
-                        )),
-                        new Assert\Regex(array('pattern' => '/^\d+$/')),
-                    ),
-                ))
-            ;
+            $builder->add('quantity');
+
             if ($Product && $Product->getProductClasses()) {
                 if (!is_null($Product->getClassName1())) {
                     $builder->add('classcategory_id1', 'choice', array(
@@ -122,6 +109,21 @@ class AddCartType extends AbstractType
                             'choices' => array('__unselected' => '選択してください') + $Product->getClassCategories2($data['classcategory_id1']),
                         ));
                     }
+                }
+            });
+
+            $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $form = $event->getForm();
+                $arrData = $form['quantity']->getData();
+                $arrQuantity = array();
+                if (is_array($arrData)) {
+                    $arrQuantity = array_filter($arrData, function ($item) {
+                        return $item > 0;
+                    });
+                }
+
+                if (count($arrQuantity) < 1) {
+                    $form['quantity']->addError(new FormError('数量は0より大きくする必要があります。'));
                 }
             });
         }

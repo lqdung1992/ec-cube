@@ -540,6 +540,33 @@ img {
     color: #222222;
 }
 
+.count-modal {
+    background-color: #ffffff;
+    border-bottom: 0.5px solid #cccccc;
+    padding: 4px 10px 0 13px;
+}
+
+.count-date {
+    color: #222222;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.count-quality {
+    text-align: left;
+    color: #888888;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.count-price {
+    text-align: left;
+    color: #888888;
+    font-size: 12px;
+    font-weight: 500;
+}
+
 .modal-header {
     text-align: center;
     font-size : 14px;
@@ -2288,7 +2315,7 @@ img {
     position: absolute;
     top: 15px;
     right: 35px;
-    color: #f1f1f1;
+    color: darkblue;
     font-size: 40px;
     font-weight: bold;
     transition: 0.3s;
@@ -2505,47 +2532,4 @@ span.required {
     border-radius: 10px;
     background-color: #c94242 !important;
     margin-left: 5px;
-}
-
-.modal-select-time {
-    width: 345px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    margin: auto;
-    position: absolute;
-    z-index: 1000;
-    top: 60px;
-    left: 10.7%;
-}
-/*Confirm stock popup*/
-.modal-select-time .count-modal {
-    background-color: #ffffff;
-    border-bottom: 0.5px solid #cccccc;
-    padding: 4px 10px 0 13px;
-    display: block;
-    height: 69px;
-}
-
-.modal-select-time .count-date {
-    color: #222222;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.modal-select-time .count-quality {
-    text-align: left;
-    color: #888888;
-    font-size: 12px;
-    font-weight: 500;
-    margin-left: 10px;
-}
-
-.modal-select-time .count-price {
-    text-align: left;
-    color: #888888;
-    font-size: 12px;
-    font-weight: 500;
-}
-.modal-select-time .count-modal span {
-    display: block;
 }

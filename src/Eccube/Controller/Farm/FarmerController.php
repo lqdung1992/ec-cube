@@ -705,10 +705,13 @@ class FarmerController extends AbstractController
                 $cartForm->handleRequest($request);
                 if ($cartForm->isSubmitted() && $cartForm->isValid()) {
                     $addCartData = $cartForm->getData();
+                    $arrQuantity = array_filter($addCartData['quantity'], function ($item) {
+                        return $item > 0;
+                    });
+                    /** @var CartService $cartService */
+                    $cartService = $app['eccube.service.cart'];
                     try {
-                        /** @var CartService $cartService */
-                        $cartService = $app['eccube.service.cart'];
-                        $cartService->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
+                        $cartService->addProduct($addCartData['product_class_id'], $arrQuantity)->save();
                     } catch (CartException $e) {
                         $app->addRequestError($e->getMessage());
                     }

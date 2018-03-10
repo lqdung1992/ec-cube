@@ -208,29 +208,18 @@ class CartService
 
     /**
      * @param $productClassId
-     * @param int $quantity
-     * @param array $dates array productReceptionDates
+     * @param array $arrQuantity
      * @return $this
      * @throws CartException
      */
-    public function addProduct($productClassId, $quantity = 1, array $dates = array())
+    public function addProduct($productClassId, array $arrQuantity)
     {
-        if ($dates) {
-            $productReceptionDates = $dates;
-        } else {
-            /** @var ProductClassRepository $productClassRepo */
-            $productClassRepo = $this->app['eccube.repository.product_class'];
-            /** @var ProductClass $ProductClass */
-            $ProductClass = $productClassRepo->find($productClassId);
-            $productReceptionDates = $ProductClass->getProduct()->getProductReceiptableDates();
-        }
-        foreach ($productReceptionDates as $productReceptionDate) {
+        foreach ($arrQuantity as $date => $quantity) {
+            if ($quantity < 1) {
+                continue;
+            }
+            $date = new \DateTime($date);
             $quantity_tmp = $quantity;
-//            $dateId = $productReceptionDate;
-//            if ($productReceptionDate instanceof ProductReceiptableDate) {
-            $date = $productReceptionDate->getDate();
-//            }
-//            $date = DateUtil::getDay($dateId);
             $quantity_tmp += $this->getProductQuantity($productClassId, $date);
             $this->setProductQuantity($productClassId, $quantity_tmp, $date);
         }
@@ -243,7 +232,7 @@ class CartService
      * @param \DateTime|null $date
      * @return integer
      */
-    public function getProductQuantity($productClassId, $date = null)
+    public function getProductQuantity($productClassId, \DateTime $date = null)
     {
         $CartItem = $this->cart->getCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId, $date);
         if ($CartItem) {
@@ -260,7 +249,7 @@ class CartService
      * @return \Eccube\Service\CartService
      * @throws CartException
      */
-    public function setProductQuantity($ProductClass, $quantity, $date = null)
+    public function setProductQuantity($ProductClass, $quantity, \DateTime $date = null)
     {
         if (!$ProductClass instanceof ProductClass) {
             $ProductClass = $this->entityManager
@@ -733,7 +722,7 @@ class CartService
      * @param \DateTime $date
      * @return int チェック後に更新した個数
      */
-    private function setProductLimit(ProductClass $ProductClass, $productName, $quantity, $date)
+    private function setProductLimit(ProductClass $ProductClass, $productName, $quantity, \DateTime $date)
     {
 
         /**
