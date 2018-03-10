@@ -70,13 +70,10 @@ class CartController extends AbstractController
 
         if ('POST' == $request->getMethod()) {
             $mode = $request->get('mode');
-            $dateId = $request->get('date_id');
-            if (!$this->checkDateId($dateId)) {
-                throw new NotFoundHttpException();
-            }
+            $date = $request->get('date');
             switch ($mode) {
                 case 'confirm':
-                    $dateTime = DateUtil::getDay($dateId);
+                    $dateTime = new \DateTime($date);
                     /** @var Cart $CartByDate */
                     $CartByDate = $cartService->getCartByDate($dateTime);
 
@@ -105,14 +102,15 @@ class CartController extends AbstractController
                             'reception_date' => $dateTime,
                             'Creators' => $arrCreator,
                             'creator_total' => $arrTotal,
-                            'date_id' => $dateId,
+//                            'date_id' => $dateId,
                             'master_date' => $masterDate
                         )
                     );
                 case 'complete':
-                    if (!$cartService->isExistCartDate($dateId)) {
-                        throw new NotFoundHttpException();
-                    }
+                    $dateTime = new \DateTime($date);
+//                    if (!$cartService->isExistCartDate($dateId)) {
+//                        throw new NotFoundHttpException();
+//                    }
                     /** @var ShoppingService $shoppingService */
                     $shoppingService = $app['eccube.service.shopping'];
 //                $Order = $shoppingService->getOrder($app['config']['order_processing']);
@@ -123,7 +121,7 @@ class CartController extends AbstractController
                     }
 
                     try {
-                        $Order = $shoppingService->createOrder($Customer, $dateId);
+                        $Order = $shoppingService->createOrder($Customer, $dateTime);
                     } catch (CartException $e) {
                         log_error('初回受注情報作成エラー', array($e->getMessage()));
                         $app->addRequestError($e->getMessage());
@@ -158,7 +156,7 @@ class CartController extends AbstractController
 
                         return $app->redirect($app->url('shopping_error'));
                     }
-                    $dateTime = DateUtil::getDay($dateId);
+//                    $dateTime = DateUtil::getDay($dateId);
                     // Remove cart item that complete
                     $CartByDate = $cartService->getCartByDate($dateTime);
                     foreach ($CartByDate->getCartItems() as $cartItem) {
@@ -414,9 +412,9 @@ class CartController extends AbstractController
     public function remove(Application $app, Request $request, $productClassId)
     {
         $this->isTokenValid($app);
-        $dateId = $request->get('date_id');
+        $date = $request->get('date');
 
-        log_info('カート削除処理開始', array('product_class_id' => $productClassId, 'date_id' => $dateId));
+        log_info('カート削除処理開始', array('product_class_id' => $productClassId, 'date' => $date));
 
         // FRONT_CART_REMOVE_INITIALIZE
         $event = new EventArgs(
@@ -429,8 +427,8 @@ class CartController extends AbstractController
 
         $productClassId = $event->getArgument('productClassId');
         $date = null;
-        if ($dateId) {
-            $date = DateUtil::getDay($dateId);
+        if ($date) {
+            $date = new \DateTime($date);
         }
         $app['eccube.service.cart']->removeProduct($productClassId, $date)->save();
 
@@ -521,8 +519,8 @@ class CartController extends AbstractController
         try {
 
             foreach ($quantity as $productClassId => $item) {
-                foreach ($item as $dateId => $quantity) {
-                    $date = DateUtil::getDay($dateId);
+                foreach ($item as $date => $quantity) {
+                    $date = new \DateTime($date);
                     $serviceCart->setProductQuantity($productClassId, $quantity, $date)->save();
                 }
             }

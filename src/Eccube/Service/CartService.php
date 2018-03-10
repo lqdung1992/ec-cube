@@ -521,7 +521,7 @@ class CartService
      * @param \DateTime $date
      * @return \Eccube\Service\CartService
      */
-    public function removeProduct($productClassId, $date = null)
+    public function removeProduct($productClassId, \DateTime $date = null)
     {
         $this->cart->removeCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId, $date);
 
