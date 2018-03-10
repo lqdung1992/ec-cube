@@ -1,0 +1,19 @@
+Eccube\Entity\Master\BusStatus:
+    type: entity
+    table: mtb_bus_status
+    repositoryClass: Eccube\Repository\Master\BusStatusRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

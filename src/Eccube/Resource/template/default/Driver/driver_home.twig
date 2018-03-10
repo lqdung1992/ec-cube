@@ -1,0 +1,194 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        #reicever-wrapper {
+            min-height: 600px;
+        }
+        @media only screen and (min-width: 768px) {
+            .rectangle-content {
+                width: 645px;
+                height: 88px;
+                border-radius: 3px;
+                background-color: #ffffff;
+                border: solid 0.5px #cccccc;
+                margin: auto;
+                margin-bottom: 10px;
+            }
+            .layer-big {
+                margin-left: 50px;
+            }
+            .layer-small {
+                margin-left: 55px;
+            }
+            .ml30p {
+                margin-left: 30%;
+            }
+        }
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            .rectangle-content {
+                width: 345px;
+                height: 88px;
+                border-radius: 3px;
+                background-color: #ffffff;
+                border: solid 0.5px #cccccc;
+                margin: auto;
+                margin-bottom: 10px;
+            }
+            .layer-big {
+                text-align: center;
+            }
+
+            .farmer-new-header .logo-svg {
+                margin-left: 28.5%;
+            }
+
+            .ml30p {
+                margin-left: 15%;
+            }
+        }
+
+        .layer-tiny {
+            margin-right: 20px;
+        }
+
+        .text-tiny {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: left;
+            margin-right: 5px;
+            color: #888888;
+        }
+
+        .text-center {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: left;
+            color: #222222;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper">
+        <div class="farmer-new-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-xs-12 wrapper" id="driver-wrapper">
+                <div class="header-bottom">
+                    <div class="ml39">
+                        <span class="layer-big">1号車 東ルート</span>
+                    </div>
+                    <div class="layer-tiny text-align-right">
+                        <span>明日の運行 〉</span>
+                    </div>
+                    <div class="ml42">
+                        <span class="layer-small">2017年12月23日</span>
+                    </div>
+                </div>
+
+                <div class="rectangle-content">
+                    <div class="rectangle-title">
+                        <span class="text-left">全日繰越分</span>
+                        <span class="text-center">バス停A</span>
+                    </div>
+                    <div class="rectangle-detail">
+                        <span class="text-tiny">配荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">集荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">積載率</span>
+                        <span class="text-center">20%</span>
+                    </div>
+                </div>
+                <div class="rectangle-content">
+                    <div class="rectangle-title">
+                        <span class="text-left">10:00</span>
+                        <span class="text-center">バス停B</span>
+                    </div>
+                    <div class="rectangle-detail">
+                        <span class="text-tiny">配荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">集荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">積載率</span>
+                        <span class="text-center">20%</span>
+                    </div>
+                </div>
+                <div class="rectangle-content">
+                    <div class="rectangle-title">
+                        <span class="text-left">12:00</span>
+                        <span class="text-center">バス停C</span>
+                    </div>
+                    <div class="rectangle-detail">
+                        <span class="text-tiny">配荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">集荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">積載率</span>
+                        <span class="text-center">20%</span>
+                    </div>
+                </div>
+                <div class="rectangle-content">
+                    <div class="rectangle-title">
+                        <span class="text-left">14:00</span>
+                        <span class="text-center">バス停D</span>
+                    </div>
+                    <div class="rectangle-detail">
+                        <span class="text-tiny">配荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">集荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">積載率</span>
+                        <span class="text-center">20%</span>
+                    </div>
+                </div>
+                <div class="rectangle-content">
+                    <div class="rectangle-title">
+                        <span class="text-left">16:00</span>
+                        <span class="text-center">バス停E</span>
+                    </div>
+                    <div class="rectangle-detail">
+                        <span class="text-tiny">配荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">集荷数</span>
+                        <span class="text-center">10</span>
+                        <span class="text-tiny ml30p">積載率</span>
+                        <span class="text-center">20%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                <li class="list-group-item li-profile">
+                    {#{% if TargetCustomer.profile_image %}#}
+                        {#{% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}#}
+                    {#{% endif %}#}
+                    {#<img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">#}
+                    {#<span class="profile-name">{{ TargetCustomer.__toString }}</span>#}
+                    {#<span class="button-x">X</span>#}
+                </li>
+                <li class="list-group-item"><a href="{{ url('contact') }}">お問い合わせ</a></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

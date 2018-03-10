@@ -28,6 +28,10 @@
                 height: 350px;
             }
         }
+
+        .product-section, .transaction-section, .delivery-section, .complete-section {
+            min-height: 520px;
+        }
     </style>
 {% endblock stylesheet %}
 
@@ -113,7 +117,7 @@
                                                 <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
                                             </div>
                                             <div class="col-sm-6 col-xs-6">
-                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -220,7 +224,7 @@
                     {% else %}
                         <div class="fav-empty">
                             <p>
-                                <span class="title12 display-block">取引中の商品はありません</span>
+                                <span class="title12 display-block">配送中の商品はありません</span>
                                 <span class="title12">商品が購入されると、ここに並びます</span>
                             </p>
                         </div>
