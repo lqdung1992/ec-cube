@@ -478,6 +478,7 @@ class CartService
      * @todo Remove new cart from old cart
      * @param \DateTime $date
      * @return \Eccube\Entity\Cart New cart
+     * @throws CartException
      */
     public function getCartByDate($date)
     {
@@ -492,7 +493,6 @@ class CartService
             $ProductClass = $CartItem->getObject();
             if (!$ProductClass) {
                 $this->loadProductClassFromCartItem($CartItem);
-
                 $ProductClass = $CartItem->getObject();
             }
 
@@ -511,6 +511,11 @@ class CartService
                 $this->removeProduct($ProductClass->getId());
             }
         }
+
+        if (count($CartNew->getCartItems()) == 0) {
+            throw new CartException('cart.receiptable_date.notfound');
+        }
+
         $CartNew->setLock(true)
             ->setPreOrderId(null);
         return $CartNew;
