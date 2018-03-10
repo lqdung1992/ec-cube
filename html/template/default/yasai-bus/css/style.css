@@ -34,7 +34,7 @@ body {
 }
 
 #driver-wrapper {
-    background-color: #f7f7f7;
+    background-color: #f7f7f7 !important;
 }
 
 .header {
@@ -97,36 +97,12 @@ body {
     margin: 20px 0;
 }
 
-.rectangle-content {
-    width: 345px;
-    height: 88px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 0.5px #cccccc;
-    margin: auto;
-    margin-bottom: 10px;
-}
-
 .text-left {
     font-size: 16px;
     font-weight: bold;
     text-align: left;
     color: #00c42b;
     margin-right: 10px;
-}
-
-.text-center {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: left;
-    color: #222222;
-}
-
-.text-tiny {
-    font-size: 10px;
-    font-weight: bold;
-    text-align: center;
-    color: #888888;
 }
 
 .text-align-right {
@@ -432,7 +408,7 @@ img {
     border-top: 0.5px solid #cccccc;
     border-bottom: 0.5px solid #cccccc;
     height: 69px;
-    margin: 20px 0;
+    margin: 10px 0;
     padding: 4px 10px 0 13px;
 }
 
@@ -699,7 +675,6 @@ img {
 
 #receiver-status-wrapper {
     background-color: #ffffff;
-    height: 1429px;
 }
 
 .cart-profile {
@@ -740,13 +715,6 @@ img {
     border-bottom: 1px solid #c3c3c3;
     height: 134px;
 }
-.cart-content {
-    width: 345px;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border: solid 0.5px #cccccc;
-    margin: 10px auto;
-}
 
 #cart-main-content1 {
     height: 333px;
@@ -757,7 +725,7 @@ img {
 }
 
 #cart-main-content3 {
-    height: 654px
+    min-height: 654px
 }
 
 #cart-sub-content {
@@ -1300,8 +1268,6 @@ img {
     padding-top: 15px;
 }
 
-
-
 .display-block {
     display: block !important;
 }
@@ -1823,6 +1789,7 @@ img {
     #service-form {
         background-color: #f7f7f7;
         padding-top: 15px;
+
     }
 
     #service-form input{
@@ -1938,6 +1905,14 @@ img {
         font-size: 18px;
         margin-top: 20px;
     }
+
+    .cart-content {
+        width: 345px !important;
+        border-radius: 3px;
+        background-color: #ffffff;
+        border: solid 0.5px #cccccc;
+        margin: 10px auto;
+    }
 }
 
 /******************************
@@ -1975,6 +1950,7 @@ img {
         padding-top: 15px;
         padding-left: 20%;
         padding-right: 20%;
+        min-height: 600px !important;
     }
 
     #service-form input{
@@ -2146,6 +2122,14 @@ img {
         height: 50px;
         font-size: 18px;
         margin-top: 20px;
+    }
+
+    .cart-content {
+        width: 645px !important;
+        border-radius: 3px;
+        background-color: #ffffff;
+        border: solid 0.5px #cccccc;
+        margin: 10px auto;
     }
 }
 

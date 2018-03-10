@@ -420,6 +420,21 @@ class CustomerRepository extends EntityRepository implements UserProviderInterfa
         return $Customer;
     }
 
+    public function getDriverList()
+    {
+        $driver = 'ROLE_DRIVER';
+        $query = $this->createQueryBuilder('c')
+            ->leftJoin('c.CustomerRole', 'r')
+            ->where('r.name = :name AND c.Status = :status')
+            ->setParameter('name', $driver)
+            ->setParameter('status', CustomerStatus::ACTIVE)
+            ->getQuery();
+
+        $Customers = $query->getResult();
+
+        return $Customers;
+    }
+
     public function getActiveCustomerByResetKey($reset_key)
     {
         $query = $this->createQueryBuilder('c')

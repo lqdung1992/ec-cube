@@ -19,11 +19,6 @@
 {% endblock %}
 {% block main %}
     <div class="wrapper container" id="receiver-form">
-        <div class="farmer-new-header">
-            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
-            <a href="{{ url('farm_home', {'id': TargetCustomer.id} ) }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
-            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
-        </div>
         <h3 id="complete_box__header_message" class="text-alight-center">お問い合わせ内容の送信が完了いたしました。</h3>
         <p class="title14 text-alight-center margin-top15">
             万一、ご回答メールが届かない場合は、トラブルの可能性もありますので<br />

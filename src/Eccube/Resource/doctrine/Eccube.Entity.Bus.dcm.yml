@@ -1,0 +1,35 @@
+Eccube\Entity\Bus:
+    type: entity
+    table: dtb_bus
+    repositoryClass: Eccube\Repository\BusRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: bus_id
+            generator:
+                strategy: AUTO
+    fields:
+        bus_no:
+            type: integer
+            nullable: false
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+    manyToOne:
+        Customer:
+            targetEntity: Eccube\Entity\Customer
+            joinColumn:
+                name: customer_id
+                referencedColumnName: customer_id
+        Route:
+            targetEntity: Eccube\Entity\Master\Route
+            joinColumn:
+                name: route_id
+                referencedColumnName: id
+    lifecycleCallbacks: {  }

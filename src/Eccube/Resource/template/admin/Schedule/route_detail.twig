@@ -1,0 +1,180 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+
+http://www.lockon.co.jp/
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set menus = ['schedule', 'schedule_new'] %}
+
+{% block title %}運行スケジュール{% endblock %}
+{% block sub_title %}ルート詳細情報管理{% endblock %}
+
+{% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload.css">
+    <link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/fileupload/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+{% endblock stylesheet %}
+
+{% block javascript %}
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/vendor/jquery.ui.widget.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.iframe-transport.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-process.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/fileupload/jquery.fileupload-validate.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script>
+    var hideSvg = function () {
+        if ($("#thumb li").length > 0) {
+            $("#icon_no_image").css("display", "none");
+        } else {
+            $("#icon_no_image").css("display", "");
+        }
+    };
+
+    $(function () {
+        var oldRanks = [];
+        // 画面の中のrank一覧を保持
+        $("div.tableish > .item_box").each(function() {
+            oldRanks.push(this.dataset.rank);
+        });
+        // rsort
+        oldRanks.sort(function(a,b){return a - b;}).reverse();
+
+        $("div.tableish").sortable({
+            items: '> .item_box',
+            cursor: 'move',
+            update: function(e, ui) {
+                $("body").append($('<div class="modal-backdrop in"></div>'));
+                updateRank();
+            }
+        });
+
+        var updateRank = function() {
+            // 並び替え後にrankを更新
+            var newRanks = {};
+            var i = 0;
+            $("div.tableish > .item_box").each(function() {
+                newRanks[this.dataset.RouteId] = oldRanks[i];
+                i++;
+            });
+
+            $.ajax({
+                url: '{{ url('admin_schedule_route_rank_move') }}',
+                type: 'POST',
+                data: newRanks,
+            }).done(function(data) {
+                console.log(data);
+                $(".modal-backdrop").remove();
+            }).fail(function() {
+                console.log('fail');
+                $(".modal-backdrop").remove();
+            });
+        };
+    })
+</script>
+{% endblock %}
+
+{% block main %}
+    <form role="form" class="form-horizontal" name="form1" id="form1" method="post" action="" {{ form_enctype(form) }}>
+        {{ form_widget(form._token) }}
+        <div class="row" id="aside_wrap">
+            <div id="detail_wrap" class="col-md-9">
+                <div id="detail_box" class="box">
+                    <div id="detail_box__header" class="box-header">
+                        <h3 class="box-title">ルート詳細情報登録・編集</h3>
+                    </div><!-- /.box-header -->
+                    <div id="detail_box__body" class="box-body">
+                        {{ form_row(form.Route) }}
+                        {{ form_row(form.BusStop) }}
+                        {{ form_row(form.move_time) }}
+                        {{ form_row(form.work_time) }}
+                        {{ form_row(form.arrive_time) }}
+                    </div><!-- /.box-body -->
+                </div><!-- /.box -->
+            </div><!-- /.col -->
+            
+            <div id="detail_list_footer" class="col-md-3">
+                <div class="col_inner" id="aside_column">
+                    <div id="detail_list_footer__body" class="box no-header">
+                        <div id="detail_list_footer__body_inner" class="box-body">
+                            <div id="detail_list_footer__insert_button" class="row text-center">
+                                <div class="col-sm-6 col-sm-offset-3 col-md-12 col-md-offset-0">
+                                    <button class="btn btn-primary btn-block btn-lg" type="submit">登録</button>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                </div>
+            </div><!-- /.col -->
+        </div>
+
+        {% if RouteDetails|length > 0 %}
+            <div id="sortable_list" class="box-body no-padding no-border box">
+                <div id="sortable_list_box" class="sortable_list">
+                    <div id="sortable_list_box__list" class="tableish">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <th>ルート</th>
+                                <th>予定時刻</th>
+                                <th>地図</th>
+                                <th>停留所</th>
+                                <th>作業時間</th>
+                                <th>到着時間</th>
+                                <th></th>
+                            </thead>
+                        {% for Route in RouteDetails %}
+                            <tr id="sortable_list__item--{{ Route.id }}" data-rank="{{ Route.rank }}" class="item_box" data-route-id="{{ Route.id }}">
+                                <td >
+                                    {{ Route.Route.name }}
+                                </td>
+                                <td>{{ Route.move_time }}</td>
+                                <td>{{ Route.BusStop.BusArea.name }}</td>
+                                <td>{{ Route.BusStop.name }}</td>
+                                <td>{{ Route.work_time }}</td>
+                                <td>{{ Route.arrive_time }}</td>
+                                <td>
+                                    {% if Route.id != CurrentRouteDetail.id %}
+                                        <a href="{{ url('admin_schedule_route_edit', {id: Route.id}) }}">編集</a>
+                                    {% else %}
+                                        <a>編集中</a>
+                                    {% endif %}
+
+                                    <a href="{{ url('admin_schedule_route_delete', {id: Route.id}) }}" {{ csrf_token_for_anchor() }}
+                                       data-method="delete">
+                                        削除
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        {% else %}
+            <div id="list_box" class="box-body no-padding">
+                <div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
+            </div><!-- /.box-body -->
+        {% endif %}
+        <!-- ▲ データがある時 ▲ -->
+    </form>
+
+{% endblock %}

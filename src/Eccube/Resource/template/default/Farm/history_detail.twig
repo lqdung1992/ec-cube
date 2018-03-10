@@ -5,31 +5,6 @@
  # Time: 8:59 PM
  #}{% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
-{% block stylesheet %}
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"/>
-    <style type="text/css">
-        .slick-prev {
-            left: 10px;
-        }
-        .slick-next {
-            right: 10px;
-        }
-        .thumb {
-            position: relative;
-            padding-right: 5px;
-        }
-        .thumb img {
-            max-width: 150px;
-            max-height: 150px;
-            width: 100%;
-            height: 100%;
-        }
-        .slick-prev:before, .slick-next:before {
-            opacity: .25;
-            color: black;
-        }
-    </style>
-{% endblock stylesheet %}
 {% block javascript %}
     <script type="text/javascript">
         $(function () {
@@ -62,66 +37,47 @@
                 $form.submit();
             });
 
-            $('#images-section .slider-for').slick({
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                arrows: true,
-                fade: true,
-                autoplay: true,
+            $('.slides').slick({
+                dots: true,
+                arrows: false,
                 speed: 300,
-                adaptiveHeight: true,
-                asNavFor: '.slider-nav',
-            });
-
-            $('#images-section .slider-nav').slick({
-                slidesToShow: 9,
-                slidesToScroll: 1,
-                asNavFor: '.slider-for',
-                arrows: true,
-                centerMode: true,
-                focusOnSelect: true
+                customPaging: function(slider, i) {
+                    return '<button class="thumbnail">' + $(slider.$slides[i]).find('img').prop('outerHTML') + '</button>';
+                }
             });
         });
     </script>
 {% endblock javascript %}
 {% block main %}
     <div id="reicever-detail-wrapper" class="wrapper">
-        <div id="images-section" class="full">
-            <div class="slider slider-for">
-                {% if Product.ProductImage|length > 0 %}
-                    {% for ProductImage in Product.ProductImage %}
-                        <div class="item">
-                            <img src="{{ app.config.image_save_urlpath }}/{{ ProductImage|no_image_product }}"/>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="item">
-                        <img src="{{ app.config.image_save_urlpath }}/{{ ''|no_image_product }}"/>
-                    </div>
-                {% endif %}
+        <div class="row">
+            <div id="item_photo_area" class="col-sm-7 col-xs-12">
+                <div id="detail_image_box__slides" class="slides">
+                    {% if Product.ProductImage|length > 0 %}
+                        {% for ProductImage in Product.ProductImage %}
+                            <div id="detail_image_box__item--{{ loop.index }}"><img src="{{ app.config.image_save_urlpath }}/{{ ProductImage|no_image_product }}"/></div>
+                        {% endfor %}
+                    {% else %}
+                        <div id="detail_image_box__item"><img src="{{ app.config.image_save_urlpath }}/{{ ''|no_image_product }}"/></div>
+                    {% endif %}
+                </div>
             </div>
-            <div class="slider slider-nav">
-                {% if Product.ProductImage|length > 0 %}
-                    {% for ProductImage in Product.ProductImage %}
-                        <div class="thumb">
-                            <img src="{{ app.config.image_save_urlpath }}/{{ ProductImage|no_image_product }}"/>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+            <div class="col-sm-5 col-xs-12">
+                <div class="bottom-cart-button padding-top10" >
+                    <div class="float-left">
+                        <p>
+                            <span class="price-title">{{ Product.getPrice02IncTaxMin|price }}<label class="price-tax ">（税込）</label></span>
+                            <!--<span class="price-tax"></span>-->
+                            <span class="price-quality">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}</span>
+                        </p>
+                    </div>
+                    <div class="float-right">
+                        <a href="{{ url('farm_history_detail', {'id': Product.id }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="この製品を更新してもよろしいですか？" class="btn btn-success">商品を再出品する</a>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
 
-        <div class="bottom-cart-button">
-            <div class="float-left">
-                <p>
-                    <span class="price-title">{{ Product.getPrice02IncTaxMin|price }}<label class="price-tax ">（税込）</label></span>
-                    <!--<span class="price-tax"></span>-->
-                    <span class="price-quality">{{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}</span>
-                </p>
-            </div>
-            <div class="float-right">
-                <a href="{{ url('farm_history_detail', {'id': Product.id }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="この製品を更新してもよろしいですか？" class="btn btn-success">商品を再出品する</a>
-            </div>
-        </div>
-    </div>
+
 {% endblock main %}

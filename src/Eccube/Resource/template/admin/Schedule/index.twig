@@ -1,0 +1,138 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
+
+http://www.lockon.co.jp/
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set menus = ['schedule', 'schedule_list'] %}
+
+{% block title %}運行スケジュール{% endblock %}
+{% block sub_title %}運行スケジュールマスター{% endblock %}
+
+{% form_theme searchForm 'Form/bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{{ app.config.admin_urlpath }}/assets/css/bootstrap-datetimepicker.min.css">
+    <style>
+        .go-to-route-detail {
+            width: 200px;
+            margin-bottom: 10px;
+            margin-right: 15px;
+            float: right;
+        }
+
+        table th {
+            background-color: #5d8fc2;
+            color: white;
+        }
+
+        table caption {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #5d8fc2;
+        }
+
+        #search_button {
+            margin-top: 20px;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/moment.min.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/moment-ja.js"></script>
+<script src="{{ app.config.admin_urlpath }}/assets/js/vendor/bootstrap-datetimepicker.min.js"></script>
+{% endblock javascript %}
+
+{% block main %}
+            <!--検索条件設定テーブルここから-->
+            <div id="search_wrap" class="search-box">
+                <form name="search_form" id="search_form" method="post" action="{{ url('admin_schedule_list') }}">
+                	{{ form_widget(searchForm._token) }}
+                    <div id="search_box" class="row">
+                        <div class="col-md-12 accordion">
+                            <div class="col-md-6">
+                                {{ form_label(searchForm.Bus) }}
+                                {{ form_widget(searchForm.Bus) }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form_label(searchForm.date) }}
+                                {{ form_widget(searchForm.date) }}
+                            </div>
+                            <div id="search_box__footer" class="row btn_area">
+                                <div id="search_box__search_button" class="col-xs-8 col-xs-offset-2 col-sm-4 col-sm-offset-4 text-center">
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="search_button">
+                                        検索する <svg class="cb cb-angle-right"><use xlink:href="#cb-angle-right"></svg>
+                                    </button>
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <button type="button" class="btn btn-primary btn-block go-to-route-detail">印刷</button>
+                <div id="detail_wrap" class="col-md-12">
+                    {% if result|length > 0 %}
+                        <div id="sortable_list" class="box-body no-padding no-border box">
+                            <div id="sortable_list_box" class="sortable_list">
+                                <div id="sortable_list_box__list" class="tableish">
+                                    <table class="table table-bordered table-hover">
+                                        <caption>運転手名 : {{ result.driver_name }}</caption>
+                                        <thead>
+                                        <th>予定時刻</th>
+                                        <th>地図</th>
+                                        <th>停留所</th>
+                                        <th>配送(引渡し)</th>
+                                        <th>集荷(受取り)</th>
+                                        <th>積載個数</th>
+                                        <th>積載率</th>
+                                        </thead>
+                                    {% for RouteDetail in result.detail %}
+                                            <tbody>
+                                            <tr>
+                                                <td>{{ RouteDetail.move_time }}</td>
+                                                <td>{{ RouteDetail.BusStop.BusArea.name }}</td>
+                                                <td>{{ RouteDetail.BusStop.name }}</td>
+                                                <td>2</td>
+                                                <td>2</td>
+                                                <td>4</td>
+                                                <td>50%</td>
+                                            </tr>
+                                            </tbody>
+                                    {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    {% else %}
+                        <div id="list_box" class="box-body no-padding">
+                            <div id="list_box__not_find_Route" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p>データはありません</p></div>
+                        </div><!-- /.box-body -->
+                    {% endif %}
+                </div>
+                <!--検索条件設定テーブルここまで-->
+            </div>
+
+{% endblock %}
