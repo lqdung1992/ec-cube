@@ -222,6 +222,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                                     <div class="col-sm-12 col-xs-12 count-modal">
                                         <div class="col-sm-8 col-xs-8 float-left">
                                             <span class="count-date">{{ CartItem.reception_date|date('m月d日') }}({{ master_date[CartItem.reception_date|date('N')].name }})</span>
+                                            <span>{{ Product.name }}</span>
                                             <input type="hidden" class="old-price" value="{{ CartItem.total_price }}">
                                             <p class="count-price">小計：<span class="price_{{ ProductClass.id }}_{{ CartItem.reception_date|date('N') }}">{{ CartItem.total_price }}</span>円</p>
                                         </div>
