@@ -54,7 +54,7 @@ class RouteScheduleRepository extends EntityRepository
                 ->leftJoin('b.Route', 'r');
 
             if (!is_null($data['date'])) {
-                $date = $data['date']->format('Y/m/d');
+                $date = $data['date']->format('Y-m-d');
                 $qb->where('rs.date = :date')->setParameter('date', $date);
             }
 
@@ -72,7 +72,6 @@ class RouteScheduleRepository extends EntityRepository
 
             return null;
         } catch (\Exception $e) {
-            dump($e);
             return null;
         }
     }

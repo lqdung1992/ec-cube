@@ -26,6 +26,8 @@ namespace Eccube\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Eccube\Entity\Master\Route;
+use Doctrine\ORM\Query\ResultSetMapping;
+
 
 /**
  * RouteDetailRepository
@@ -117,5 +119,63 @@ class RouteDetailRepository extends EntityRepository
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function getDriverReceiverSchedule($driverNo, $date) {
+
+        $sql = 'SELECT stop.bus_stop_id, stop.name, stop.address, total_amount, arrive_time, move_time, work_time, route.name as route_name FROM'.
+                ' (SELECT SUM(container_amount) as total_amount, bus_stop FROM dtb_order' .
+                ' LEFT JOIN dtb_customer ON dtb_order.customer_id = dtb_customer.customer_id' .
+                ' WHERE receiptable_date = ?  AND bus_stop' .
+                ' IN (SELECT dtb_route_detail.bus_stop_id FROM dtb_bus LEFT JOIN dtb_route_detail' .
+                ' ON dtb_bus.route_id = dtb_route_detail.route_id WHERE customer_id = ?) GROUP BY bus_stop) AS order_bus' .
+                ' LEFT JOIN dtb_route_detail ON dtb_route_detail.bus_stop_id = order_bus.bus_stop' .
+                ' LEFT JOIN dtb_bus_stop stop ON dtb_route_detail.bus_stop_id = stop.bus_stop_id' .
+                ' LEFT JOIN mtb_route route ON route.id = dtb_route_detail.route_id';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('bus_stop_id', 'bus_stop_id');
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('address', 'address');
+        $rsm->addScalarResult('total_amount', 'total_amount');
+        $rsm->addScalarResult('arrive_time', 'arrive_time');
+        $rsm->addScalarResult('move_time', 'move_time');
+        $rsm->addScalarResult('work_time', 'work_time');
+        $rsm->addScalarResult('route_name', 'route_name');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $date. ' 00:00:00');
+        $query->setParameter(2, $driverNo);
+        $results = $query->getResult();
+
+        return $results;
+    }
+
+    public function getDriverFarmerSchedule($driverNo, $date) {
+
+        $sql = 'SELECT stop.bus_stop_id, stop.name, stop.address, total_amount, arrive_time, move_time, work_time, route.name as route_name FROM'.
+            ' (SELECT SUM(container_amount) as total_amount, bus_stop FROM dtb_order' .
+            ' LEFT JOIN dtb_customer ON dtb_order.farmer_id = dtb_customer.customer_id' .
+            ' WHERE receiptable_date = ? AND bus_stop' .
+            ' IN (SELECT dtb_route_detail.bus_stop_id FROM dtb_bus LEFT JOIN dtb_route_detail' .
+            ' ON dtb_bus.route_id = dtb_route_detail.route_id WHERE customer_id = ?) GROUP BY bus_stop) AS order_bus' .
+            ' LEFT JOIN dtb_route_detail ON dtb_route_detail.bus_stop_id = order_bus.bus_stop' .
+            ' LEFT JOIN dtb_bus_stop stop ON dtb_route_detail.bus_stop_id = stop.bus_stop_id' .
+            ' LEFT JOIN mtb_route route ON route.id = dtb_route_detail.route_id';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('bus_stop_id', 'bus_stop_id');
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('address', 'address');
+        $rsm->addScalarResult('total_amount', 'total_amount');
+        $rsm->addScalarResult('arrive_time', 'arrive_time');
+        $rsm->addScalarResult('move_time', 'move_time');
+        $rsm->addScalarResult('work_time', 'work_time');
+        $rsm->addScalarResult('route_name', 'route_name');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $date. ' 00:00:00');
+        $query->setParameter(2, $driverNo);
+        $results = $query->getResult();
+
+        return $results;
     }
 }

@@ -142,6 +142,11 @@ Eccube\Entity\Order:
             nullable: true
             options:
                 default: '0'
+        farmer_id:
+            type: integer
+            nullable: true
+            options:
+                default: '0'
         total:
             type: decimal
             nullable: true

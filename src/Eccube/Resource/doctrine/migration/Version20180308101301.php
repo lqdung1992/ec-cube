@@ -67,6 +67,10 @@ class Version20180308101301 extends AbstractMigration
             $this->addSql('ALTER TABLE dtb_order ADD container_amount int;');
         }
 
+        if (!$table->hasColumn('farmer_id')) {
+            $this->addSql('ALTER TABLE dtb_order ADD farmer_id int;');
+        }
+
         return true;
     }
 

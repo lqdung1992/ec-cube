@@ -1156,12 +1156,15 @@ class ShoppingService
         /* @var OrderDetail $orderDetail */
         $orderDetails = $Order->getOrderDetails();
         $containerAmount = 0;
+        $farmerId = 0;
         foreach ($orderDetails as $orderDetail) {
             $container = $orderDetail->getProductClass()->getAmountPerContainer();
             $safetyPercent = (1 / $container) / self::SAFETY_PERCENT;
             $containerAmount += $safetyPercent * $orderDetail->getQuantity();
+            $farmerId = $orderDetail->getProductClass()->getCreator()->getId();
         }
         $Order->setContainerAmount(ceil($containerAmount));
+        $Order->setFarmerId($farmerId);
     }
 
     /**

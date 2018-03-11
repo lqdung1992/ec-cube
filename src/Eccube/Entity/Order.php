@@ -1603,6 +1603,23 @@ class Order extends \Eccube\Entity\AbstractEntity
     }
 
     private $container_amount;
+    private $farmer_id;
+
+    /**
+     * @return mixed
+     */
+    public function getFarmerId()
+    {
+        return $this->farmer_id;
+    }
+
+    /**
+     * @param mixed $farmer_id
+     */
+    public function setFarmerId($farmer_id)
+    {
+        $this->farmer_id = $farmer_id;
+    }
 
     /**
      * @return mixed
