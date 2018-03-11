@@ -41,7 +41,46 @@ class ScheduleController extends AbstractController
         $result = null;
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $result = $app['eccube.repository.route_schedule']->getRoute($data);
+            $RouteSchedules = $app['eccube.repository.route_schedule']->getRoute($data);
+            if ($RouteSchedules != null) {
+                $receiverSchedule = $app['eccube.repository.route_detail']->getDriverReceiverSchedule($data['Bus']->getCustomer()->getId(), date('Y-m-d'));
+                $farmerSchedule = $app['eccube.repository.route_detail']->getDriverFarmerSchedule($data['Bus']->getCustomer()->getId(), date('Y-m-d'));
+                $results = null;
+                foreach ($receiverSchedule as $receiver) {
+                    $flag = false;
+                    foreach ($farmerSchedule as $farmer) {
+                        if ($farmer['bus_stop_id'] == $receiver['bus_stop_id']) {
+                            $receiver['farmer_total_amount'] = $farmer['total_amount'];
+                            $results[] = $receiver;
+                            $flag = true;
+                            break;
+                        }
+                    }
+                    if (!$flag) {
+                        $receiver['farmer_total_amount'] = 0;
+                        $results[] = $receiver;
+                    }
+                }
+
+                foreach ($RouteSchedules['detail'] as $routeSchedule) {
+                    $flag = false;
+                    foreach ($results as $res) {
+                        if($res['bus_stop_id'] == $routeSchedule->getBusStop()->getId()) {
+                            $routeSchedule->setTotalAmount($res['total_amount']);
+                            $routeSchedule->setTotalFarmerAmount($res['farmer_total_amount']);
+                            $result['detail'][] = $routeSchedule;
+                            $flag = true;
+                            break;
+                        }
+                    }
+                    if (!$flag) {
+                        $routeSchedule->setTotalAmount(0);
+                        $routeSchedule->setTotalFarmerAmount(0);
+                        $result['detail'][] = $routeSchedule;
+                    }
+                }
+                $result['driver_name'] = $RouteSchedules['driver_name'];
+            }
         }
 
         return $app->render('Schedule/index.twig', array(

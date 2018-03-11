@@ -26,7 +26,6 @@ namespace Eccube\Entity;
 
 use Eccube\Common\Constant;
 use Eccube\Entity\Master\ApprovalStatus;
-use Eccube\Entity\Master\BusStop;
 use Eccube\Entity\Master\CustomerRole;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -240,7 +239,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     /** @var CustomerRole */
     private $CustomerRole;
 
-    /** @var BusStop */
+    /** @var \Eccube\Entity\BusStop */
     private $BusStop;
 
     /** @var string */

@@ -30,7 +30,89 @@ class DriverController extends AbstractController
 {
     public function home(Application $app)
     {
-        return $app->render('Driver\driver_home.twig');
+        if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $routeName = '';
+            $today = '';
+            $results = null;
+            $bus_no = 0;
+            $driver = $app->user()->getId();
+            $Bus = $app['eccube.repository.bus']->findOneBy(array('Customer' => $app->user()));
+            if ($Bus != null) {
+                $receiverSchedule = $app['eccube.repository.route_detail']->getDriverReceiverSchedule($driver, date('Y-m-d'));
+                $farmerSchedule = $app['eccube.repository.route_detail']->getDriverFarmerSchedule($driver, date('Y-m-d'));
+                foreach ($receiverSchedule as $receiver) {
+                    $flag = false;
+                    foreach ($farmerSchedule as $farmer) {
+                        if ($farmer['bus_stop_id'] == $receiver['bus_stop_id']) {
+                            $receiver['farmer_total_amount'] = $farmer['total_amount'];
+                            $results[] = $receiver;
+                            $flag = true;
+                            break;
+                        }
+                    }
+                    if (!$flag) {
+                        $receiver['farmer_total_amount'] = 0;
+                        $results[] = $receiver;
+                    }
+
+                }
+                if (sizeof($results) > 0) {
+                    $routeName = $results[0]['route_name'];
+                    $today = date('Y') . '年' . date('m') . '月' . date('d') . '日';
+                }
+                $bus_no = $Bus->getBusNo();
+            }
+
+            return $app->render('Driver\driver_home.twig', array('BusSchedule' => $results, 'route_name' => $routeName, 'today' => $today, 'bus_no' => $bus_no));
+        } else {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
+    }
+
+    public function home_tomorrow(Application $app)
+    {
+        if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $routeName = '';
+            $today = '';
+            $results = null;
+            $bus_no = 0;
+            $Bus = $app['eccube.repository.bus']->findOneBy(array('Customer' => $app->user()));
+            if ($Bus != null) {
+                $driver = $app->user()->getId();
+                $tomorrow = date("Y-m-d", strtotime('tomorrow'));
+                $receiverSchedule = $app['eccube.repository.route_detail']->getDriverReceiverSchedule($driver, $tomorrow);
+                $farmerSchedule = $app['eccube.repository.route_detail']->getDriverFarmerSchedule($driver, $tomorrow);
+
+
+                foreach ($receiverSchedule as $receiver) {
+                    $flag = false;
+                    foreach ($farmerSchedule as $farmer) {
+                        if ($farmer['bus_stop_id'] == $receiver['bus_stop_id']) {
+                            $receiver['farmer_total_amount'] = $farmer['total_amount'];
+                            $results[] = $receiver;
+                            $flag = true;
+                            break;
+                        }
+                    }
+                    if (!$flag) {
+                        $receiver['farmer_total_amount'] = 0;
+                        $results[] = $receiver;
+                    }
+                }
+                if (sizeof($results) > 0) {
+                    $routeName = $results[0]['route_name'];
+                    $tomorrow = explode('-', $tomorrow);
+                    $today = $tomorrow[0] . '年' . $tomorrow[1] . '月' . $tomorrow[2] . '日';
+                }
+                $bus_no = $Bus->getBusNo();
+            }
+
+
+            return $app->render('Driver\driver_home.twig', array('BusSchedule' => $results, 'route_name' => $routeName, 'today' => $today, 'bus_no' => $bus_no));
+        } else {
+            return $app->redirect($app->url('mypage_login'));
+        }
     }
 
     public function detail_cargo(Application $app)

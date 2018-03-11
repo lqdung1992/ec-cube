@@ -93,8 +93,9 @@ class ServiceSignUpType extends AbstractType
             ->add('password', 'repeated_password')
             ->add('bus_stop', 'entity', array(
                 'required' => false,
-                'class' => 'Eccube\Entity\Master\BusStop',
+                'class' => 'Eccube\Entity\BusStop',
                 'empty_value' => '----------',
+                'property' => 'name',
                 'label' => '集荷先のバス停'
             ));
     }

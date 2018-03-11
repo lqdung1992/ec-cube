@@ -61,6 +61,9 @@ class ShoppingService
     /** @var  \Doctrine\ORM\EntityManager */
     protected $em;
 
+    //安全率：80％
+    const SAFETY_PERCENT = 0.8;
+
     public function __construct(Application $app, $cartService, $orderService)
     {
         $this->app = $app;
@@ -1136,12 +1139,32 @@ class ShoppingService
         $this->setOrderUpdateData($Order);
         // 在庫情報を更新
         $this->setStockUpdate($em, $Order);
+        //set container amount
+        $this->setContainerAmount($Order);
 
         if ($this->app->isGranted('IS_AUTHENTICATED_FULLY')) {
             // 会員の場合、購入金額を更新
             $this->setCustomerUpdate($Order, $this->app->user());
         }
 
+    }
+
+    /**
+     * @param Order $Order
+     */
+    public function setContainerAmount (Order $Order) {
+        /* @var OrderDetail $orderDetail */
+        $orderDetails = $Order->getOrderDetails();
+        $containerAmount = 0;
+        $farmerId = 0;
+        foreach ($orderDetails as $orderDetail) {
+            $container = $orderDetail->getProductClass()->getAmountPerContainer();
+            $safetyPercent = (1 / $container) / self::SAFETY_PERCENT;
+            $containerAmount += $safetyPercent * $orderDetail->getQuantity();
+            $farmerId = $orderDetail->getProductClass()->getCreator()->getId();
+        }
+        $Order->setContainerAmount(ceil($containerAmount));
+        $Order->setFarmerId($farmerId);
     }
 
     /**

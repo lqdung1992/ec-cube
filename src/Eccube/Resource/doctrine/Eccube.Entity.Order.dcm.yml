@@ -137,6 +137,16 @@ Eccube\Entity\Order:
             nullable: true
             precision: 10
             scale: 0
+        container_amount:
+            type: integer
+            nullable: true
+            options:
+                default: '0'
+        farmer_id:
+            type: integer
+            nullable: true
+            options:
+                default: '0'
         total:
             type: decimal
             nullable: true

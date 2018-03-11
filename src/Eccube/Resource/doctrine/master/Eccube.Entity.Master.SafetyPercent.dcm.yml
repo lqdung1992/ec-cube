@@ -1,0 +1,19 @@
+Eccube\Entity\Master\SafetyPercent:
+    type: entity
+    table: mtb_safety_percent
+    repositoryClass: Eccube\Repository\Master\SafetyPercentRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

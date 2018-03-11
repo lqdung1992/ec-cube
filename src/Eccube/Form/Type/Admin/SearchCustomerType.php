@@ -227,7 +227,8 @@ class SearchCustomerType extends AbstractType
             ->add('bus_stop', 'entity', array(
                 'label' => 'バス停',
                 'required' => false,
-                'class' => 'Eccube\Entity\Master\BusStop',
+                'property' => 'name',
+                'class' => 'Eccube\Entity\BusStop',
             ))
         ;
     }

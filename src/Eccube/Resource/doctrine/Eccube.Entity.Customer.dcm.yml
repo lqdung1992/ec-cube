@@ -164,10 +164,10 @@ Eccube\Entity\Customer:
                 name: customer_role
                 referencedColumnName: id
         BusStop:
-            targetEntity: Eccube\Entity\Master\BusStop
+            targetEntity: Eccube\Entity\BusStop
             joinColumn:
                 name: bus_stop
-                referencedColumnName: id
+                referencedColumnName: bus_stop_id
         Sex:
             targetEntity: Eccube\Entity\Master\Sex
             joinColumn:

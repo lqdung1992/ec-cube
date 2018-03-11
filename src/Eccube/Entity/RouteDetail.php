@@ -220,4 +220,40 @@ class RouteDetail extends \Eccube\Entity\AbstractEntity
         $this->Route = $Route;
     }
 
+
+    private $total_amount;
+    private $total_farmer_amount;
+
+    /**
+     * @return mixed
+     */
+    public function getTotalAmount()
+    {
+        return $this->total_amount;
+    }
+
+    /**
+     * @param mixed $total_amount
+     */
+    public function setTotalAmount($total_amount)
+    {
+        $this->total_amount = $total_amount;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTotalFarmerAmount()
+    {
+        return $this->total_farmer_amount;
+    }
+
+    /**
+     * @param mixed $total_farmer_amount
+     */
+    public function setTotalFarmerAmount($total_farmer_amount)
+    {
+        $this->total_farmer_amount = $total_farmer_amount;
+    }
+
 }

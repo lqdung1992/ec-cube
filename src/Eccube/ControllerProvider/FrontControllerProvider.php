@@ -48,6 +48,7 @@ class FrontControllerProvider implements ControllerProviderInterface
 
         //driver
         $c->match('/driver/home', '\Eccube\Controller\DriverController::home')->bind('driver_home');
+        $c->match('/driver/home_tomorrow', '\Eccube\Controller\DriverController::home_tomorrow')->bind('driver_home_tomorrow');
         $c->match('/driver/detail_cargo', '\Eccube\Controller\DriverController::detail_cargo')->bind('driver_detail_cargo');
 
         // cart

@@ -27,6 +27,7 @@ namespace Eccube\Controller\Mypage;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\RouteSchedule;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
@@ -35,6 +36,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MypageController extends AbstractController
 {
+
+    const ROLE_FARMER = 'ROLE_FARMER';
+    const ROLE_DRIVER = 'ROLE_DRIVER';
+    const ROLE_RECIPIENT = 'ROLE_RECIPIENT';
+
     /**
      * Login
      *
@@ -47,8 +53,28 @@ class MypageController extends AbstractController
     {
         if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
             log_info('認証済のためログイン処理をスキップ');
+            $userRole = $app->user()->getCustomerRole()->getName();
+            if ($userRole == self::ROLE_DRIVER) {
+                //insert data to route schedule
+                $Bus = $app['eccube.repository.bus']->findOneBy(array('Customer' => $app->user()));
+                $RouteSchedule = new RouteSchedule();
+                $RouteSchedule->setBus($Bus);
+                $RouteSchedule->setDate(date('Y-m-d'));
+                $RouteSchedule->setScheduleStatus('Normal');
+                $RouteSchedule->setDelFlg(Constant::DISABLED);
+                $app['orm.em']->persist($RouteSchedule);
+                $app['orm.em']->flush($RouteSchedule);
 
-            return $app->redirect($app->url('farm_home', array('id' => $app->user()->getId())));
+                $RouteSchedules = $app['eccube.repository.route_schedule']->findOneBy(
+                    array('Bus' => $Bus), array('date' => 'DESC'));
+
+
+
+                return $app->redirect($app->url('driver_home'));
+            } else {
+                return $app->redirect($app->url('farm_home', array('id' => $app->user()->getId())));
+            }
+
         }
 
         /* @var $form \Symfony\Component\Form\FormInterface */

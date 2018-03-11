@@ -362,6 +362,18 @@
                                 </div>
                             {#</div>#}
                         </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <label>{{ form.bus_stop.vars.label }}</label>
+                            </div>
+                            <div class="col-xs-12">
+                                <div id="button_box__customer_role" class="form-group">
+                                    {{ form_widget(form.bus_stop) }}
+                                    {{ form_errors(form.bus_stop) }}
+                                </div>
+                            </div>
+                        </div>
                         <div id="button_box__insert_button" class="row text-center">
                             <div class="col-sm-6 col-sm-offset-3 col-md-12 col-md-offset-0">
                                 <button class="btn btn-primary btn-block btn-lg" type="submit">会員情報を登録</button>
