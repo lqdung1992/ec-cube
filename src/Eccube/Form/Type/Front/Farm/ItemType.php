@@ -13,6 +13,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -124,6 +126,30 @@ class ItemType extends AbstractType
                     new Assert\NotBlank(),
                 ),
             ));
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function ($event) {
+            $form = $event->getForm();
+            $data = $form->getData();
+            $class = $data->getProductClasses()[0];
+
+            $interval = \DateInterval::createFromDateString('1 day');
+            $dateEnd = clone $class->getProductionEndDate();
+            $period = new \DatePeriod($class->getProductionStartDate(), $interval, $dateEnd->modify('+1 day'));
+            $arrDateId = array();
+            /** @var \DateTime $date */
+            foreach ($period as $date) {
+                $dateId = $date->format('N');
+                $arrDateId[] = $dateId;
+            }
+            $ReceiptableDates = $form['ReceiptableDate']->getData();
+            $arrReceiptableDateId = array();
+            foreach ($ReceiptableDates as $receiptableDate) {
+                $arrReceiptableDateId[] = $receiptableDate->getId();
+            }
+            if (count(array_diff($arrReceiptableDateId, $arrDateId)) > 0) {
+                $form['ReceiptableDate']->addError(new FormError('発送可能日は生産予定期間内ではありません。'));
+            }
+        });
     }
 
     /**

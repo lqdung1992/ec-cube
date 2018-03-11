@@ -22,14 +22,18 @@ class OrderController extends AbstractController
     /**
      * @param Application $app
      * @param Request $request
-     * @param int $id
-     * @return Response
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function index(Application $app, Request $request, $id)
     {
+        // Todo: check permission: ROLE_FARMER|ALL
+        if (!$app->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $app->redirect($app->url('mypage_login'));
+        }
         /** @var OrderRepository $orderRepo */
         $orderRepo = $app['eccube.repository.order'];
-        // Todo: check permission: ROLE_FARMER|ALL
         /** @var Order $Order */
         $Order = $orderRepo->find($id);
         if (!$Order) {

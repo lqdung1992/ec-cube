@@ -138,7 +138,7 @@ class Cart extends \Eccube\Entity\AbstractEntity
      * @param  \DateTime $date
      * @return \Eccube\Entity\CartItem
      */
-    public function getCartItemByIdentifier($class_name, $class_id, $date = null)
+    public function getCartItemByIdentifier($class_name, $class_id, \DateTime $date = null)
     {
         /** @var CartItem $CartItem */
         foreach ($this->CartItems as $CartItem) {
@@ -162,7 +162,7 @@ class Cart extends \Eccube\Entity\AbstractEntity
      * @param null|\DateTime $date
      * @return $this
      */
-    public function removeCartItemByIdentifier($class_name, $class_id, $date = null)
+    public function removeCartItemByIdentifier($class_name, $class_id, \DateTime $date = null)
     {
         foreach ($this->CartItems as $CartItem) {
             $expr = $CartItem->getClassName() === $class_name && $CartItem->getClassId() === $class_id;

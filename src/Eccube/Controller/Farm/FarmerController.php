@@ -29,6 +29,7 @@ use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
 use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductRepository;
+use Eccube\Service\CartService;
 use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
@@ -466,8 +467,7 @@ class FarmerController extends AbstractController
         /** @var FormBuilder $builder */
         $builder = $app['form.factory']->createBuilder('item_edit', $Product);
         $form = $builder->getForm();
-        $ProductType = $app['eccube.repository.master.product_type']->find(1);
-        $ProductClass->setStockUnlimited(true);
+        $ProductClass->setStockUnlimited(false);
 
         $form['class']->setData($ProductClass);
 
@@ -504,7 +504,7 @@ class FarmerController extends AbstractController
             $Product = $form->getData();
             $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_SHOW);
             $Product->setStatus($Disp);
-            // error creator;
+            // set farmer
             $Product->setCreator($Customer);
 
             /** @var EntityManager $em */
@@ -512,6 +512,7 @@ class FarmerController extends AbstractController
 
             /** @var ProductClass $ProductClass */
             $ProductClass = $form['class']->getData();
+            $ProductType = $app['eccube.repository.master.product_type']->find(1);
             $ProductClass->setProductType($ProductType);
 
             // 個別消費税
@@ -522,7 +523,6 @@ class FarmerController extends AbstractController
                         if ($ProductClass->getTaxRule()->getDelFlg() == Constant::ENABLED) {
                             $ProductClass->getTaxRule()->setDelFlg(Constant::DISABLED);
                         }
-
                         $ProductClass->getTaxRule()->setTaxRate($ProductClass->getTaxRate());
                     } else {
                         $taxrule = $app['eccube.repository.tax_rule']->newTaxRule();
@@ -539,14 +539,7 @@ class FarmerController extends AbstractController
                 }
             }
             $em->persist($ProductClass);
-
-            // 在庫情報を作成
-            if (!$ProductClass->getStockUnlimited()) {
-                $ProductStock->setStock($ProductClass->getStock());
-            } else {
-                // 在庫無制限時はnullを設定
-                $ProductStock->setStock(null);
-            }
+            $ProductStock->setStock($ProductClass->getStock());
             $em->persist($ProductStock);
 
             /* @var $Product \Eccube\Entity\Product */
@@ -554,36 +547,45 @@ class FarmerController extends AbstractController
                 $Product->removeProductCategory($ProductCategory);
                 $em->remove($ProductCategory);
             }
+            // Remove Receiptable date
+            $ProductRDs = $Product->getProductReceiptableDates();
+            foreach ($ProductRDs as $productRD) {
+                $Product->removeProductReceiptableDate($productRD);
+                $em->remove($productRD);
+            }
+
             $em->persist($Product);
             $em->flush();
 
             $Category = $form->get('Category')->getData();
             $productCate = $this->createProductCategory($Product, $Category);
             $em->persist($productCate);
-            $em->flush();
 
-            // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
             $ReceiptableDates = $form->get('ReceiptableDate')->getData();
-
-            $ProductRDs = $Product->getProductReceiptableDates();
-            foreach ($ProductRDs as $productRD) {
-                $Product->removeProductReceiptableDate($productRD);
-                $em->remove($productRD);
-            }
-            $em->flush();
-
+            // Loop step
+            $interval = \DateInterval::createFromDateString('1 day');
+            $dateEnd = clone $ProductClass->getProductionEndDate();
+            $period = new \DatePeriod($ProductClass->getProductionStartDate(), $interval, $dateEnd->modify('+1 day'));
+            $arrDateId = array();
             foreach ($ReceiptableDates as $receiptableDate) {
-                $productRD = new ProductReceiptableDate();
-                $productRD->setProduct($Product);
-                $productRD->setProductId($Product->getId());
-                $productRD->setReceiptableDate($receiptableDate);
-                $productRD->setDateId($receiptableDate->getId());
-                $productRD->setMaxQuantity(1);
-                $Product->addProductReceiptableDate($productRD);
-                $em->persist($productRD);
+                $arrDateId[$receiptableDate->getId()] = $receiptableDate;
             }
-            $em->persist($Product);
+            foreach ($period as $date) {
+                $dateId = $date->format('N');
+                if (in_array($dateId, array_keys($arrDateId))) {
+                    $productRD = new ProductReceiptableDate();
+                    $productRD->setProduct($Product);
+                    $productRD->setProductId($Product->getId());
+                    $productRD->setDate($date);
+                    $productRD->setReceiptableDate($arrDateId[$dateId]);
+                    $productRD->setDateId($dateId);
+                    $productRD->setMaxQuantity($ProductClass->getStock());
+                    $Product->addProductReceiptableDate($productRD);
+                    $em->persist($productRD);
+                }
+            }
+
             $em->flush();
 
             // 画像の登録
@@ -597,7 +599,6 @@ class FarmerController extends AbstractController
                     ->setCreator($Customer);
                 $Product->addProductImage($ProductImage);
                 $em->persist($ProductImage);
-
                 // 移動
                 $file = new File($app['config']['image_temp_realdir'].'/'.$add_image);
                 $file->move($app['config']['image_save_realdir']);
@@ -608,21 +609,18 @@ class FarmerController extends AbstractController
             foreach ($delete_images as $delete_image) {
                 $ProductImage = $app['eccube.repository.product_image']
                     ->findOneBy(array('file_name' => $delete_image));
-
                 // 追加してすぐに削除した画像は、Entityに追加されない
                 if ($ProductImage instanceof \Eccube\Entity\ProductImage) {
                     $Product->removeProductImage($ProductImage);
                     $em->remove($ProductImage);
-
                 }
-                $em->persist($Product);
-
                 // 削除
                 if (!empty($delete_image)) {
                     $fs = new Filesystem();
                     $fs->remove($app['config']['image_save_realdir'].'/'.$delete_image);
                 }
             }
+
             $em->persist($Product);
             $em->flush();
 
@@ -707,8 +705,13 @@ class FarmerController extends AbstractController
                 $cartForm->handleRequest($request);
                 if ($cartForm->isSubmitted() && $cartForm->isValid()) {
                     $addCartData = $cartForm->getData();
+                    $arrQuantity = array_filter($addCartData['quantity'], function ($item) {
+                        return $item > 0;
+                    });
+                    /** @var CartService $cartService */
+                    $cartService = $app['eccube.service.cart'];
                     try {
-                        $app['eccube.service.cart']->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
+                        $cartService->addProduct($addCartData['product_class_id'], $arrQuantity)->save();
                     } catch (CartException $e) {
                         $app->addRequestError($e->getMessage());
                     }
