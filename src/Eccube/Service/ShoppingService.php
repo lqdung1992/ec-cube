@@ -24,6 +24,7 @@
 namespace Eccube\Service;
 
 use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\EntityManager;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Entity\Customer;
@@ -130,11 +131,11 @@ class ShoppingService
 
     /**
      * @param $Customer
-     * @param null $dateId
+     * @param \DateTime $dateTime
      * @return Order
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function createOrder($Customer, $dateId = null)
+    public function createOrder($Customer, \DateTime $dateTime = null)
     {
         // ランダムなpre_order_idを作成
         do {
@@ -146,7 +147,7 @@ class ShoppingService
         } while ($Order);
 
         // 受注情報、受注明細情報、お届け先情報、配送商品情報を作成
-        $Order = $this->registerPreOrder($Customer, $preOrderId, $dateId);
+        $Order = $this->registerPreOrder($Customer, $preOrderId, $dateTime);
 
         $this->cartService->setPreOrderId($preOrderId);
         $this->cartService->save();
@@ -157,11 +158,11 @@ class ShoppingService
     /**
      * @param Customer $Customer
      * @param $preOrderId
-     * @param null $dateId
+     * @param \DateTime $dateTime
      * @return Order
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function registerPreOrder(Customer $Customer, $preOrderId, $dateId = null)
+    public function registerPreOrder(Customer $Customer, $preOrderId, \DateTime $dateTime = null)
     {
         $this->em = $this->app['orm.em'];
 
@@ -183,7 +184,7 @@ class ShoppingService
         $Order = $this->getNewShipping($Order, $Customer);
 
         // 受注明細情報、配送商品情報を作成
-        $Order = $this->getNewDetails($Order, $dateId);
+        $Order = $this->getNewDetails($Order, $dateTime);
 
         // 小計
         $subTotal = $this->orderService->getSubTotal($Order);
@@ -221,9 +222,8 @@ class ShoppingService
         // 合計金額の計算
         $this->calculatePrice($Order);
 
-        if ($dateId) {
-            $date = DateUtil::getDay($dateId);
-            $Order->setReceiptableDate($date);
+        if ($dateTime) {
+            $Order->setReceiptableDate($dateTime);
         }
 
         $this->em->flush();
@@ -450,14 +450,13 @@ class ShoppingService
      * Create new cart detail
      *
      * @param Order $Order
-     * @param null $dateId
+     * @param null $date
      * @return Order
      */
-    public function getNewDetails(Order $Order, $dateId = null)
+    public function getNewDetails(Order $Order, \DateTime $date = null)
     {
-        if ($dateId) {
-            $dateTime = DateUtil::getDay($dateId);
-            $Cart = $this->cartService->getCartByDate($dateTime);
+        if ($date) {
+            $Cart = $this->cartService->getCartByDate($date);
         } else {
             $Cart = $this->cartService->getCart();
         }
@@ -710,7 +709,6 @@ class ShoppingService
         $orderDetails = $Order->getOrderDetails();
 
         foreach ($orderDetails as $orderDetail) {
-
             // 商品削除チェック
             if ($orderDetail->getProductClass()->getDelFlg()) {
                 // @deprecated 3.1以降ではexceptionをthrowする
@@ -751,19 +749,18 @@ class ShoppingService
         foreach ($orderDetails as $orderDetail) {
             // 在庫が無制限かチェックし、制限ありなら在庫数をチェック
             if ($orderDetail->getProductClass()->getStockUnlimited() == Constant::DISABLED) {
-                // 在庫チェックあり
-                // 在庫に対してロック(select ... for update)を実行
-                $productStock = $em->getRepository('Eccube\Entity\ProductStock')->find(
-                    $orderDetail->getProductClass()->getProductStock()->getId(), LockMode::PESSIMISTIC_WRITE
-                );
-                // 購入数量と在庫数をチェックして在庫がなければエラー
-                if ($productStock->getStock() < 1) {
-                    // @deprecated 3.1以降ではexceptionをthrowする
-                    // throw new ShoppingException('cart.over.stock');
+                /** @var Product $Product */
+                $Product = $orderDetail->getProductClass()->getProduct();
+                $ProductRD = $Product->getProductReceiptableByDate($Order->getReceiptableDate());
+                if (!$ProductRD) {
                     return false;
-                } elseif ($orderDetail->getQuantity() > $productStock->getStock()) {
-                    // @deprecated 3.1以降ではexceptionをthrowする
-                    // throw new ShoppingException('cart.over.stock');
+                }
+
+                if ($ProductRD->getMaxQuantity() < 1) {
+                    return false;
+                }
+
+                if ($orderDetail->getQuantity() > $ProductRD->getMaxQuantity()) {
                     return false;
                 }
             }
@@ -833,30 +830,25 @@ class ShoppingService
     /**
      * 在庫情報の更新
      *
-     * @param $em トランザクション制御されているEntityManager
+     * @param EntityManager $em トランザクション制御されているEntityManager
      * @param Order $Order 受注情報
+     * @throws ShoppingException
      */
-    public function setStockUpdate($em, Order $Order)
+    public function setStockUpdate(EntityManager $em, Order $Order)
     {
-
         $orderDetails = $Order->getOrderDetails();
-
-        // 在庫情報更新
         foreach ($orderDetails as $orderDetail) {
-            // 在庫が無制限かチェックし、制限ありなら在庫数を更新
             if ($orderDetail->getProductClass()->getStockUnlimited() == Constant::DISABLED) {
-
-                $productStock = $em->getRepository('Eccube\Entity\ProductStock')->find(
-                    $orderDetail->getProductClass()->getProductStock()->getId()
-                );
-
-                // 在庫情報の在庫数を更新
-                $stock = $productStock->getStock() - $orderDetail->getQuantity();
-                $productStock->setStock($stock);
-
-                // 商品規格情報の在庫数を更新
-                $orderDetail->getProductClass()->setStock($stock);
-
+                /** @var Product $Product */
+                $Product = $orderDetail->getProductClass()->getProduct();
+                $ProductRD = $Product->getProductReceiptableByDate($Order->getReceiptableDate());
+                if (!$ProductRD) {
+                    throw new ShoppingException('Receiptable date does not found!');
+                }
+                $stockMax = $ProductRD->getMaxQuantity();
+                $stock = $stockMax - $orderDetail->getQuantity();
+                $ProductRD->setMaxQuantity($stock);
+                $em->persist($ProductRD);
             }
         }
 

@@ -29,6 +29,7 @@ use Eccube\Application;
 use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Customer;
+use Eccube\Entity\Master\CustomerRole;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
@@ -70,15 +71,24 @@ class CartController extends AbstractController
 
         if ('POST' == $request->getMethod()) {
             $mode = $request->get('mode');
-            $dateId = $request->get('date_id');
-            if (!$this->checkDateId($dateId)) {
-                throw new NotFoundHttpException();
-            }
+            $date = $request->get('date');
             switch ($mode) {
                 case 'confirm':
-                    $dateTime = DateUtil::getDay($dateId);
-                    /** @var Cart $CartByDate */
-                    $CartByDate = $cartService->getCartByDate($dateTime);
+                    if (!$date) {
+                        throw new NotFoundHttpException();
+                    }
+                    $dateTime = new \DateTime($date);
+                    try {
+                        /** @var Cart $CartByDate */
+                        $CartByDate = $cartService->getCartByDate($dateTime);
+                    } catch (CartException $e) {
+                        log_error('初回受注情報作成エラー', array($e->getMessage()));
+                        $app->addRequestError($e->getMessage());
+                        return $app->redirect($app->url('cart'));
+                    } catch (\Exception $exception) {
+                        $app->addRequestError($exception->getMessage());
+                        return $app->redirect($app->url('cart'));
+                    }
 
                     /** @var  Customer[] $arrCreator */
                     $arrCreator = array();
@@ -105,30 +115,23 @@ class CartController extends AbstractController
                             'reception_date' => $dateTime,
                             'Creators' => $arrCreator,
                             'creator_total' => $arrTotal,
-                            'date_id' => $dateId,
                             'master_date' => $masterDate
                         )
                     );
                 case 'complete':
-                    if (!$cartService->isExistCartDate($dateId)) {
-                        throw new NotFoundHttpException();
-                    }
-                    /** @var ShoppingService $shoppingService */
-                    $shoppingService = $app['eccube.service.shopping'];
-//                $Order = $shoppingService->getOrder($app['config']['order_processing']);
-
-                    $Customer = $app->user();
-                    if (is_null($Customer)) {
+                    if (!$app->isGranted(CustomerRole::RECIPIENT)) {
                         return $app->redirect($app->url('shopping_login'));
                     }
+                    $Customer = $app->user();
 
+                    if (!$date) {
+                        throw new NotFoundHttpException();
+                    }
+                    $dateTime = new \DateTime($date);
+                    /** @var ShoppingService $shoppingService */
+                    $shoppingService = $app['eccube.service.shopping'];
                     try {
-                        $Order = $shoppingService->createOrder($Customer, $dateId);
-                    } catch (CartException $e) {
-                        log_error('初回受注情報作成エラー', array($e->getMessage()));
-                        $app->addRequestError($e->getMessage());
-
-                        return $app->redirect($app->url('cart'));
+                        $Order = $shoppingService->createOrder($Customer, $dateTime);
                     } catch (\Exception $exception) {
                         $app->addRequestError($exception->getMessage());
 
@@ -158,7 +161,7 @@ class CartController extends AbstractController
 
                         return $app->redirect($app->url('shopping_error'));
                     }
-                    $dateTime = DateUtil::getDay($dateId);
+
                     // Remove cart item that complete
                     $CartByDate = $cartService->getCartByDate($dateTime);
                     foreach ($CartByDate->getCartItems() as $cartItem) {
@@ -191,9 +194,6 @@ class CartController extends AbstractController
             'Cart/index.twig',
             array(
                 'Cart' => $Cart,
-//                'least' => $least,
-//                'quantity' => $quantity,
-//                'is_delivery_free' => $isDeliveryFree,
                 'reception_dates' => $receptionDate,
                 'master_date' => $masterDate
             )
@@ -414,9 +414,9 @@ class CartController extends AbstractController
     public function remove(Application $app, Request $request, $productClassId)
     {
         $this->isTokenValid($app);
-        $dateId = $request->get('date_id');
+        $date = $request->get('date');
 
-        log_info('カート削除処理開始', array('product_class_id' => $productClassId, 'date_id' => $dateId));
+        log_info('カート削除処理開始', array('product_class_id' => $productClassId, 'date' => $date));
 
         // FRONT_CART_REMOVE_INITIALIZE
         $event = new EventArgs(
@@ -429,8 +429,8 @@ class CartController extends AbstractController
 
         $productClassId = $event->getArgument('productClassId');
         $date = null;
-        if ($dateId) {
-            $date = DateUtil::getDay($dateId);
+        if ($date) {
+            $date = new \DateTime($date);
         }
         $app['eccube.service.cart']->removeProduct($productClassId, $date)->save();
 
@@ -521,8 +521,8 @@ class CartController extends AbstractController
         try {
 
             foreach ($quantity as $productClassId => $item) {
-                foreach ($item as $dateId => $quantity) {
-                    $date = DateUtil::getDay($dateId);
+                foreach ($item as $date => $quantity) {
+                    $date = new \DateTime($date);
                     $serviceCart->setProductQuantity($productClassId, $quantity, $date)->save();
                 }
             }
@@ -546,22 +546,5 @@ class CartController extends AbstractController
     public function complete(Application $app, Request $request, $id = null)
     {
         return $app->render('Cart/complete.twig', array('id' => $id));
-    }
-
-    /**
-     * @param int $dateId [1->7]
-     * @return bool
-     */
-    private function checkDateId($dateId)
-    {
-        if (!is_numeric($dateId)) {
-            return false;
-        }
-
-        if ($dateId < 1 or $dateId > 7) {
-            return false;
-        }
-
-        return true;
     }
 }

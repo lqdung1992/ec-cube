@@ -894,7 +894,7 @@ class ShoppingController extends AbstractController
         }
 
         if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
-            return $app->redirect($app->url('shopping'));
+            return $app->redirect($app->url('cart'));
         }
 
         /* @var $form \Symfony\Component\Form\FormInterface */

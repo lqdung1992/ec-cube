@@ -10,7 +10,6 @@
 {% block javascript %}
 {% endblock javascript %}
 {% block main %}
-
     <div id="receiver-cart-confirm-wrapper" class="wrapper">
         <div class="container">
         <div id="cart-confirm-main">
@@ -71,7 +70,7 @@
             </div>
             <div class="float-right">
                 <form action="?" method="post" name="cart-complete">
-                    <input type="hidden" name="date_id" value="{{ reception_date|date('N') }}">
+                    <input type="hidden" name="date" value="{{ reception_date|date('Y/m/d') }}">
                     <input type="hidden" name="mode" value="complete">
                 <button class="btn btn-success" type="submit">注文を確定する</button>
                 </form>

@@ -1150,4 +1150,33 @@ class Product extends \Eccube\Entity\AbstractEntity
     {
         $this->ProductRate = $ProductRate;
     }
+
+    /**
+     * @param \DateTime $dateTime
+     * @return int
+     */
+    public function getStockByDate(\DateTime $dateTime)
+    {
+        foreach ($this->getProductReceiptableDates() as $productReceiptableDate) {
+            if ($productReceiptableDate->getDate()->format('Y/m/d') == $dateTime->format('Y/m/d')) {
+                return $productReceiptableDate->getMaxQuantity();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * @param \DateTime $dateTime
+     * @return ProductReceiptableDate|null
+     */
+    public function getProductReceiptableByDate(\DateTime $dateTime)
+    {
+        foreach ($this->getProductReceiptableDates() as $productReceiptableDate) {
+            if ($productReceiptableDate->getDate()->format('Y/m/d') == $dateTime->format('Y/m/d')) {
+                return $productReceiptableDate;
+            }
+        }
+
+        return null;
+    }
 }

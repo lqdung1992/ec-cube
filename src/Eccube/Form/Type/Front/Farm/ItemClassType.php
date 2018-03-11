@@ -35,31 +35,31 @@ class ItemClassType extends AbstractType
                 'required' => false,
             ))
             ->add('stock', 'number', array(
-                'label' => '在庫数',
-                'required' => false,
-                'constraints' => array(
-                    new Assert\Regex(array(
-                        'pattern' => "/^\d+$/u",
-                        'message' => 'form.type.numeric.invalid'
-                    )),
-                ),
-            ))
-            ->add('sale_limit', 'number', array(
                 'label' => '1日あたりの出荷可能数',
                 'required' => false,
                 'constraints' => array(
-                    new Assert\Length(array(
-                        'max' => 10,
-                    )),
-                    new Assert\GreaterThanOrEqual(array(
-                        'value' => 1,
-                    )),
                     new Assert\Regex(array(
                         'pattern' => "/^\d+$/u",
                         'message' => 'form.type.numeric.invalid'
                     )),
                 ),
             ))
+//            ->add('sale_limit', 'number', array(
+//                'label' => '1日あたりの出荷可能数',
+//                'required' => false,
+//                'constraints' => array(
+//                    new Assert\Length(array(
+//                        'max' => 10,
+//                    )),
+//                    new Assert\GreaterThanOrEqual(array(
+//                        'value' => 1,
+//                    )),
+//                    new Assert\Regex(array(
+//                        'pattern' => "/^\d+$/u",
+//                        'message' => 'form.type.numeric.invalid'
+//                    )),
+//                ),
+//            ))
             ->add('price01', 'money', array(
                 'label' => '通常価格',
                 'currency' => 'JPY',

@@ -22,6 +22,11 @@ class ProductReceiptableDate extends \Eccube\Entity\AbstractEntity
     private $product_id;
 
     /**
+     * @var string
+     */
+    private $date;
+
+    /**
      * @var int
      */
     private $date_id;
@@ -115,5 +120,23 @@ class ProductReceiptableDate extends \Eccube\Entity\AbstractEntity
     public function setReceiptableDate($ReceiptableDate)
     {
         $this->ReceiptableDate = $ReceiptableDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDate()
+    {
+        return new \DateTime($this->date);
+    }
+
+    /**
+     * @param \DateTime $date
+     * @return $this
+     */
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date->format('Y-m-d');
+        return $this;
     }
 }

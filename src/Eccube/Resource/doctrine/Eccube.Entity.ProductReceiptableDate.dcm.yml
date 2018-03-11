@@ -8,15 +8,19 @@ Eccube\Entity\ProductReceiptableDate:
             nullable: false
             unsigned: false
             id: true
-        date_id:
-            type: smallint
+        date:
+            type: string
             nullable: false
-            unsigned: false
+            length: 20
             id: true
     fields:
         max_quantity:
             type: integer
             nullable: true
+        date_id:
+            type: smallint
+            nullable: false
+            unsigned: false
     manyToOne:
         Product:
             targetEntity: Eccube\Entity\Product

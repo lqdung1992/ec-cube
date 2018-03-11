@@ -2299,7 +2299,7 @@ img {
     position: absolute;
     top: 15px;
     right: 35px;
-    color: #f1f1f1;
+    color: darkblue;
     font-size: 40px;
     font-weight: bold;
     transition: 0.3s;
@@ -2501,4 +2501,19 @@ input[readonly], textarea[readonly] {
     border: solid 0.5px #cccccc;
     margin: auto;
     margin-bottom: 15px;
+}
+span.required {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border-radius: 10px;
+    background-color: #c94242 !important;
+    margin-left: 5px;
 }
