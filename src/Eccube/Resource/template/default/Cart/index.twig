@@ -73,35 +73,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 $button.parent().find("input").val(newVal);
             });
 
-            var createForm = function (action, data) {
-                var $form = $('<form action="' + action + '" method="post"></form>');
-                for (input in data) {
-                    if (data.hasOwnProperty(input)) {
-                        $form.append('<input name="' + input + '" value="' + data[input] + '">');
-                    }
-                }
-                return $form;
-            };
-
-            $('a[token-for-anchor]').click(function (e) {
-                e.preventDefault();
-                var $this = $(this);
-                var data = $this.data();
-                if (data.confirm != false) {
-                    if (!confirm(data.message ? data.message : '削除してもよろしいですか?')) {
-                        return false;
-                    }
-                }
-
-                var $form = createForm($this.attr('href'), {
-                    _token: $this.attr('token-for-anchor'),
-                    _method: data.method
-                }).hide();
-
-                $('body').append($form); // Firefox requires form to be on the page to allow submission
-                $form.submit();
-            });
-
             // reset modal
             $('.modal').on('hidden.bs.modal', function(){
                 $(this).find('form')[0].reset();
@@ -251,6 +222,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                                     <div class="col-sm-12 col-xs-12 count-modal">
                                         <div class="col-sm-8 col-xs-8 float-left">
                                             <span class="count-date">{{ CartItem.reception_date|date('m月d日') }}({{ master_date[CartItem.reception_date|date('N')].name }})</span>
+                                            <span>{{ Product.name }}</span>
                                             <input type="hidden" class="old-price" value="{{ CartItem.total_price }}">
                                             <p class="count-price">小計：<span class="price_{{ ProductClass.id }}_{{ CartItem.reception_date|date('N') }}">{{ CartItem.total_price }}</span>円</p>
                                         </div>

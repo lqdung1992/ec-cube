@@ -54,12 +54,12 @@ class FrontControllerProvider implements ControllerProviderInterface
         // cart
         $c->match('/cart', '\Eccube\Controller\CartController::index')->bind('cart');
         $c->match('/cart/complete/{id}', '\Eccube\Controller\CartController::complete')->bind('cart_complete')->assert('id', '\d+');
-        $c->post('/cart/add', '\Eccube\Controller\CartController::add')->bind('cart_add');
+//        $c->post('/cart/add', '\Eccube\Controller\CartController::add')->bind('cart_add');
         $c->post('/cart/modify', '\Eccube\Controller\CartController::modify')->bind('cart_modify');
-        $c->put('/cart/up/{productClassId}', '\Eccube\Controller\CartController::up')->bind('cart_up')->assert('productClassId', '\d+');
-        $c->put('/cart/down/{productClassId}', '\Eccube\Controller\CartController::down')->bind('cart_down')->assert('productClassId', '\d+');
+//        $c->put('/cart/up/{productClassId}', '\Eccube\Controller\CartController::up')->bind('cart_up')->assert('productClassId', '\d+');
+//        $c->put('/cart/down/{productClassId}', '\Eccube\Controller\CartController::down')->bind('cart_down')->assert('productClassId', '\d+');
         // setquantity deprecated since 3.0.0, to be removed in 3.1
-        $c->put('/cart/setQuantity/{productClassId}/{quantity}', '\Eccube\Controller\CartController::setQuantity')->bind('cart_set_quantity')->assert('productClassId', '\d+')->assert('quantity', '\d+');
+//        $c->put('/cart/setQuantity/{productClassId}/{quantity}', '\Eccube\Controller\CartController::setQuantity')->bind('cart_set_quantity')->assert('productClassId', '\d+')->assert('quantity', '\d+');
         $c->put('/cart/remove/{productClassId}', '\Eccube\Controller\CartController::remove')->bind('cart_remove')->assert('productClassId', '\d+');
         $c->match('/cart/buystep', '\Eccube\Controller\CartController::buystep')->bind('cart_buystep');
 
@@ -83,6 +83,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/block/search_product', '\Eccube\Controller\Block\SearchProductController::index')->bind('block_search_product');
         $c->match('/block/news', '\Eccube\Controller\Block\NewsController::index')->bind('block_news');
         $c->match('/block/login', '\Eccube\Controller\Block\LoginController::index')->bind('block_login');
+        $c->match('/block/product', '\Eccube\Controller\Block\ProductListController::index')->bind('block_product_list');
 
         // 特定商取引 order -> help/traderaw
         $c->match('/help/about', '\Eccube\Controller\HelpController::about')->bind('help_about');
@@ -117,19 +118,21 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/service', '\Eccube\Controller\Farm\FarmServiceController::index')->bind('farm_service');
         $c->match('/farm/service/profile', '\Eccube\Controller\Farm\FarmServiceController::profile')->bind('farm_service_profile');
         $c->match('/farm/service/profile/setting', '\Eccube\Controller\Farm\FarmServiceController::settingProfile')->bind('farm_service_profile_setting');
+
+        // Farm change password
         $c->match('/farm/farmer/password/change', '\Eccube\Controller\Farm\FarmerController::changePassword')->bind('farm_farmer_password_change');
 
         // farm - profile
         $c->match('/farm/profile', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile_own');
-        $c->match('/farm/profile/edit', '\Eccube\Controller\Farm\FarmerController::editProfile')->bind('farm_profile_edit');
         $c->match('/farm/profile/{id}', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile')->assert('id', '\d+');
+        $c->match('/farm/profile/edit', '\Eccube\Controller\Farm\FarmerController::editProfile')->bind('farm_profile_edit');
         $c->match('/farm/profile/voice/{id}/delete', '\Eccube\Controller\Farm\FarmerController::deleteVoice')->bind('farm_profile_voice_delete')->assert('id', '\d+');
         // Add image ajax
         $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
 
         // farm - home
-        $c->match('/farm/home', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home');
-        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmerController::home')->bind('farm_home_other')->assert('id', '\d+');
+        $c->match('/farm/home', '\Eccube\Controller\Farm\FarmHomeController::index')->bind('farm_home');
+        $c->match('/farm/home/{id}', '\Eccube\Controller\Farm\FarmHomeController::index')->bind('farm_home_other')->assert('id', '\d+');
 
         // farm - add item
         $c->match('/farm/item/new', '\Eccube\Controller\Farm\FarmerController::item')->bind('farm_item_new');
@@ -140,8 +143,12 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/order/{id}', '\Eccube\Controller\OrderController::index')->bind('order')->assert('id', '\d+');
 
         // Farm order history
-        $c->match('/farm/history', '\Eccube\Controller\Farm\FarmerController::history')->bind('farm_history');
-        $c->match('/farm/history/{id}', '\Eccube\Controller\Farm\FarmerController::historyDetail')->bind('farm_history_detail')->assert('id', '\d+');
+        $c->match('/farm/history', '\Eccube\Controller\Farm\FarmHistoryController::index')->bind('farm_history');
+        $c->match('/farm/history/{id}', '\Eccube\Controller\Farm\FarmHistoryController::historyDetail')->bind('farm_history_detail')->assert('id', '\d+');
+
+        // Farm notice
+        $c->match('/farm/notice', '\Eccube\Controller\Farm\NoticeController::index')->bind('farm_notice');
+        $c->match('/farm/notice/{id}', '\Eccube\Controller\Farm\NoticeController::index')->bind('farm_notice_view')->assert('id', '\d+');
 
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');
