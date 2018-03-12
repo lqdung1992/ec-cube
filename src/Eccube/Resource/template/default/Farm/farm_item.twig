@@ -331,8 +331,8 @@
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group form-inline">
-                        {#<label class="display-block">1点あたりの量<span class="badge wait-approve">必須</span></label>#}
-                        {{ form_label(form.class.amount) }}
+                        <label class="display-block">1点あたりの量<span class="badge wait-approve">必須</span></label>
+                        {#{{ form_label(form.class.amount) }}#}
                         {{ form_errors(form.class.amount) }}
                         {{ form_errors(form.class.amount_unit_type) }}
                         {{ form_widget(form.class.amount) }}

@@ -146,10 +146,14 @@
         border: 1px solid #ddd !important;
     }
 </style>
-<div class="container">
+<div class="container" id="product-list">
     <div class="row">
         <div class="col-xs-12 col-sm-12">
-            <h3>Product list</h3>
+            <p class="product-list-title">
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/asset/asset1.PNG">
+                <span class="title20">やさいバスの新着商品</span>
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/asset/asset2.PNG">
+            </p>
         </div>
     </div>
     {% if Products|length > 0 %}
@@ -184,4 +188,5 @@
             </div>
         </div>
     {% endif %}
+    <button class="btn btn-success btn-labelmedium">新着商品をもっと見る</button>
 </div>

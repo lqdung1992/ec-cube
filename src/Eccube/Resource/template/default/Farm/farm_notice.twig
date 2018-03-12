@@ -7,6 +7,15 @@
 {% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
+    <style type="text/css">
+        .list-group-item:hover {
+            background-color: #f7f7f7 !important;
+        }
+
+        .notice-section, .news-section {
+            min-height: 600px;
+        }
+    </style>
 {% endblock stylesheet %}
 {% block javascript %}
     <script type="text/javascript">
@@ -61,6 +70,7 @@
                         <a href="{{ New.url }}" {% if New.link_method == '1' %}target="_blank"{% endif %}>
                     {% endif %}
                         <span class="profile-name-medium color222">{{ New.title }}</span>
+                        <span class="color888">{{ New.comment }}</span>
                         <span class="color888 float-right title12 notice-time">{{ New.date|date('m月d日 H:i') }}</span>
                     {% if New.url %}
                     </a>

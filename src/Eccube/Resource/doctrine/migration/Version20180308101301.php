@@ -70,6 +70,9 @@ class Version20180308101301 extends AbstractMigration
         if (!$table->hasColumn('farmer_id')) {
             $this->addSql('ALTER TABLE dtb_order ADD farmer_id int;');
         }
+        //add farmer notice
+        $this->addSql("INSERT INTO dtb_page_layout (device_type_id, page_name, url, file_name, edit_flg, author, description, keyword, update_url, create_date, update_date, meta_robots) VALUES (10, 'Farm Notice', 'farm_notice', 'Farm/farm_notice.twig', 2, NULL, NULL, NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);");
+
 
         return true;
     }

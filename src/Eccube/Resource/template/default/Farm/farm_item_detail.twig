@@ -9,6 +9,9 @@
 {% set body_class = ' ' %}
 {% block stylesheet %}
     <style type="text/css">
+        #order_button {
+            width: 92% !important;
+        }
     </style>
 {% endblock stylesheet %}
 
@@ -376,7 +379,7 @@
                     {{ form_widget(cartForm.product_id) }}
                     {{ form_widget(cartForm.product_class_id) }}
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="top:0px; right: 6px">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="top:-6px; right: 6px">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
