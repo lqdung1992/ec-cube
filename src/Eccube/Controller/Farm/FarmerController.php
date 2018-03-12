@@ -16,9 +16,8 @@ use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
-use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Master\ReceiptableDate;
-use Eccube\Entity\Order;
+use Eccube\Entity\Notification;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
@@ -27,7 +26,6 @@ use Eccube\Entity\ProductTag;
 use Eccube\Exception\CartException;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
-use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductRepository;
 use Eccube\Service\CartService;
 use Eccube\Util\EntityUtil;
@@ -52,19 +50,19 @@ class FarmerController extends AbstractController
      *
      * @param Application $app
      * @param Request $request
-     * @param $id
+     * @param null $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function index(Application $app, Request $request, $id = null)
     {
+        if (!$app->isGranted("IS_AUTHENTICATED_FULLY")) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
         $isOwner = false;
         /** @var Customer $Customer */
         $Customer = $app->user();
-        // Todo: check is farmer
-        // || !$app->isGranted(CustomerRole::FARMER)
-        if (!($Customer instanceof Customer)) {
-            return $app->redirect($app->url('mypage_login'));
-        }
         if ($id) {
             /** @var CustomerRepository $repo */
             $repo = $app['eccube.repository.customer'];
@@ -99,6 +97,11 @@ class FarmerController extends AbstractController
             $voice->setTargetCustomer($TargetCustomer);
             $app['orm.em']->persist($voice);
             $app['orm.em']->flush();
+
+            if ($TargetCustomer->getId() != $Customer->getId()) {
+                $app['eccube.repository.notification']
+                    ->insertNotice($Customer, $TargetCustomer, Notification::TYPE_PROFILE, $id);
+            }
 
             return $app->redirect($app->url('farm_profile', array('id' => $TargetCustomer->getId(), 'voice' => 1)));
         }
@@ -317,103 +320,6 @@ class FarmerController extends AbstractController
         }
 
         return $app->json(array('files' => $files), 200);
-    }
-
-    /**
-     * @param Application $app
-     * @param Request $request
-     * @param $id
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function home(Application $app, Request $request, $id = null)
-    {
-        /** @var Customer $Customer */
-        $Customer = $app->user();
-        if (!($Customer instanceof Customer)) {
-            return $app->redirect($app->url('mypage_login'));
-        }
-        $TargetCustomer = null;
-        if ($id) {
-            $TargetCustomer = $app['eccube.repository.customer']->find($id);
-            if (!$TargetCustomer) {
-                throw new NotFoundHttpException();
-            }
-        }
-        if (!$TargetCustomer) {
-            $TargetCustomer = $Customer;
-        }
-
-        /** @var ProductRepository $productRepo */
-        $productRepo = $app['eccube.repository.product'];
-        $productList = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
-        /** @var OrderRepository $orderRepos */
-        $orderRepos = $app['eccube.repository.order'];
-        $arrStatusTransaction = array(
-            $app['config']['order_new'],
-        );
-        /** @var Order[] $orderTransaction */
-        $orderTransaction = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusTransaction)->getQuery()->getResult();
-        $orderTransactionByDate = array();
-        if ($orderTransaction) {
-            foreach ($orderTransaction as $order) {
-                if ($order->getReceiptableDate()) {
-                    $orderTransactionByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
-                }
-            }
-        }
-
-        $arrStatusDelivery = array(
-            OrderStatus::ORDER_PREPARE,
-            OrderStatus::ORDER_PICKUP,
-        );
-        /** @var Order[] $orderDelivery */
-        $orderDelivery = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusDelivery)->getQuery()->getResult();
-        $orderDeliveryByDate = array();
-        if ($orderDelivery) {
-            foreach ($orderDelivery as $order) {
-                if ($order->getReceiptableDate()) {
-                    $orderDeliveryByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
-                }
-            }
-        }
-
-        $arrStatusComplete = array(
-            OrderStatus::ORDER_DONE,
-        );
-
-        /** @var FormBuilder $builder */
-        $builder = $app['form.factory']->createNamedBuilder('', 'home_complete');
-        if ($request->getMethod() === 'GET') {
-            $builder->setMethod('GET');
-        }
-
-        $formOrderBy = $builder->getForm();
-        $formOrderBy->handleRequest($request);
-        $queryBuilder = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusComplete);
-        $queryBuilder->resetDQLPart('orderBy');
-        $data = $formOrderBy->getData();
-        $orderBy = isset($data['order_by']) ? $data['order_by'] : Order::SORT_BY_NEW;
-        switch ($orderBy) {
-            case Order::SORT_BY_TOTAL:
-                $queryBuilder->orderBy('o.total', 'DESC');
-                break;
-            case Order::SORT_BY_NEW:
-            default:
-                $queryBuilder->orderBy('o.update_date', 'DESC');
-                break;
-
-        }
-        /** @var Order[] $orderComplete */
-        $orderComplete = $queryBuilder->getQuery()->getResult();
-
-        return $app->render('Farm/farm_home.twig', array(
-            'Products' => $productList,
-            'TargetCustomer' => $TargetCustomer,
-            'OrderTransactionByDate' => $orderTransactionByDate,
-            'OrderDeliveryByDate' => $orderDeliveryByDate,
-            'formOrderBy' => $formOrderBy->createView(),
-            'OrderComplete' => $orderComplete,
-        ));
     }
 
     /**
@@ -672,6 +578,7 @@ class FarmerController extends AbstractController
      * @param Request $request
      * @param $id
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function detail(Application $app, Request $request, $id)
     {
@@ -683,8 +590,6 @@ class FarmerController extends AbstractController
         if (!$Product) {
             throw new NotFoundHttpException();
         }
-        $TargetCustomer = $Product->getCreator();
-        $Customer = $app->user();
 
         $voice = new CustomerVoice();
         /** @var FormBuilder $builder */
@@ -699,7 +604,6 @@ class FarmerController extends AbstractController
         $cartForm = $builderCart->getForm();
 
         $mode = $request->get('mode');
-
         switch ($mode) {
             case 'add_cart':
                 $cartForm->handleRequest($request);
@@ -722,9 +626,12 @@ class FarmerController extends AbstractController
             case 'add_voice':
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
-                    if (!($Customer instanceof Customer)) {
+                    if (!$app->isGranted("IS_AUTHENTICATED_FULLY")) {
                         return $app->redirect($app->url('mypage_login'));
                     }
+                    $Customer = $app->user();
+                    $TargetCustomer = $Product->getCreator();
+
                     /** @var UploadedFile $image */
                     $image = $form['file_name']->getData();
                     if ($image) {
@@ -738,6 +645,10 @@ class FarmerController extends AbstractController
                     $voice->setProduct($Product);
                     $app['orm.em']->persist($voice);
                     $app['orm.em']->flush();
+                    if ($TargetCustomer->getId() != $Customer->getId()) {
+                        $app['eccube.repository.notification']
+                            ->insertNotice($Customer, $TargetCustomer, Notification::TYPE_PRODUCT, $Product->getId(), $Product->getName());
+                    }
                 }
                 break;
             default:
@@ -758,108 +669,6 @@ class FarmerController extends AbstractController
             'CustomerVoice' => $CustomerVoice,
             'ProductRate' => $ProductRate,
             'cartForm' => $cartForm->createView(),
-        ));
-    }
-
-    public function history(Application $app, Request $request)
-    {
-        if (!$app->isGranted('ROLE_FARMER')) {
-            throw new NotFoundHttpException();
-        }
-        $Customer = $app->user();
-
-        /** @var ProductRepository $productRepository */
-        $productRepository = $app['eccube.repository.product'];
-        $queryBuilder = $productRepository->getProductQueryBuilderForHistory($Customer);
-        $history = $queryBuilder->getQuery()->getResult();
-
-        return $app->render('Farm/history.twig', array(
-            'history' => $history
-        ));
-    }
-
-    public function historyDetail(Application $app, Request $request, $id)
-    {
-        if (!$app->isGranted('ROLE_FARMER')) {
-            throw new NotFoundHttpException();
-        }
-        /** @var ProductRepository $productRepository */
-        $productRepository = $app['eccube.repository.product'];
-        $Product = $productRepository->find($id);
-        if (!$Product) {
-            throw new NotFoundHttpException();
-        }
-
-        if ($request->getMethod() == 'PUT') {
-            $this->isTokenValid($app);
-
-            $CopyProduct = clone $Product;
-            $CopyProduct->copy();
-            $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_HIDE);
-            $CopyProduct->setStatus($Disp);
-
-            $CopyProductCategories = $CopyProduct->getProductCategories();
-            /** @var EntityManager $em */
-            $em = $app['orm.em'];
-            foreach ($CopyProductCategories as $Category) {
-                $em->persist($Category);
-            }
-
-            // 規格あり商品の場合は, デフォルトの商品規格を取得し登録する.
-            if ($CopyProduct->hasProductClass()) {
-                $softDeleteFilter = $em->getFilters()->getFilter('soft_delete');
-                $softDeleteFilter->setExcludes(array(
-                    'Eccube\Entity\ProductClass'
-                ));
-                $dummyClass = $app['eccube.repository.product_class']->findOneBy(array(
-                    'del_flg' => \Eccube\Common\Constant::ENABLED,
-                    'ClassCategory1' => null,
-                    'ClassCategory2' => null,
-                    'Product' => $Product,
-                ));
-                $dummyClass = clone $dummyClass;
-                $dummyClass->setProduct($CopyProduct);
-                $CopyProduct->addProductClass($dummyClass);
-                $softDeleteFilter->setExcludes(array());
-            }
-
-            $CopyProductClasses = $CopyProduct->getProductClasses();
-            foreach ($CopyProductClasses as $Class) {
-                $Stock = $Class->getProductStock();
-                $CopyStock = clone $Stock;
-                $CopyStock->setProductClass($Class);
-                $em->persist($CopyStock);
-
-                $em->persist($Class);
-            }
-            $Images = $CopyProduct->getProductImage();
-            foreach ($Images as $Image) {
-                // 画像ファイルを新規作成
-                $extension = pathinfo($Image->getFileName(), PATHINFO_EXTENSION);
-                $filename = date('mdHis').uniqid('_').'.'.$extension;
-                try {
-                    $fs = new Filesystem();
-                    $fs->copy($app['config']['image_save_realdir'].'/'.$Image->getFileName(), $app['config']['image_save_realdir'].'/'.$filename);
-                } catch (\Exception $e) {
-                    // エラーが発生しても無視する
-                }
-                $Image->setFileName($filename);
-
-                $em->persist($Image);
-            }
-            $Tags = $CopyProduct->getProductTag();
-            foreach ($Tags as $Tag) {
-                $em->persist($Tag);
-            }
-
-            $em->persist($CopyProduct);
-
-            $em->flush($CopyProduct);
-            return $app->redirect($app->url('farm_item_edit', array('id' => $CopyProduct->getId())));
-        }
-
-        return $app->render('Farm/history_detail.twig', array(
-            'Product' => $Product
         ));
     }
 
