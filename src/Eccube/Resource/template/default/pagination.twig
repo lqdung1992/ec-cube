@@ -25,6 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     {% set pageinrange  = false %}
 {% endif %}
 
+{% set section = section|default('product') %}
+
 {% if pages.pageCount > 1 %}
 <div id="pagination_wrap" >
     <ul class="pagination">
@@ -51,11 +53,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
         {% for page in pages.pagesInRange %}
             {% if page == pages.current %}
                 <li class="page-item pagenation__item">
-                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'pageno': page})) }}" class="page-link active"> {{ page }} </a>
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'pageno': page, 'section': section})) }}" class="page-link active"> {{ page }} </a>
                 </li>
             {% else %}
                 <li class="page-item pagenation__item">
-                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'pageno': page})) }}" class="page-link inactive"> {{ page }} </a></li>
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'pageno': page, 'section': section})) }}" class="page-link inactive"> {{ page }} </a></li>
             {% endif %}
         {% endfor %}
 

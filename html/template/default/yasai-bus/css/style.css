@@ -2503,6 +2503,34 @@ span.required {
     background-color: #c94242 !important;
     margin-left: 5px;
 }
-.news-section {
+.news-section, .recommend-section, .quick-section, .favorite-section {
     display: none;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top:50%;
+    left:50%;
+    width:32px;
+    height:32px;
+    background: url("./ajax-loader.gif");
+}
+
+.thumbnail .image-box {
+    position: relative;
+}
+
+.thumbnail .image-box .unlike-icon {
+    display: none;
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+}
+
+.thumbnail .image-box .like-icon {
+    display: block;
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
 }

@@ -372,7 +372,7 @@ class ProductRepository extends EntityRepository
         $now = new \DateTime();
         $now = $now->format('Y-m-d 00:00:00');
         $qb = $this->createQueryBuilder('p')
-            ->innerJoin('Eccube\Entity\ProductClass', 'pc', Join::WITH, 'pc.Product = p.id')
+            ->innerJoin('p.ProductClasses', 'pc')
             ->where('p.Status = 1');
         $qb->andWhere(':date <= pc.production_end_date')
             ->setParameter('date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);

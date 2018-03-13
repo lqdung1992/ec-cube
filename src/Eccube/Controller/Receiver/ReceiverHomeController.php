@@ -15,6 +15,7 @@ use Eccube\Entity\Master\CustomerRole;
 use Eccube\Repository\CustomerFavoriteProductRepository;
 use Eccube\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReceiverHomeController extends AbstractController
 {
@@ -31,21 +32,54 @@ class ReceiverHomeController extends AbstractController
             return $app->redirect($app->url('mypage_login'));
         }
 
+        if (!$app->isGranted(CustomerRole::RECIPIENT)) {
+            throw new NotFoundHttpException();
+        }
+
         /** @var ProductRepository $productRepo */
         $productRepo = $app['eccube.repository.product'];
         $qb = $productRepo->getProductQueryBuilderAll();
         $max = $app['eccube.repository.master.product_list_max']->findOneBy(array(), array('rank' => 'ASC'));
 
-        $pageNo = $request->get('pageno', 1);
-        $pagination = $app['paginator']()->paginate(
+        $pageNo = 1;
+        $pageNoFav = 1;
+        $pageNoQuick = 1;
+        $pageNoRec = 1;
+        $section = $request->get('section');
+        switch ($section) {
+            case 'quick':
+                $pageNoQuick = $request->get('pageno', 1);
+                break;
+            case 'recommend':
+                $pageNoRec = $request->get('pageno', 1);
+                break;
+            case 'favorite':
+                $pageNoFav = $request->get('pageno', 1);
+                break;
+            default:
+                $pageNo = $request->get('pageno', 1);
+                break;
+        }
+        $paginator = $app['paginator']();
+        $pagination = $paginator->paginate(
             $qb,
             $pageNo,
             $max->getId()
         );
 
+        /** @var CustomerFavoriteProductRepository $favoriteRepo */
+        $favoriteRepo = $app['eccube.repository.customer_favorite_product'];
+        $qbFavorite = $favoriteRepo->getQueryBuilderByCustomer($Customer);
+
+        $Favorites = $paginator->paginate(
+            $qbFavorite,
+            $pageNoFav,
+            $max->getId()
+        );
         return $app->render('Receiver/receiver_home.twig', array(
             'Products' => $pagination,
-            'Customer' => $Customer
+            'Customer' => $Customer,
+            'Favorites' => $Favorites
         ));
     }
 
@@ -53,6 +87,7 @@ class ReceiverHomeController extends AbstractController
      * @param Application $app
      * @param Request $request
      * @return bool
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function actionFavorite(Application $app, Request $request)
     {
