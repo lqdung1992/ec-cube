@@ -361,4 +361,27 @@ class ProductRepository extends EntityRepository
 
         return $qb;
     }
+
+    /**
+     * Get query builder for receipt product list
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getProductQueryBuilderAll()
+    {
+        $now = new \DateTime();
+        $now = $now->format('Y-m-d 00:00:00');
+        $qb = $this->createQueryBuilder('p')
+            ->innerJoin('Eccube\Entity\ProductClass', 'pc', Join::WITH, 'pc.Product = p.id')
+            ->where('p.Status = 1');
+        $qb->andWhere(':date <= pc.production_end_date')
+            ->setParameter('date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);
+
+        // Order By
+        // XXX Paginater を使用した場合に PostgreSQL で正しくソートできない
+        $qb->orderBy('p.create_date', 'DESC');
+        $qb->groupBy('p.id');
+
+        return $qb;
+    }
 }

@@ -1,0 +1,166 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        .image-box {
+            position: relative;
+        }
+
+        .image-box .unlike-icon {
+            display: none;
+            position: absolute;
+            bottom: 5%;
+            right: 5%;
+            z-index: 100;
+        }
+
+        .image-box .like-icon {
+            display: block;
+            position: absolute;
+            bottom: 5%;
+            right: 5%;
+            z-index: 99;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $(".exhibition li").click(function () {
+                var $class = $(this).data('text');
+                $(this).parent().find('li').each(function (index, value) {
+                    $(value).removeClass('enable').addClass('disable');
+                    $('.'+$(value).data('text')).hide();
+                });
+                $(this).addClass('enable').removeClass('disable');
+                $('.'+$class).show();
+            });
+
+            $(window).load(function() {
+                $('.thumbnail').matchHeight();
+            });
+
+
+            $('.like-icon').click(function() {
+                $.ajax({
+                    url: "{{ url('receiver_favorite_action') }}",
+                    type: "post",
+                    dataType: 'json',
+                    data: {'id' : $(this).data('id')}
+                }).done(function (data) {
+                    $(".like-icon").hide();
+                    $(".unlike-icon").show();
+                });
+            });
+
+            $('.unlike-icon').click(function() {
+                $.ajax({
+                    url: "{{ url('receiver_favorite_action') }}",
+                    type: "post",
+                    dataType: 'json',
+                    data: {'id' : $(this).data('id')}
+                }).done(function (data) {
+                    $(".unlike-icon").hide();
+                    $(".like-icon").show();
+                });
+            });
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper container">
+        <div class="exhibition">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <ul class="list-inline">
+                        <li class="col-sm-3 col-xs-3 text-alight-center enable " id="product-section" data-text="product-section">新着</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="quick-section" data-text="quick-section">明後日届く</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="recommend-section" data-text="recommend-section">おすすめ</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="favorite-section" data-text="favorite-section">お気に入り</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Products|length > 0 %}
+                        {% for Product in Products %}
+                            {% set TargetCustomer = Product.Creator %}
+                            <div class="col-sm-3 col-xs-6 thumbnail">
+                                <div class="image-box">
+                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-inactive.svg" class="like-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: none;"{% endif %}>
+                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: block;"{% endif %}>
+                                </div>
+                                <div class="caption">
+                                    <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                    <div class="row mg20">
+                                        <div class="col-sm-12 col-xs-12">
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                        <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                        <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span class="title12 display-block">出品されている商品はありません</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if Products.totalItemCount > 0 %}
+            <div class="row">
+                <div class="col-xs-12 col-sm-12">
+                        {% include "pagination.twig" with { 'pages' : Products.paginationData } %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="quick-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                </div>
+            </div>
+        </div>
+
+        <div class="recommend-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                </div>
+            </div>
+        </div>
+
+        <div class="favorite-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

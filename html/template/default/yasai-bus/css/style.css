@@ -1127,20 +1127,6 @@ img {
     margin-left: 5px;
 }
 
-.unlike-icon {
-    position: absolute;
-    top: 100px;
-    left: 139px;
-    z-index: 100;
-}
-
-.like-icon {
-    position: absolute;
-    top: 100px;
-    left: 139px;
-    z-index: 99;
-}
-
 .top-left {
     top: 98px;
     left: 138px;
