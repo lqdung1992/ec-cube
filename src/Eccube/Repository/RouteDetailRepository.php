@@ -178,4 +178,32 @@ class RouteDetailRepository extends EntityRepository
 
         return $results;
     }
+
+    public function getDriveCargoDetail($busStopNo, $date) {
+
+        $sql = 'SELECT '.
+                'container_amount as total_amount, '.
+                'bus_stop, '.
+                'dtb_customer.name01 as name1, '.
+                'dtb_customer.name02 as name2, order_id '.
+                'FROM '.
+                'dtb_order '.
+                'LEFT JOIN dtb_customer ON dtb_order.customer_id = dtb_customer.customer_id '.
+                'WHERE '.
+                'receiptable_date = ? '.
+                'AND bus_stop = ?';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('total_amount', 'total_amount');
+        $rsm->addScalarResult('bus_stop', 'bus_stop');
+        $rsm->addScalarResult('name1', 'name1');
+        $rsm->addScalarResult('name2', 'name2');
+        $rsm->addScalarResult('order_id', 'order_id');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $date. ' 00:00:00');
+        $query->setParameter(2, $busStopNo);
+        $results = $query->getResult();
+
+        return $results;
+    }
 }

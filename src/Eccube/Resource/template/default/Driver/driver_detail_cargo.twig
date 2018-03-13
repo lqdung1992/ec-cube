@@ -29,12 +29,21 @@
             text-indent: -9999px;
         }
 
+        .wrapper {
+            min-height: 600px;
+        }
+
         @media only screen and (min-width: 768px) {
             .pickup {
                 padding-left: 20%;
                 margin-top: 20px;
                 margin-bottom: 20px;
                 border-bottom: 1px solid #c3c3c3;
+            }
+
+            #cart-done-button {
+                width: 96% !important;
+                margin: 25px;
             }
         }
         /******************************
@@ -47,9 +56,31 @@
                 margin-bottom: 20px;
                 border-bottom: 1px solid #c3c3c3;
             }
+
+            #cart-done-button {
+                width: 96% !important;
+                margin: 25px 2px;
+            }
         }
     </style>
 {% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $('.check-active-icon').click(function () {
+                $(this).parent().addClass('hidden');
+                var id = $(this).attr('container-id');
+                if ($(this).hasClass('active')) {
+                    $('#inactive'+id).parent().removeClass('hidden');
+                } else {
+                    $('#active'+id).parent().removeClass('hidden');
+                }
+
+            });
+        })
+    </script>
+{% endblock javascript %}
+
 
 {% block main %}
     <div id="reicever-wrapper" class="wrapper">
@@ -61,7 +92,7 @@
             <div class="col-sm-12 col-xs-12 wrapper" id="driver-wrapper">
                 <div class="header-bottom">
                     <div class="ml39">
-                        <span class="layer-big">バス停 A</span>
+                        <span class="layer-big">{{ BusStop.name }}</span>
                     </div>
                 </div>
 
@@ -76,153 +107,64 @@
                     </div>
                 </div>
 
-                <div class="pickup">
-                    <p class="section-title color888">レストランA</p>
-                    <div class="body-item form-inline">
-                        <span class="section-name">
-                            <span class="title16">S01-11111111 </span>
-                            <span class="color888">(積み替え)</span>
-                        </span>
+                {% if results|length > 0 %}
+                    {% set index = 0 %}
+                    {% for result in results %}
+                        <div class="pickup">
+                            <p class="section-title color888">{{ result.name1 }} {{ result.name2 }}</p>
+                            <div class="body-item form-inline">
+                            <span class="section-name">
+                                <span class="title16">注文番号 : {{ result.order_id }}</span>
+                                <span class="color888">(積み替え)</span>
+                            </span>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="check-item">
+                                <ul class="list-inline">
+                                    <li>
+                                        <div class="checkbox">
+                                            <ul class="list-inline">
+                                                <li>
+                                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg"
+                                                         class="container-icon">
+                                                    <span class="text-indent999">01</span>
+                                                </li>
+                                                {% for i in 1..result.total_amount %}
+                                                    {% set index = index + 1 %}
+                                                    <li>
+                                                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-inactive.svg"
+                                                             class="check-active-icon" id="inactive{{ index }}" container-id="{{ index }}">
+                                                        <span>0{{ i }}</span>
+                                                    </li>
+                                                    <li class="hidden">
+                                                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg"
+                                                             class="check-active-icon active" id="active{{ index }}" container-id="{{ index }}">
+                                                        <span>0{{ i }}</span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div>
+                        <p>
+                            <a href="{{ url('contact') }}" class="float-right margin-right15">コンテナや商品に不備があった場合</a>
+                        </p>
+                        <a href="{{ url('driver_home', {'id': BusStop.id}) }}" class="btn btn-success" id="cart-done-button">配荷を完了する</a>
                     </div>
-                    <div class="clearfix"></div>
-                    <div class="check-item">
-                        <ul class="list-inline">
-                            <li>
-                                <div class="checkbox">
-                                    <ul class="list-inline">
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg" class="container-icon">
-                                            <span class="text-indent999">01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-inactive.svg" class="check-active-icon">
-                                            <span>01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-inactive.svg" class="check-active-icon">
-                                            <span>02</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-inactive.svg" class="check-active-icon">
-                                            <span>03</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {% else %}
+                    <div id="list_box" class="box-body no-padding">
+                        <div id="list_box__not_find_Bus" class="data-empty">
+                            <svg class="cb cb-inbox">
+                                <use xlink:href="#cb-inbox"/>
+                            </svg>
+                            <p class="text-center" style="text-align: center">データはありません</p></div>
+                    </div><!-- /.box-body -->
+                {% endif %}
 
-                <div class="pickup">
-                    <p class="section-title color888">レストランA</p>
-                    <div class="body-item form-inline">
-                        <span class="section-name">
-                            <span class="title16">S01-11111111 </span>
-                            <span class="color888">(積み替え)</span>
-                        </span>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="check-item">
-                        <ul class="list-inline">
-                            <li>
-                                <div class="checkbox">
-                                    <ul class="list-inline">
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg" class="container-icon">
-                                            <span class="text-indent999">01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>02</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>03</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="pickup">
-                    <p class="section-title color888">レストランA</p>
-                    <div class="body-item form-inline">
-                        <span class="section-name">
-                            <span class="title16">S01-11111111 </span>
-                            <span class="color888">(積み替え)</span>
-                        </span>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="check-item">
-                        <ul class="list-inline">
-                            <li>
-                                <div class="checkbox">
-                                    <ul class="list-inline">
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg" class="container-icon">
-                                            <span class="text-indent999">01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>02</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>03</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="pickup">
-                    <p class="section-title color888">レストランA</p>
-                    <div class="body-item form-inline">
-                        <span class="section-name">
-                            <span class="title16">S01-11111111 </span>
-                            <span class="color888">(積み替え)</span>
-                        </span>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="check-item">
-                        <ul class="list-inline">
-                            <li>
-                                <div class="checkbox">
-                                    <ul class="list-inline">
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg" class="container-icon">
-                                            <span class="text-indent999">01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>01</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>02</span>
-                                        </li>
-                                        <li>
-                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg" class="check-active-icon">
-                                            <span>03</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -230,14 +172,14 @@
     <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
         <div class="Rectangle">
             <ul class="list-group" id="main-menu">
-                <li class="list-group-item li-profile">
-                    {#{% if TargetCustomer.profile_image %}#}
-                        {#{% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}#}
-                    {#{% endif %}#}
-                    {#<img id="upload-image" src="{{ img }}" alt="profile" class="img-circle small-profile">#}
-                    {#<span class="profile-name">{{ TargetCustomer.__toString }}</span>#}
-                    {#<span class="button-x">X</span>#}
-                </li>
+                {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+                    <li class="list-group-item li-profile">
+                        <img id="upload-image" src="{{ app.config.image_save_urlpath }}/{{ app.user.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                        <span class="profile-name">{{ app.user.__toString }}</span>
+                        <span class="button-x">X</span>
+                    </li>
+                {% endif %}
+                <li class="list-group-item"><a href="{{ url('driver_home') }}">今日の運行スケジュール</a></li>
                 <li class="list-group-item"><a href="{{ url('contact') }}">お問い合わせ</a></li>
             </ul>
         </div>

@@ -82,6 +82,15 @@
         #driver-wrapper {
             min-height: 600px;
         }
+
+        div.rectangle-content {
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
     </style>
 {% endblock stylesheet %}
 
@@ -107,20 +116,22 @@
                 </div>
 
                 {% for Bus in BusSchedule %}
-                    <div class="rectangle-content">
-                        <div class="rectangle-title">
-                            <span class="text-left">{{ Bus.move_time }}</span>
-                            <span class="text-center">{{ Bus.name }}</span>
+                    <a href="{{ url('driver_detail_cargo', {'id': Bus.bus_stop_id}) }}">
+                        <div class="rectangle-content">
+                            <div class="rectangle-title">
+                                <span class="text-left">{{ Bus.move_time }}</span>
+                                <span class="text-center">{{ Bus.name }}</span>
+                            </div>
+                            <div class="rectangle-detail">
+                                <span class="text-tiny">配荷数</span>
+                                <span class="text-center">{{ Bus.total_amount }}</span>
+                                <span class="text-tiny ml30p">集荷数</span>
+                                <span class="text-center">{{ Bus.farmer_total_amount }}</span>
+                                <span class="text-tiny ml30p">積載率</span>
+                                <span class="text-center">50%</span>
+                            </div>
                         </div>
-                        <div class="rectangle-detail">
-                            <span class="text-tiny">配荷数</span>
-                            <span class="text-center">{{ Bus.total_amount }}</span>
-                            <span class="text-tiny ml30p">集荷数</span>
-                            <span class="text-center">{{ Bus.farmer_total_amount }}</span>
-                            <span class="text-tiny ml30p">積載率</span>
-                            <span class="text-center">50%</span>
-                        </div>
-                    </div>
+                    </a>
                 {% endfor %}
             </div>
         </div>
@@ -141,6 +152,7 @@
                     <span class="button-x">X</span>
                 </li>
                 {% endif %}
+                <li class="list-group-item"><a href="{{ url('driver_home') }}">今日の運行スケジュール</a></li>
                 <li class="list-group-item"><a href="{{ url('contact') }}">お問い合わせ</a></li>
             </ul>
         </div>

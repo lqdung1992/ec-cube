@@ -115,9 +115,18 @@ class DriverController extends AbstractController
         }
     }
 
-    public function detail_cargo(Application $app)
+    public function detail_cargo(Application $app, $id)
     {
-        return $app->render('Driver\driver_detail_cargo.twig');
+        if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $BusStop = $app['eccube.repository.bus_stop']->find($id);
+            $results = null;
+            if ($BusStop != null) {
+                $results = $app['eccube.repository.route_detail']->getDriveCargoDetail($id, date('Y-m-d'));
+            }
+            return $app->render('Driver\driver_detail_cargo.twig', array('BusStop' => $BusStop, 'results' => $results));
+        } else {
+            return $app->redirect($app->url('mypage_login'));
+        }
     }
 
     public function detail_cargo_pick(Application $app, Request $request)
@@ -125,8 +134,7 @@ class DriverController extends AbstractController
         return $app->render('index.twig');
     }
 
-    public function detail_cargo_active(Application $app, Request $request)
+    public function detail_cargo_active(Application $app, $id)
     {
-        return $app->render('index.twig');
     }
 }
