@@ -50,7 +50,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/driver/home', '\Eccube\Controller\DriverController::home')->bind('driver_home');
         $c->match('/driver/home_tomorrow', '\Eccube\Controller\DriverController::home_tomorrow')->bind('driver_home_tomorrow');
         $c->match('/driver/detail_cargo/{id}', '\Eccube\Controller\DriverController::detail_cargo')->bind('driver_detail_cargo')->assert('id', '\d+');
-        $c->match('/driver/detail_cargo_active/{id}', '\Eccube\Controller\DriverController::detail_cargo_active')->bind('driver_detail_cargo_active')->assert('id', '\d+');
+        $c->match('/driver/detail_cargo_pick/{id}', '\Eccube\Controller\DriverController::detail_cargo_pick')->bind('driver_detail_pick')->assert('id', '\d+');
 
         // cart
         $c->match('/cart', '\Eccube\Controller\CartController::index')->bind('cart');

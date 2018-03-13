@@ -75,7 +75,6 @@
                 } else {
                     $('#active'+id).parent().removeClass('hidden');
                 }
-
             });
         })
     </script>
@@ -100,11 +99,11 @@
                     <div class="row">
                         <div class="col-sm-12 col-xs-12">
                             <ul class="list-inline">
-                                <a href="#">
-                                    <li class="col-sm-6 col-xs-6 text-alight-center enable" id="haika">配荷</li>
+                                <a href="{{ url('driver_detail_cargo', {'id': BusStop.id}) }}">
+                                    <li class="col-sm-6 col-xs-6 text-alight-center disable" id="haika">配荷</li>
                                 </a>
-                                <a href="{{ url('driver_detail_pick', {'id': BusStop.id}) }}">
-                                    <li class="col-sm-6 col-xs-6 text-alight-center disable" id="syuka">集荷</li>
+                                <a href="#">
+                                    <li class="col-sm-6 col-xs-6 text-alight-center enable" id="syuka">集荷</li>
                                 </a>
                             </ul>
                         </div>
@@ -120,6 +119,7 @@
                             <span class="section-name">
                                 <span class="title16">注文番号 : {{ result.order_id }}</span>
                                 <span class="color888">(積み替え)</span>
+                                <span class="color888 float-right margin-right15">配達先 : {{ result.user_bus_stop_name }}</span>
                             </span>
                             </div>
                             <div class="clearfix"></div>
@@ -157,7 +157,7 @@
                         <p>
                             <a href="{{ url('contact') }}" class="float-right margin-right15">コンテナや商品に不備があった場合</a>
                         </p>
-                        <a href="{{ url('driver_home', {'id': BusStop.id}) }}" class="btn btn-success" id="cart-done-button">配荷を完了する</a>
+                        <a href="{{ url('driver_home', {'id': BusStop.id}) }}" class="btn btn-success" id="cart-done-button">集荷を完了する</a>
                     </div>
                 {% else %}
                     <div id="list_box" class="box-body no-padding">
