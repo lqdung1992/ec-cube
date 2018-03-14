@@ -324,9 +324,9 @@ class ProductRepository extends EntityRepository
             ->innerJoin('Eccube\Entity\ProductClass', 'pc', Join::WITH, 'pc.Product = p.id')
             ->where('p.Creator = :Customer AND p.Status = 1')
             ->setParameter('Customer', $Customer)
-            ->andWhere('pc.production_start_date IS NULL or pc.production_start_date <= :start_date')
+//            ->andWhere('pc.production_start_date IS NULL or pc.production_start_date <= :start_date')
             ->andWhere('pc.production_end_date IS NULL or pc.production_end_date >= :end_date')
-            ->setParameter('start_date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME)
+//            ->setParameter('start_date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME)
             ->setParameter('end_date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);
 
         // Order By
@@ -346,7 +346,7 @@ class ProductRepository extends EntityRepository
     public function getProductQueryBuilderForHistory(Customer $Customer)
     {
         $now = new \DateTime();
-        $now = $now->format('Y-m-d 00:00:00');
+        $now = $now->format('Y-m-d');
         $qb = $this->createQueryBuilder('p')
             ->innerJoin('Eccube\Entity\ProductClass', 'pc', Join::WITH, 'pc.Product = p.id')
             ->where('p.Creator = :Customer AND p.Status = 1')
@@ -370,12 +370,35 @@ class ProductRepository extends EntityRepository
     public function getProductQueryBuilderAll()
     {
         $now = new \DateTime();
-        $now = $now->format('Y-m-d 00:00:00');
+        $now = $now->format('Y-m-d');
         $qb = $this->createQueryBuilder('p')
             ->innerJoin('p.ProductClasses', 'pc')
             ->where('p.Status = 1');
         $qb->andWhere(':date <= pc.production_end_date')
             ->setParameter('date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);
+
+        // Order By
+        // XXX Paginater を使用した場合に PostgreSQL で正しくソートできない
+        $qb->orderBy('p.create_date', 'DESC');
+        $qb->groupBy('p.id');
+
+        return $qb;
+    }
+
+    /**
+     * Get query builder for receipt product list quick
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getProductQueryBuilderQuick()
+    {
+        $date = new \DateTime();
+        $date = $date->modify('+2 days')->format('Y-m-d');
+        $qb = $this->createQueryBuilder('p')
+            ->innerJoin('p.ProductReceiptableDates', 'prd')
+            ->where('p.Status = 1');
+        $qb->andWhere('prd.date = :date')
+            ->setParameter('date', $date);
 
         // Order By
         // XXX Paginater を使用した場合に PostgreSQL で正しくソートできない

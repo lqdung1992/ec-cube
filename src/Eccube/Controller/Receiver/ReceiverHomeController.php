@@ -80,11 +80,19 @@ class ReceiverHomeController extends AbstractController
             $arrRecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProduct($Disp);
         }
 
+        $qbQuick = $productRepo->getProductQueryBuilderQuick();
+        $Quicks = $paginator->paginate(
+            $qbQuick,
+            $pageNoQuick,
+            $max->getId()
+        );
+
         return $app->render('Receiver/receiver_home.twig', array(
             'Products' => $pagination,
             'Customer' => $Customer,
             'Favorites' => $Favorites,
             'Recommends' => $arrRecommendProduct,
+            'Quicks' => $Quicks
         ));
     }
 
