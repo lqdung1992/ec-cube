@@ -7,6 +7,28 @@
 {% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
+    <style type="text/css">
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            #farmer-status-order-button {
+                width: 97% !important;
+                margin-bottom: 20px;
+            }
+        }
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+        }
+
+        #order_id {
+            border-bottom: 2px solid #333333;
+            margin-right: 10px;
+        }
+    </style>
 {% endblock stylesheet %}
 {% block javascript %}
 {% endblock javascript %}
@@ -73,6 +95,8 @@
                         </div>
                     </div>
                 {% endfor %}
+                <p class="title18 margin-left10 margin-top15">注文番号</p>
+                <p class="title20 margin-left10 margin-top15" id="order_id">{{ Order.id }}</p>
             </div>
         </div>
     </div>

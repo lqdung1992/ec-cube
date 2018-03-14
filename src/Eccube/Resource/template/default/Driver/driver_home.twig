@@ -116,7 +116,7 @@
                 </div>
 
                 {% for Bus in BusSchedule %}
-                    <a href="{{ url('driver_detail_cargo', {'id': Bus.bus_stop_id}) }}">
+                    <a href="{{ url('driver_detail_pick', {'id': Bus.bus_stop_id}) }}">
                         <div class="rectangle-content">
                             <div class="rectangle-title">
                                 <span class="text-left">{{ Bus.move_time }}</span>

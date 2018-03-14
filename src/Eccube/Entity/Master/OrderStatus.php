@@ -37,6 +37,8 @@ class OrderStatus extends \Eccube\Entity\AbstractEntity
     const ORDER_RECEIVE = 11;
     /** 完了 = done */
     const ORDER_DONE = 12;
+    const PICKUP_DONE = 13;
+    const DELIVERY_DONE = 11;
 
     /**
      * @return string

@@ -30,6 +30,8 @@ use Eccube\Util\Str;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Silex\Tests\Provider\ValidatorServiceProviderTest\Constraint\Custom;
+use Doctrine\ORM\Query\ResultSetMapping;
+
 
 /**
  * OrderRepository
@@ -553,5 +555,16 @@ class OrderRepository extends EntityRepository
         $qb->addOrderBy('o.receiptable_date', 'ASC');
 
         return $qb;
+    }
+
+    public function driverChangeStatus($orderIdArr, $status) {
+        $in = '(' . implode(',', $orderIdArr) .')';
+        $sql = 'UPDATE dtb_order SET status = ? WHERE order_id IN ' . $in;
+        $rsm = new ResultSetMapping();
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $status);
+        $results = $query->getResult();
+
+        return $results;
     }
 }

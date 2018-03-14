@@ -157,7 +157,9 @@
                         <p>
                             <a href="{{ url('contact') }}" class="float-right margin-right15">コンテナや商品に不備があった場合</a>
                         </p>
-                        <a href="{{ url('driver_home', {'id': BusStop.id}) }}" class="btn btn-success" id="cart-done-button">集荷を完了する</a>
+                        <form method="post" action="" enctype="multipart/form-data">
+                            <button type="submit" value="pick_up" class="btn btn-success" id="cart-done-button" name="pick_up">集荷を完了する</button>
+                        </form>
                     </div>
                 {% else %}
                     <div id="list_box" class="box-body no-padding">
