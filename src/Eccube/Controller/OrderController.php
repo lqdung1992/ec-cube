@@ -43,11 +43,17 @@ class OrderController extends AbstractController
         $mode = $request->get('mode');
         if (!$mode) {
             switch ($Order->getOrderStatus()->getId()) {
-                case OrderStatus::ORDER_PREPARE:
-                    $mode = 'prepare';
-                    break;
                 case OrderStatus::ORDER_PICKUP:
                     $mode = 'pickup';
+                    break;
+                case OrderStatus::PICKUP_DONE:
+                    $mode = 'pickup_done';
+                    break;
+                case OrderStatus::DELIVERY_DONE:
+                    $mode = 'delivery';
+                    break;
+                case OrderStatus::ORDER_DONE:
+                    $mode = 'complete';
                     break;
             }
         }
@@ -57,7 +63,7 @@ class OrderController extends AbstractController
             // for role recipient
             case "check_status":
             // for role farmer
-            case "prepare":
+            case "pickup":
                 $customer = $app->user();
                 $farms = $Order->getFarm();
                 // is farmer and creator
@@ -69,8 +75,14 @@ class OrderController extends AbstractController
                 return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
 
-            case "pickup":
+            case "pickup_done":
                 return $app->render('Order/pickup_done.twig', array('Order' => $Order, 'days' => $masterDate));
+                break;
+            case "delivery":
+                return $app->render('Order/delivery.twig', array('Order' => $Order, 'days' => $masterDate));
+                break;
+            case "complete":
+                return $app->render('Order/complete.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
             default:
                 break;

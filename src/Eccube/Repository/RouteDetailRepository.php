@@ -126,7 +126,7 @@ class RouteDetailRepository extends EntityRepository
         $sql = 'SELECT stop.bus_stop_id, stop.name, stop.address, total_amount, arrive_time, move_time, work_time, route.name as route_name FROM'.
                 ' (SELECT SUM(container_amount) as total_amount, bus_stop FROM dtb_order' .
                 ' LEFT JOIN dtb_customer ON dtb_order.customer_id = dtb_customer.customer_id' .
-                ' WHERE receiptable_date = ?  AND bus_stop' .
+                ' WHERE order_date LIKE ? AND bus_stop' .
                 ' IN (SELECT dtb_route_detail.bus_stop_id FROM dtb_bus LEFT JOIN dtb_route_detail' .
                 ' ON dtb_bus.route_id = dtb_route_detail.route_id WHERE customer_id = ?) GROUP BY bus_stop) AS order_bus' .
                 ' LEFT JOIN dtb_route_detail ON dtb_route_detail.bus_stop_id = order_bus.bus_stop' .
@@ -143,7 +143,7 @@ class RouteDetailRepository extends EntityRepository
         $rsm->addScalarResult('work_time', 'work_time');
         $rsm->addScalarResult('route_name', 'route_name');
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter(1, $date. ' 00:00:00');
+        $query->setParameter(1, $date. '%');
         $query->setParameter(2, $driverNo);
         $results = $query->getResult();
 
@@ -155,7 +155,7 @@ class RouteDetailRepository extends EntityRepository
         $sql = 'SELECT stop.bus_stop_id, stop.name, stop.address, total_amount, arrive_time, move_time, work_time, route.name as route_name FROM'.
             ' (SELECT SUM(container_amount) as total_amount, bus_stop FROM dtb_order' .
             ' LEFT JOIN dtb_customer ON dtb_order.farmer_id = dtb_customer.customer_id' .
-            ' WHERE receiptable_date = ? AND bus_stop' .
+            ' WHERE order_date LIKE ? AND bus_stop' .
             ' IN (SELECT dtb_route_detail.bus_stop_id FROM dtb_bus LEFT JOIN dtb_route_detail' .
             ' ON dtb_bus.route_id = dtb_route_detail.route_id WHERE customer_id = ?) GROUP BY bus_stop) AS order_bus' .
             ' LEFT JOIN dtb_route_detail ON dtb_route_detail.bus_stop_id = order_bus.bus_stop' .
@@ -172,8 +172,68 @@ class RouteDetailRepository extends EntityRepository
         $rsm->addScalarResult('work_time', 'work_time');
         $rsm->addScalarResult('route_name', 'route_name');
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter(1, $date. ' 00:00:00');
+        $query->setParameter(1, $date. '%');
         $query->setParameter(2, $driverNo);
+        $results = $query->getResult();
+
+        return $results;
+    }
+
+    public function getDriveCargoDetail($busStopNo, $date) {
+
+        $sql = 'SELECT '.
+                'container_amount as total_amount, '.
+                'bus_stop, '.
+                'dtb_customer.name01 as name1, '.
+                'dtb_customer.name02 as name2, order_id '.
+                'FROM '.
+                'dtb_order '.
+                'LEFT JOIN dtb_customer ON dtb_order.customer_id = dtb_customer.customer_id '.
+                'WHERE '.
+                'order_date LIKE ? '.
+                'AND bus_stop = ?';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('total_amount', 'total_amount');
+        $rsm->addScalarResult('bus_stop', 'bus_stop');
+        $rsm->addScalarResult('name1', 'name1');
+        $rsm->addScalarResult('name2', 'name2');
+        $rsm->addScalarResult('order_id', 'order_id');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $date. '%');
+        $query->setParameter(2, $busStopNo);
+        $results = $query->getResult();
+
+        return $results;
+    }
+
+    public function getDriveCargoPick($busStopNo, $date) {
+
+        $sql = 'SELECT driver.*, dtb_bus_stop.name as user_bus_stop_name FROM '.
+            '(SELECT '.
+            'container_amount as total_amount, '.
+            'bus_stop, '.
+            'dtb_customer.name01 as name1, '.
+            'dtb_customer.name02 as name2, order_id, dtb_order.customer_id '.
+            'FROM '.
+            'dtb_order '.
+            'LEFT JOIN dtb_customer ON dtb_order.farmer_id = dtb_customer.customer_id '.
+            'WHERE '.
+            'order_date LIKE ? '.
+            'AND bus_stop = ?) as driver '.
+            'LEFT JOIN dtb_customer ON driver.customer_id = dtb_customer.customer_id '.
+            'LEFT JOIN dtb_bus_stop ON dtb_customer.bus_stop = dtb_bus_stop.bus_stop_id ';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('total_amount', 'total_amount');
+        $rsm->addScalarResult('bus_stop', 'bus_stop');
+        $rsm->addScalarResult('name1', 'name1');
+        $rsm->addScalarResult('name2', 'name2');
+        $rsm->addScalarResult('order_id', 'order_id');
+        $rsm->addScalarResult('user_bus_stop_name', 'user_bus_stop_name');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $date. '%');
+        $query->setParameter(2, $busStopNo);
         $results = $query->getResult();
 
         return $results;

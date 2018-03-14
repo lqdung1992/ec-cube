@@ -25,9 +25,14 @@
 namespace Eccube\Controller;
 
 use Eccube\Application;
+use Symfony\Component\HttpFoundation\Request;
+
 
 class DriverController extends AbstractController
 {
+    const PICK_UP = 'pick_up';
+    const DELIVERY = 'delivery';
+
     public function home(Application $app)
     {
         if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
@@ -115,18 +120,53 @@ class DriverController extends AbstractController
         }
     }
 
-    public function detail_cargo(Application $app)
+    public function detail_cargo(Application $app, $id, Request $request)
     {
-        return $app->render('Driver\driver_detail_cargo.twig');
+        if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $BusStop = $app['eccube.repository.bus_stop']->find($id);
+            $orderIdArr = null;
+            $status = 11;
+            $results = null;
+            if ($BusStop != null) {
+                $results = $app['eccube.repository.route_detail']->getDriveCargoDetail($id, date('Y-m-d'));
+                foreach ($results as $result) {
+                    $orderIdArr[] = $result['order_id'];
+                }
+                $delivery = $request->get('delivery');
+                if ($delivery == self::DELIVERY) {
+                    $app['eccube.repository.order']->driverChangeStatus($orderIdArr, $status);
+                    return $app->redirect($app->url('driver_home'));
+                }
+            }
+            return $app->render('Driver\driver_detail_cargo.twig', array('BusStop' => $BusStop, 'results' => $results));
+        } else {
+            return $app->redirect($app->url('mypage_login'));
+        }
     }
 
-    public function detail_cargo_pick(Application $app, Request $request)
+    public function detail_cargo_pick(Application $app, $id, Request $request)
     {
-        return $app->render('index.twig');
+        if ($app->isGranted('IS_AUTHENTICATED_FULLY')) {
+            $BusStop = $app['eccube.repository.bus_stop']->find($id);
+            $results = null;
+            $orderIdArr = null;
+            $status = 13;
+            if ($BusStop != null) {
+                $results = $app['eccube.repository.route_detail']->getDriveCargoPick($id, date('Y-m-d'));
+                foreach ($results as $result) {
+                    $orderIdArr[] = $result['order_id'];
+                }
+            }
+            $pick_up = $request->get('pick_up');
+            if ($pick_up == self::PICK_UP) {
+                $app['eccube.repository.order']->driverChangeStatus($orderIdArr, $status);
+                return $app->redirect($app->url('driver_home'));
+            }
+
+            return $app->render('Driver\driver_detail_pick.twig', array('BusStop' => $BusStop, 'results' => $results));
+        } else {
+            return $app->redirect($app->url('mypage_login'));
+        }
     }
 
-    public function detail_cargo_active(Application $app, Request $request)
-    {
-        return $app->render('index.twig');
-    }
 }

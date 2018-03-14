@@ -200,10 +200,12 @@
                                         <div class="order-detail-profile float-left">
                                             <p class="title15 width120">
                                                 {{ Order.name01 }}{{ Order.name02 }}
-                                                {% if Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::ORDER_PREPARE') %}
-                                                    <label class="badge float-right wait-order">{{ Order.OrderStatus.name }}</label>
+                                                {% if Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::ORDER_PICKUP') %}
+                                                    <label class="badge float-right pick-up">{{ Order.OrderStatus.name }}</label>
+                                                {% elseif Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::PICKUP_DONE') %}
+                                                    <label class="badge float-right pick-up-done">{{ Order.OrderStatus.name }}</label>
                                                 {% else %}
-                                                    <label class="badge float-right delivery-now">{{ Order.OrderStatus.name }}</label>
+                                                    <label class="badge float-right delivery-done">{{ Order.OrderStatus.name }}</label>
                                                 {% endif %}
                                                 <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/box-min.svg" class="float-right margin-left20">
                                             </p>
@@ -211,7 +213,7 @@
                                                 {% set Product = OrderDetail.Product %}
                                                 <img class="image-review order-profile" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}">
                                             {% endfor %}
-                                        </div>
+                                        </div>　
                                         <div class="float-right arrow-right">
                                             <a href="{{ url('order', {'id': Order.id}) }}">
                                                 <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">

@@ -66,7 +66,8 @@ class FarmHomeController extends AbstractController
         }
 
         $arrStatusDelivery = array(
-            OrderStatus::ORDER_PREPARE,
+            OrderStatus::DELIVERY_DONE,
+            OrderStatus::PICKUP_DONE,
             OrderStatus::ORDER_PICKUP,
         );
         /** @var Order[] $orderDelivery */

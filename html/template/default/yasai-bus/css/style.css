@@ -1127,6 +1127,21 @@ img {
     margin-left: 5px;
 }
 
+.pick-up {
+    background-color: #00c42b !important;
+    margin-left: 5px;
+}
+
+.pick-up-done {
+    background-color: #344250 !important;
+    margin-left: 5px;
+}
+
+.delivery-done {
+    background-color: #3157ec !important;
+    margin-left: 5px;
+}
+
 .top-left {
     top: 98px;
     left: 138px;
