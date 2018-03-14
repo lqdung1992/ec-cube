@@ -12,6 +12,7 @@ use Eccube\Application;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\Customer;
 use Eccube\Entity\Master\CustomerRole;
+use Eccube\Entity\Master\Disp;
 use Eccube\Repository\CustomerFavoriteProductRepository;
 use Eccube\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,14 +45,10 @@ class ReceiverHomeController extends AbstractController
         $pageNo = 1;
         $pageNoFav = 1;
         $pageNoQuick = 1;
-        $pageNoRec = 1;
         $section = $request->get('section');
         switch ($section) {
             case 'quick':
                 $pageNoQuick = $request->get('pageno', 1);
-                break;
-            case 'recommend':
-                $pageNoRec = $request->get('pageno', 1);
                 break;
             case 'favorite':
                 $pageNoFav = $request->get('pageno', 1);
@@ -76,10 +73,18 @@ class ReceiverHomeController extends AbstractController
             $pageNoFav,
             $max->getId()
         );
+
+        $arrRecommendProduct = array();
+        if (isset($app['eccube.plugin.recommend.repository.recommend_product'])) {
+            $Disp = $app['eccube.repository.master.disp']->find(Disp::DISPLAY_SHOW);
+            $arrRecommendProduct = $app['eccube.plugin.recommend.repository.recommend_product']->getRecommendProduct($Disp);
+        }
+
         return $app->render('Receiver/receiver_home.twig', array(
             'Products' => $pagination,
             'Customer' => $Customer,
-            'Favorites' => $Favorites
+            'Favorites' => $Favorites,
+            'Recommends' => $arrRecommendProduct,
         ));
     }
 
