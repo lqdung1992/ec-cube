@@ -72,8 +72,8 @@ class OrderController extends AbstractController
                     $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PICKUP);
                     $orderRepo->changeStatus($id, $OrderStatus);
                 }
-
-                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
+                $busStop = $orderRepo->getFarmerBusStop($id);
+                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop[0]));
                 break;
 
             case "pickup_done":

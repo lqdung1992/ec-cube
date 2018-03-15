@@ -91,21 +91,24 @@
             <div id="map-content" class="cart-content">
                 <div class="title-section-medium">
                     <p>
-                        <span class="title18">{{ Order.receiptable_date|date('m月d日') }} ({{ days[Order.receiptable_date|date('N')] }}) ！ {{ Order.order_date|diff_time(Order.receiptable_date) }}</span>
+                        <span class="title18">
+                            {{ Order.receiptable_date|date('m月d日') }} ({{ days[Order.receiptable_date|date('N')] }}) ！
+                            {{ busStop.move_time }}
+                        </span>
                         <span>までに</span>
                     </p>
                     <p>
-                        <span class="title18">{{ Order.farm[0].__toString }}</span>
+                        <span class="title18">{{ busStop.name }}</span>
                         <span>へお持ちください</span>
                     </p>
                     {% set Shipping = Order.Shippings[0] %}
-                    <p class="color888 margin-top15">{{ Shipping.Pref.name }}{{ Shipping.addr01 }}{{ Shipping.addr02 }}</p>
+                    <p class="color888 margin-top15">{{ busStop.address }}</p>
                 </div>
 
                 <div class="map">
                     {#Todo: map#}
                     <div id="map"></div>
-                    <input id="address" type="hidden" value="{{ Order.Customer.BusStop.address }}">
+                    <input id="address" type="hidden" value="{{ busStop.address }}">
                     <button class="btn btn-inactive popup" id="farmer-qr-code">QRコードを読み込んで出荷完了する</button>
                     <p class="title12 margin-top10 color888">QRコードは持ち込みの◯時間前から表示できます-15</p>
                 </div>

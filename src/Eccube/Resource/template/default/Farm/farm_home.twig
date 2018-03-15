@@ -29,6 +29,10 @@
             }
         }
 
+        .complete-detail {
+            height: 141px !important;
+        }
+
         .product-section, .transaction-section, .delivery-section, .complete-section {
             min-height: 520px;
         }
@@ -245,7 +249,7 @@
 
                     {% if OrderComplete|length > 0 %}
                         {% for Order in OrderComplete %}
-                            <div class="complete-detail clearfix height141">
+                            <div class="complete-detail clearfix">
                                 <div class="clearfix">
                                     <div class="order-detail-profile float-left">
                                         <p class="title15 width120">
@@ -262,15 +266,15 @@
                                         </a>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="order-detail-info">
-                                <div class="float-left">
-                                    <p>
-                                        <span class="color888 margin-right10">出荷日</span>
-                                        <span>{{ Order.commit_date|date_format }}</span>
-                                        <span class="color888 margin-right10 margin-left60">合計</span>
-                                        <span>{{ Order.total|price }}</span>
-                                    </p>
+                                <div class="order-detail-info">
+                                    <div class="float-left">
+                                        <p>
+                                            <span class="color888 margin-right10">出荷日</span>
+                                            <span>{{ Order.commit_date|date_format }}</span>
+                                            <span class="color888 margin-right10 margin-left60">合計</span>
+                                            <span>{{ Order.total|price }}</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
