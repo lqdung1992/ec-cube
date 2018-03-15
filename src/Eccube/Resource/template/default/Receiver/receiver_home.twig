@@ -1,0 +1,305 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        .product-section {
+            background-color: #FFFFFF;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $(".exhibition li").click(function () {
+                var $class = $(this).data('text');
+                $(this).parent().find('li').each(function (index, value) {
+                    $(value).removeClass('enable').addClass('disable');
+                    $('.'+$(value).data('text')).hide();
+                });
+                $(this).addClass('enable').removeClass('disable');
+                $('.'+$class).show();
+            });
+
+            $(window).load(function() {
+                $('.thumbnail').matchHeight();
+            });
+
+
+            $('.like-icon').click(function() {
+                var unlike_icon = $(this).parent().find(".unlike-icon");
+                $.ajax({
+                    url: "{{ url('receiver_favorite_action') }}",
+                    type: "post",
+                    dataType: 'json',
+                    data: {'id' : $(this).data('id')}
+                }).done(function (data) {
+                    if (data == true) {
+                        $(this).hide();
+                        $(unlike_icon).show();
+                    } else {
+                        alert("Has error!");
+                    }
+                });
+            });
+
+            $('.unlike-icon').click(function() {
+                var like_icon = $(this).parent().find(".like-icon");
+                var thumbnail = $(this).parents(".thumbnail");
+                var is_delete = $(this).data('delete');
+                $.ajax({
+                    url: "{{ url('receiver_favorite_action') }}",
+                    type: "post",
+                    dataType: 'json',
+                    data: {'id' : $(this).data('id')},
+                }).done(function (data) {
+                    if (data == true) {
+                        $(this).hide();
+                        $(like_icon).show();
+                        if (is_delete == true) {
+                            $(thumbnail).remove();
+                        }
+                    } else {
+                        alert('Has error!');
+                    }
+                });
+            });
+
+            var section = '{{ app.request.get('section', '') }}';
+            if (section) {
+                $('#'+section+'-section').trigger('click');
+            }
+        });
+
+        $( document ).ajaxStart(function() {
+            $( ".overlay" ).show();
+        });
+
+        $( document ).ajaxComplete(function() {
+            $( ".overlay" ).hide();
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper container">
+        <div class="exhibition">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <ul class="list-inline">
+                        <li class="col-sm-3 col-xs-3 text-alight-center enable " id="product-section" data-text="product-section">新着</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="quick-section" data-text="quick-section">明後日届く</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="recommend-section" data-text="recommend-section">おすすめ</li>
+                        <li class="col-sm-3 col-xs-3 text-alight-center disable" id="favorite-section" data-text="favorite-section">お気に入り</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Products|length > 0 %}
+                        {% for Product in Products %}
+                            {% set TargetCustomer = Product.Creator %}
+                            <div class="col-sm-3 col-xs-6 thumbnail">
+                                <div class="image-box">
+                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-inactive.svg" class="like-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: none;"{% endif %}>
+                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: block;"{% endif %}>
+                                </div>
+                                <div class="caption">
+                                    <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                    <div class="row mg20">
+                                        <div class="col-sm-12 col-xs-12">
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                        <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                        <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span class="title12 display-block">出品されている商品はありません</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if Products.totalItemCount > 0 %}
+            <div class="row">
+                <div class="col-xs-12 col-sm-12">
+                    {% include "pagination.twig" with { 'pages' : Products.paginationData } %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="quick-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Quicks|length > 0 %}
+                        {% for Product in Quicks %}
+                            {% set TargetCustomer = Product.Creator %}
+                            <div class="col-sm-3 col-xs-6 thumbnail">
+                                <div class="image-box">
+                                    <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-inactive.svg" class="like-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: none;"{% endif %}>
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: block;"{% endif %}>
+                                </div>
+                                <div class="caption">
+                                    <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                    <div class="row mg20">
+                                        <div class="col-sm-12 col-xs-12">
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                        <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                        <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span class="title12 display-block">出品されている商品はありません</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if Quicks.totalItemCount > 0 %}
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        {% include "pagination.twig" with { 'pages' : Quicks.paginationData, 'section' : 'quick' } %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="recommend-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Recommends|length > 0 %}
+                        {% for Recommend in Recommends %}
+                            {% set Product = Recommend.Product %}
+                            {% set TargetCustomer = Product.Creator %}
+                            <div class="col-sm-3 col-xs-6 thumbnail">
+                                <div class="image-box">
+                                    <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-inactive.svg" class="like-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: none;"{% endif %}>
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: block;"{% endif %}>
+                                </div>
+                                <div class="caption">
+                                    <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                    <div class="row mg20">
+                                        <div class="col-sm-12 col-xs-12">
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                        <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                        <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span>お気に入りに追加されている</span>
+                                <span>商品はありません</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="favorite-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                {% if Favorites|length > 0 %}
+                    {% for FavoriteProduct in Favorites %}
+                        {% set Product = FavoriteProduct.Product %}
+                        {% set TargetCustomer = Product.Creator %}
+                        <div class="col-sm-3 col-xs-6 thumbnail" id="favorite_{{ FavoriteProduct.id }}">
+                            <div class="image-box">
+                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon display-block" data-id="{{ Product.id }}" data-delete="true">
+                            </div>
+                            <div class="caption">
+                                <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                <div class="row mg20">
+                                    <div class="col-sm-12 col-xs-12">
+                                        <div class="col-sm-6 col-xs-6">
+                                            <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                        </div>
+                                        <div class="col-sm-6 col-xs-6">
+                                            <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p>
+                                    <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                    <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                    <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span>お気に入りに追加されている</span>
+                                <span>商品はありません</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if Favorites.totalItemCount > 0 %}
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        {% include "pagination.twig" with { 'pages' : Favorites.paginationData, 'section' : 'favorite' } %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
