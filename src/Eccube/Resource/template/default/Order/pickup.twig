@@ -27,9 +27,42 @@
             border-bottom: 2px solid #333333;
             margin-right: 10px;
         }
+
+        #map {
+            width: 60% !important;
+            margin: auto;
+            height: 300px;
+        }
     </style>
 {% endblock stylesheet %}
 {% block javascript %}
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPVy-7CF4XBqC_QPWoRfo-kfI9j9dm_7A&callback=initMap"></script>
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
+                center: {lat: -34.397, lng: 150.644}
+            });
+            var geocoder = new google.maps.Geocoder();
+            var address = $('#address').val();
+            geocodeAddress(geocoder, map);
+        }
+
+        function geocodeAddress(geocoder, resultsMap) {
+            var address = document.getElementById('address').value;
+            geocoder.geocode({'address': address}, function(results, status) {
+                if (status === 'OK') {
+                    resultsMap.setCenter(results[0].geometry.location);
+                    var marker = new google.maps.Marker({
+                        map: resultsMap,
+                        position: results[0].geometry.location
+                    });
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+        }
+    </script>
 {% endblock javascript %}
 {% block main %}
     <div id="receiver-status-wrapper" class="wrapper">
@@ -71,7 +104,8 @@
 
                 <div class="map">
                     {#Todo: map#}
-                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/map.PNG" width="340">
+                    <div id="map"></div>
+                    <input id="address" type="hidden" value="{{ Order.Customer.BusStop.address }}">
                     <button class="btn btn-inactive popup" id="farmer-qr-code">QRコードを読み込んで出荷完了する</button>
                     <p class="title12 margin-top10 color888">QRコードは持ち込みの◯時間前から表示できます-15</p>
                 </div>
