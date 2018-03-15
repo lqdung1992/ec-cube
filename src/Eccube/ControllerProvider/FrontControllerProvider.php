@@ -151,6 +151,10 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/notice', '\Eccube\Controller\Farm\NoticeController::index')->bind('farm_notice');
         $c->match('/farm/notice/{id}', '\Eccube\Controller\Farm\NoticeController::index')->bind('farm_notice_view')->assert('id', '\d+');
 
+        // Receiver home
+        $c->match('/receiver/home', '\Eccube\Controller\Receiver\ReceiverHomeController::index')->bind('receiver_home');
+        $c->post('/receiver/home/favorite/action', '\Eccube\Controller\Receiver\ReceiverHomeController::actionFavorite')->bind('receiver_favorite_action');
+
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');
         $c->match('/shopping/confirm', '\Eccube\Controller\ShoppingController::confirm')->bind('shopping_confirm');

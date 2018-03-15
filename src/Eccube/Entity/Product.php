@@ -1179,4 +1179,19 @@ class Product extends \Eccube\Entity\AbstractEntity
 
         return null;
     }
+
+    /**
+     * @param Customer $customer
+     * @return bool
+     */
+    public function isFavorite(Customer $customer)
+    {
+        /** @var CustomerFavoriteProduct $customerFavoriteProduct */
+        foreach ($this->getCustomerFavoriteProducts() as $customerFavoriteProduct) {
+            if ($customerFavoriteProduct->getCustomer()->getId() == $customer->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
