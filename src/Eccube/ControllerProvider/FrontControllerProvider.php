@@ -154,7 +154,8 @@ class FrontControllerProvider implements ControllerProviderInterface
         // Receiver home
         $c->match('/receiver/home', '\Eccube\Controller\Receiver\ReceiverHomeController::index')->bind('receiver_home');
         $c->post('/receiver/home/favorite/action', '\Eccube\Controller\Receiver\ReceiverHomeController::actionFavorite')->bind('receiver_favorite_action');
-
+        // receiver search
+        $c->match('/receiver/search', '\Eccube\Controller\Receiver\ReceiverSearchController::index')->bind('receiver_search');
         // shopping
         $c->match('/shopping', '\Eccube\Controller\ShoppingController::index')->bind('shopping');
         $c->match('/shopping/confirm', '\Eccube\Controller\ShoppingController::confirm')->bind('shopping_confirm');

@@ -115,6 +115,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.csv_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
+
         // Farm
         $app['eccube.repository.notification'] = $app->share(function () use ($app) {
             $repository = $app['orm.em']->getRepository('Eccube\Entity\Notification');
@@ -419,6 +420,8 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemClassType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\HomeCompleteType();
+            // Receiver search
+            $types[] = new \Eccube\Form\Type\Front\Receiver\ReceiverSearchType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);

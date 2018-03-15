@@ -1,0 +1,38 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/15/2018
+ # Time: 8:03 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $(".list-group-item").click(function () {
+                var value = $(this).find('input').val();
+                $("#search_type").val(value);
+                $("#search-form").submit();
+            });
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div class="wrapper" id="search-menu">
+        <form action="?" method="get" name="search-form" id="search-form">
+            {{ form_widget(form.name, {attr: {placeholder: '品目・キーワードなどで探す', class: 'search-input'}}) }}
+            <input type="hidden" id="search_type" name="search_type" value="">
+        </form>
+        <ul class="list-group">
+            {% for item in form.search_type.vars.choices %}
+            <li class="list-group-item">
+                <input type="hidden" name="search_type" value="{{ item.value }}">
+                {{ item.label }}
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock main %}
