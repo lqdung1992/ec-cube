@@ -158,13 +158,13 @@ class CustomerType extends AbstractType
                     new Assert\NotBlank(),
                 )
             ))->add('bus_stop', 'entity', array(
-                'required' => true,
+                'required' => false,
                 'class' => 'Eccube\Entity\BusStop',
                 'empty_value' => '----------',
                 'property' => 'name',
                 'label' => 'バス停',
                 'constraints' => array(
-                    new Assert\NotBlank(),
+//                    new Assert\NotBlank(),
                 )
             ));
     }

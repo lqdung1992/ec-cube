@@ -118,8 +118,15 @@ class CustomerFavoriteProductRepository extends EntityRepository
             ->where('cfp.Customer = :Customer AND p.Status = 1')
             ->setParameter('Customer', $Customer);
 
+        $now = new \DateTime();
+        $now = $now->format('Y-m-d 00:00:00');
+        $qb = $qb->innerJoin('p.ProductClasses', 'pc');
+        $qb->andWhere(':date <= pc.production_end_date')
+            ->setParameter('date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);
+
         // Order By
         $qb->addOrderBy('cfp.create_date', 'DESC');
+        $qb->groupBy('cfp.id');
 
         return $qb;
     }

@@ -472,7 +472,12 @@ class FarmerController extends AbstractController
             // Loop step
             $interval = \DateInterval::createFromDateString('1 day');
             $dateEnd = clone $ProductClass->getProductionEndDate();
-            $period = new \DatePeriod($ProductClass->getProductionStartDate(), $interval, $dateEnd->modify('+1 day'));
+            $dateStart = $ProductClass->getProductionStartDate();
+            $now = new \DateTime();
+            if ($dateStart->getTimestamp() < $now) {
+                $dateStart = new \DateTime($now->format('Y/m/d'));
+            }
+            $period = new \DatePeriod($dateStart, $interval, $dateEnd->modify('+1 day'));
             $arrDateId = array();
             foreach ($ReceiptableDates as $receiptableDate) {
                 $arrDateId[$receiptableDate->getId()] = $receiptableDate;
