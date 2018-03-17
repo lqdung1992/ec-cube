@@ -28,7 +28,9 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Eccube\Application;
+use Eccube\Common\Constant;
 use Eccube\Entity\Customer;
+use Eccube\Entity\Master\ProductListOrderBy;
 use Eccube\Util\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -135,47 +137,57 @@ class ProductRepository extends EntityRepository
 
         // Order By
         // 価格低い順
-        $config = $this->app['config'];
         $isJoinProductClass = false;
-        if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['product_order_price_lower']) {
-            //@see http://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html
-            $qb->addSelect('MIN(pc.price02) as HIDDEN price02_min');
-            $qb->innerJoin('p.ProductClasses', 'pc');
-            $isJoinProductClass = true;
-            $qb->groupBy('p');
-            // postgres9.0以下は, groupBy('p.id')が利用できない
-            // mysqlおよびpostgresql9.1以上であればgroupBy('p.id')にすることで性能向上が期待できる.
-            // @see https://github.com/EC-CUBE/ec-cube/issues/1904
-            // $qb->groupBy('p.id');
-            $qb->orderBy('price02_min', 'ASC');
-            $qb->addOrderBy('p.id', 'DESC');
-            // 価格高い順
-        } else if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['product_order_price_higher']) {
-            $qb->addSelect('MAX(pc.price02) as HIDDEN price02_max');
-            $qb->innerJoin('p.ProductClasses', 'pc');
-            $isJoinProductClass = true;
-            $qb->groupBy('p');
-            $qb->orderBy('price02_max', 'DESC');
-            $qb->addOrderBy('p.id', 'DESC');
-            // 新着順
-        } else if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['product_order_newer']) {
-            // 在庫切れ商品非表示の設定が有効時対応
-            // @see https://github.com/EC-CUBE/ec-cube/issues/1998
-            if ($this->app['orm.em']->getFilters()->isEnabled('nostock_hidden') == true) {
-                $qb->innerJoin('p.ProductClasses', 'pc');
-                $isJoinProductClass = true;
+        if (isset($searchData['orderby']) && $searchData['orderby'] instanceof ProductListOrderBy) {
+            switch ($searchData['orderby']->getId()) {
+                case ProductListOrderBy::PRICE_LOWER:
+                    //@see http://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html
+                    $qb->addSelect('MIN(pc.price02) as HIDDEN price02_min');
+                    $qb->innerJoin('p.ProductClasses', 'pc');
+                    $isJoinProductClass = true;
+                    $qb->groupBy('p');
+                    // postgres9.0以下は, groupBy('p.id')が利用できない
+                    // mysqlおよびpostgresql9.1以上であればgroupBy('p.id')にすることで性能向上が期待できる.
+                    // @see https://github.com/EC-CUBE/ec-cube/issues/1904
+                    // $qb->groupBy('p.id');
+                    $qb->orderBy('price02_min', 'ASC');
+                    break;
+                case ProductListOrderBy::ORDER_NEWER:
+                    $qb->addSelect('MAX(pc.price02) as HIDDEN price02_max');
+                    $qb->innerJoin('p.ProductClasses', 'pc');
+                    $isJoinProductClass = true;
+                    $qb->groupBy('p');
+                    $qb->orderBy('price02_max', 'DESC');
+                    break;
+                case ProductListOrderBy::PRICE_HIGHER:
+                    // @see https://github.com/EC-CUBE/ec-cube/issues/1998
+                    if ($this->app['orm.em']->getFilters()->isEnabled('nostock_hidden') == Constant::ENABLED) {
+                        $qb->innerJoin('p.ProductClasses', 'pc');
+                        $isJoinProductClass = true;
+                    }
+                    $qb->orderBy('p.create_date', 'DESC');
+                    break;
+                case ProductListOrderBy::EARLY_ARRIVAL:
+                    $qb->addSelect('MIN(prd.date) as HIDDEN date_min');
+                    $qb->leftJoin('p.ProductReceiptableDates', 'prd');
+                    $qb->groupBy('p');
+                    $qb->orderBy('date_min', 'ASC');
+                    break;
+                case ProductListOrderBy::ORDER_LIKER:
+                    $qb->leftJoin('p.ProductRate', 'pr');
+                    $qb->orderBy('pr.like_count', 'DESC');
+                    break;
+
             }
-            $qb->orderBy('p.create_date', 'DESC');
-            $qb->addOrderBy('p.id', 'DESC');
         } else {
             if ($categoryJoin === false) {
                 $qb
                     ->leftJoin('p.ProductCategories', 'pct')
                     ->leftJoin('pct.Category', 'c');
             }
-            $qb
-                ->addOrderBy('p.id', 'DESC');
+
         }
+        $qb->addOrderBy('p.id', 'DESC');
 
         if (isset($searchData['method']) && is_numeric($searchData['method'])) {
             if (!$isJoinProductClass) {
@@ -184,6 +196,15 @@ class ProductRepository extends EntityRepository
             $qb->andWhere('pc.CultivationMethod = :Method')
                 ->setParameter('Method', $searchData['method']);
         }
+
+        // filter date
+        $now = new \DateTime();
+        $now = $now->format('Y-m-d');
+        if (!$isJoinProductClass) {
+            $qb->innerJoin('p.ProductClasses', 'pc');
+        }
+        $qb->andWhere(':date <= pc.production_end_date')
+            ->setParameter('date', new \DateTime($now), \Doctrine\DBAL\Types\Type::DATETIME);
 
         return $qb;
     }

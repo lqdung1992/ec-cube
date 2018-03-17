@@ -34,6 +34,7 @@ class Version20180315203900 extends AbstractMigration
 
     /**
      * @param Schema $schema
+     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\Tools\ToolsException
      */
     public function up(Schema $schema)

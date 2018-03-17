@@ -30,6 +30,8 @@
             <form action="?" method="get" name="search-form" id="search-form">
                 {{ form_widget(form.name) }}
                 {{ form_widget(form.search_type) }}
+                {{ form_widget(form.method) }}
+                {{ form_widget(form.farmer) }}
                 {{ form_widget(order_by_form, {'id': '', 'attr': {'onchange': "javascript:fnChangeOrderBy(this.value);"}}) }}
             </form>
 

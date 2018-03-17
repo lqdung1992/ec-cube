@@ -25,6 +25,12 @@ class ReceiverSearchController extends AbstractController
 {
     const COOKIE_KEY = 'search_key';
 
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
+     */
     public function index(Application $app, Request $request)
     {
         if (!$app->isGranted(CustomerRole::RECIPIENT)) {
@@ -32,13 +38,12 @@ class ReceiverSearchController extends AbstractController
         }
         /** @var SearchTypeRepository $searchRepo */
         $searchRepo = $app['eccube.repository.master.search'];
-        $arrType = $searchRepo->getAllIdAsKey();
-        $arrType = array_column($arrType, 'name', 'id');
+        $arrType = $searchRepo->findAll();
 
         $searchHistory = $this->getSearchHistory($request);
         $arrSearchHistoryType = array();
         if ($searchHistory) {
-            $arrSearchHistoryType = explode(',', $searchHistory);
+            $arrSearchHistoryType = json_decode($searchHistory, true);
         }
         /** @var FormBuilder $builder */
         $builder = $app['form.factory']->createNamedBuilder('', 'receiver_search');
@@ -49,10 +54,7 @@ class ReceiverSearchController extends AbstractController
         $form = $builder->getForm();
         $form->handleRequest($request);
         $searchData = $form->getData();
-        $type = null;
-        if (isset($searchData['search_type'])) {
-            $type = $searchData['search_type'];
-        }
+        $type = isset($searchData['search_type'])? $searchData['search_type'] : null;
         switch ($type) {
             case SearchType::SEARCH_ITEM:
                 $builder->setAttribute('freeze', true);
@@ -133,12 +135,8 @@ class ReceiverSearchController extends AbstractController
 
                 return $this->createRender($app, $searchData, $arrSearchHistoryType, $template, $arrOptions);
                 break;
-            case SearchType::SEARCH_HISTORY:
-                return $app->redirect($app->url('receiver_search', array('name' => $searchData['name'], 'search_type' => SearchType::SEARCH_ITEM)));
-                break;
             case SearchType::SEARCH_OTHER:
             default:
-
                 break;
         }
 
@@ -188,12 +186,16 @@ class ReceiverSearchController extends AbstractController
     protected function createRender(Application $app, $searchData, $arrSearchHistoryType, $template, $arrOptions)
     {
         if (isset($searchData['name']) && $searchData['name']) {
-            $arrSearchHistoryType[] = $searchData['name'];
-            $arrSearchHistoryType = array_unique($arrSearchHistoryType);
+            $arrSearchHistoryType[] = array(
+                'type' => $searchData['search_type'],
+                'name' => $searchData['name'],
+            );
+
+            $arrSearchHistoryType = array_unique($arrSearchHistoryType, SORT_REGULAR);
             if (count($arrSearchHistoryType) > 10) {
                 unset($arrSearchHistoryType[0]);
             }
-            $saveData = implode(',', $arrSearchHistoryType);
+            $saveData = json_encode($arrSearchHistoryType);
 
             return $this->renderWithCookie($app, $template, $arrOptions, $saveData);
         }

@@ -12,12 +12,14 @@
     <script type="text/javascript">
         $(function () {
             $(".list-group-item").click(function () {
-                var value = $(this).find("input[name=search_type]").val();
-                $("#search_type").val(value);
-                if (value == '{{ constant('Eccube\\Entity\\Master\\SearchType::SEARCH_HISTORY') }}') {
-                    $('#search-form').find("input[name=name]").val($(this).find("input[name=name]").val());
+                var search_type = $(this).find("input[name=search_type]").val();
+                var search_name = $(this).find("input[name=name]").val();
+                var form = $('#search-form');
+                $("#search_type").val(search_type);
+                if (search_name) {
+                    $(form).find("input[name=name]").val(search_name);
                 }
-                $("#search-form").submit();
+                $(form).submit();
             });
         });
     </script>
@@ -29,10 +31,10 @@
             <input type="hidden" id="search_type" name="search_type" value="">
         </form>
         <ul class="list-group">
-            {% for key, item in types %}
+            {% for item in types %}
             <li class="list-group-item">
-                <input type="hidden" name="search_type" value="{{ key }}">
-                {{ item }}
+                <input type="hidden" name="search_type" value="{{ item.id }}">
+                {{ item.name }}
                 <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
             </li>
             {% endfor %}
@@ -40,11 +42,11 @@
                 <li class="list-group-item">
                     検索履歴
                 </li>
-            {% for item in history_type %}
+            {% for item in history_type|reverse %}
                 <li class="list-group-item">
-                    <input type="hidden" name="search_type" value="{{ constant('Eccube\\Entity\\Master\\SearchType::SEARCH_HISTORY') }}">
-                    <input type="hidden" name="name" value="{{ item }}">
-                    {{ item }}
+                    <input type="hidden" name="search_type" value="{{ item.type }}">
+                    <input type="hidden" name="name" value="{{ item.name }}">
+                    {{ item.name }}
                     <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
                 </li>
             {% endfor %}

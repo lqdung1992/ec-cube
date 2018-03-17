@@ -28,6 +28,12 @@ namespace Eccube\Entity\Master;
  */
 class ProductListOrderBy extends \Eccube\Entity\AbstractEntity
 {
+    const PRICE_LOWER = 1;
+    const ORDER_NEWER = 2;
+    const PRICE_HIGHER = 3;
+    const EARLY_ARRIVAL = 4;
+    const ORDER_LIKER = 5;
+
     /**
      * @return string
      */
