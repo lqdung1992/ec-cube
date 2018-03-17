@@ -68,13 +68,12 @@ class MypageController extends AbstractController
                 $RouteSchedules = $app['eccube.repository.route_schedule']->findOneBy(
                     array('Bus' => $Bus), array('date' => 'DESC'));
 
-
-
                 return $app->redirect($app->url('driver_home'));
+            } else if($userRole == self::ROLE_RECIPIENT){
+                return $app->redirect($app->url('receiver_home'));
             } else {
                 return $app->redirect($app->url('farm_home', array('id' => $app->user()->getId())));
             }
-
         }
 
         /* @var $form \Symfony\Component\Form\FormInterface */

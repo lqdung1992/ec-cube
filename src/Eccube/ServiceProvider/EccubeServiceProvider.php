@@ -116,6 +116,9 @@ class EccubeServiceProvider implements ServiceProviderInterface
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
 
+        $app['eccube.repository.product_rate'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\ProductRate');
+        });
         // Farm
         $app['eccube.repository.notification'] = $app->share(function () use ($app) {
             $repository = $app['orm.em']->getRepository('Eccube\Entity\Notification');

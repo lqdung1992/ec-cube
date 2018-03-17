@@ -63,16 +63,17 @@ class OrderController extends AbstractController
             // for role recipient
             case "check_status":
             // for role farmer
+            case "prepare":
             case "pickup":
                 $customer = $app->user();
                 $farms = $Order->getFarm();
                 // is farmer and creator
-                if ($app->isGranted('ROLE_FARMER') && $farms[0]->getId() == $customer->getId() && $Order->getOrderStatus()->getId() != $app['config']['order_deliv']) {
-                    $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PREPARE);
+                if ($app->isGranted('ROLE_FARMER') && $farms[0]->getId() == $customer->getId() && $Order->getOrderStatus()->getId() == $app['config']['order_new']) {
+                    $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PICKUP);
                     $orderRepo->changeStatus($id, $OrderStatus);
                 }
-
-                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate));
+                $busStop = $orderRepo->getFarmerBusStop($id);
+                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop[0]));
                 break;
 
             case "pickup_done":

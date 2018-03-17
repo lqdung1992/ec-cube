@@ -3,11 +3,14 @@ Eccube\Entity\ProductRate:
     table: dtb_product_rate
     repositoryClass: Eccube\Repository\ProductRateRepository
     id:
-        product_id:
+        id:
             type: integer
             nullable: false
             unsigned: false
             id: true
+            column: product_rate_id
+            generator:
+                strategy: AUTO
     fields:
         like_count:
             type: integer

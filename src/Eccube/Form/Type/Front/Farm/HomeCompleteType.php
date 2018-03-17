@@ -24,7 +24,7 @@ class HomeCompleteType extends AbstractType
             ->add('order_by', 'choice', array(
                 'choices' => array(
                     Order::SORT_BY_NEW => '新着順',
-                    Order::SORT_BY_TOTAL => '合計'
+                    Order::SORT_BY_TOTAL => 'お届け先順'
                 ),
                 'multiple' => false,
                 'expanded' => false,

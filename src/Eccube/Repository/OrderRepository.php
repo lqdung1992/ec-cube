@@ -58,7 +58,7 @@ class OrderRepository extends EntityRepository
         switch ($Status->getId()) {
             // Todo: set commit date with new status
             // Maybe OrderStatus::ORDER_PICKUP
-            case '5': // 発送済へ
+            case OrderStatus::ORDER_PICKUP: // 発送済へ
                 $Order->setCommitDate(new \DateTime());
                 break;
             case '6': // 入金済へ
@@ -563,6 +563,24 @@ class OrderRepository extends EntityRepository
         $rsm = new ResultSetMapping();
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter(1, $status);
+        $results = $query->getResult();
+        return $results;
+    }
+
+    public function getFarmerBusStop($id) {
+        $sql =  'SELECT dtb_bus_stop.bus_stop_id, dtb_bus_stop.name, dtb_bus_stop.address, move_time FROM dtb_order '.
+                'LEFT JOIN dtb_customer ON dtb_order.farmer_id = dtb_customer.customer_id '.
+                'LEFT JOIN dtb_bus_stop ON dtb_customer.bus_stop = dtb_bus_stop.bus_stop_id '.
+                'LEFT JOIN dtb_route_detail ON dtb_bus_stop.bus_stop_id = dtb_route_detail.bus_stop_id '.
+                'WHERE order_id = ?';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('bus_stop_id', 'bus_stop_id');
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('address', 'address');
+        $rsm->addScalarResult('move_time', 'move_time');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $id);
         $results = $query->getResult();
 
         return $results;

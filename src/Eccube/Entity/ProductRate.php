@@ -11,30 +11,14 @@ namespace Eccube\Entity;
 
 class ProductRate extends AbstractEntity
 {
-    private $product_id;
     private $like_count;
     private $delicious_count;
     private $fresh_count;
     private $vivid_count;
     private $aroma_count;
+    private $id;
     /** @var Product */
     private $Product;
-
-    /**
-     * @return mixed
-     */
-    public function getProductId()
-    {
-        return $this->product_id;
-    }
-
-    /**
-     * @param mixed $product_id
-     */
-    public function setProductId($product_id)
-    {
-        $this->product_id = $product_id;
-    }
 
     /**
      * @return mixed
@@ -130,5 +114,21 @@ class ProductRate extends AbstractEntity
     public function setProduct($Product)
     {
         $this->Product = $Product;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param integer $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 }

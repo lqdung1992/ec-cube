@@ -21,6 +21,7 @@ use Eccube\Entity\Notification;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
+use Eccube\Entity\ProductRate;
 use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Entity\ProductTag;
 use Eccube\Exception\CartException;
@@ -677,6 +678,8 @@ class FarmerController extends AbstractController
         ));
     }
 
+
+
     /*
      * ProductCategory作成
      * @param \Eccube\Entity\Product $Product
@@ -693,5 +696,75 @@ class FarmerController extends AbstractController
         $ProductCategory->setRank($count);
 
         return $ProductCategory;
+    }
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function countLike(Application $app, Request $request)
+    {
+
+        if (!$request->isXmlHttpRequest()) {
+            throw new BadRequestHttpException('リクエストが不正です');
+        }
+        $id = $request->get('product_id');
+        $type = $request->get('type');
+        $Product = $app['eccube.repository.product']->find($id);
+        if ($id != null) {
+            /**@var $ProductRate ProductRate*/
+            $ProductRate = $app['eccube.repository.product_rate']->findOneBy(array('Product' => $Product));
+            if ($ProductRate != null) {
+                switch ($type) {
+                    case 'like_count' :
+                        $count = $ProductRate->getLikeCount() + 1;
+                        $ProductRate->setLikeCount($count);
+                        break;
+                    case 'delicious_count' :
+                        $count = $ProductRate->getDeliciousCount() + 1;
+                        $ProductRate->setDeliciousCount($count);
+                        break;
+                    case 'fresh_count' :
+                        $count = $ProductRate->getFreshCount() + 1;
+                        $ProductRate->setFreshCount($count);
+                        break;
+                    case 'vivid_count' :
+                        $count = $ProductRate->getVividCount() + 1;
+                        $ProductRate->setVividCount($count);
+                        break;
+                    default:
+                        $count = $ProductRate->getAromaCount() + 1;
+                        $ProductRate->setAromaCount($count);
+                        break;
+                }
+            } else {
+                $ProductRate = new ProductRate();
+                $ProductRate->setProduct($Product);
+                switch ($type) {
+                    case 'like_count' :
+                        $ProductRate->setLikeCount(1);
+                        break;
+                    case 'delicious_count' :
+                        $ProductRate->setDeliciousCount(1);
+                        break;
+                    case 'fresh_count' :
+                        $ProductRate->setFreshCount(1);
+                        break;
+                    case 'vivid_count' :
+                        $ProductRate->setVividCount(1);
+                        break;
+                    default:
+                        $ProductRate->setAromaCount(1);
+                        break;
+                }
+            }
+            $app['orm.em']->persist($ProductRate);
+            $app['orm.em']->flush($ProductRate);
+
+        }
+
+        return $app->json(array('success' => true), 200);
+
     }
 }
