@@ -174,8 +174,9 @@ class ProductRepository extends EntityRepository
                     $qb->orderBy('date_min', 'ASC');
                     break;
                 case ProductListOrderBy::ORDER_LIKER:
+                    $qb->addSelect('(pr.like_count + pr.aroma_count + pr.delicious_count + pr.fresh_count + pr.vivid_count) as HIDDEN total_like');
                     $qb->leftJoin('p.ProductRate', 'pr');
-                    $qb->orderBy('pr.like_count', 'DESC');
+                    $qb->orderBy('total_like', 'DESC');
                     break;
 
             }
