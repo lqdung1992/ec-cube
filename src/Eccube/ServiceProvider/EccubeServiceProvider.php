@@ -115,6 +115,7 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.csv_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
+
         $app['eccube.repository.product_rate'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\ProductRate');
         });
@@ -152,6 +153,11 @@ class EccubeServiceProvider implements ServiceProviderInterface
         });
         $app['eccube.repository.master.receiptable_date'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\ReceiptableDate');
+        });
+
+        // Receiver
+        $app['eccube.repository.master.search'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\SearchType');
         });
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
@@ -422,6 +428,8 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemClassType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\HomeCompleteType();
+            // Receiver search
+            $types[] = new \Eccube\Form\Type\Front\Receiver\ReceiverSearchType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);

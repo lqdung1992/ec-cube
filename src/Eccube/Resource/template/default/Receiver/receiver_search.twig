@@ -1,0 +1,56 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/15/2018
+ # Time: 8:03 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $(".list-group-item").click(function () {
+                var search_type = $(this).find("input[name=search_type]").val();
+                var search_name = $(this).find("input[name=name]").val();
+                var form = $('#search-form');
+                $("#search_type").val(search_type);
+                if (search_name) {
+                    $(form).find("input[name=name]").val(search_name);
+                }
+                $(form).submit();
+            });
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div class="wrapper" id="search-menu">
+        <form action="?" method="get" name="search-form" id="search-form">
+            {{ form_widget(form.name, {attr: {placeholder: '品目・キーワードなどで探す', class: 'search-input'}}) }}
+            <input type="hidden" id="search_type" name="search_type" value="">
+        </form>
+        <ul class="list-group">
+            {% for item in types %}
+            <li class="list-group-item">
+                <input type="hidden" name="search_type" value="{{ item.id }}">
+                {{ item.name }}
+                <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+            </li>
+            {% endfor %}
+            {% if history_type is not empty %}
+                <li class="list-group-item">
+                    検索履歴
+                </li>
+            {% for item in history_type|reverse %}
+                <li class="list-group-item">
+                    <input type="hidden" name="search_type" value="{{ item.type }}">
+                    <input type="hidden" name="name" value="{{ item.name }}">
+                    {{ item.name }}
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                </li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+{% endblock main %}

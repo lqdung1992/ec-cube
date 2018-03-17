@@ -1,0 +1,40 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/15/2018
+ # Time: 8:03 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $("ul li.list-group-item").click(function () {
+                var value = $(this).find("input").val();
+                $("#search-form").find("input[name=method]").val(value);
+                $("#search-form").submit();
+            });
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div class="wrapper container">
+        <div class="product-section">
+            <form action="?" method="get" name="search-form" id="search-form">
+                <input type="hidden" name="search_type" value="{{ constant('Eccube\\Entity\\Master\\SearchType::SEARCH_ITEM') }}"/>
+                {{ form_widget(form.method) }}
+            </form>
+            <ul class="list-group">
+                {% for method in methods %}
+                <li class="list-group-item">
+                    <input type="hidden" name="method" value="{{ method.id }}">
+                    {{ method.name }}
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock main %}
