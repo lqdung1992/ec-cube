@@ -130,6 +130,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         $c->match('/farm/profile/voice/{id}/delete', '\Eccube\Controller\Farm\FarmerController::deleteVoice')->bind('farm_profile_voice_delete')->assert('id', '\d+');
         // Add image ajax
         $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
+        $c->post('/farm/like_count', '\Eccube\Controller\Farm\FarmerController::countLike')->bind('farm_count_like');
 
         // farm - home
         $c->match('/farm/home', '\Eccube\Controller\Farm\FarmHomeController::index')->bind('farm_home');
