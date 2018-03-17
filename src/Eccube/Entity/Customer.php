@@ -262,6 +262,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->CustomerAddresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->Orders = new \Doctrine\Common\Collections\ArrayCollection();
         $this->CustomerImage = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->Follows = new \Doctrine\Common\Collections\ArrayCollection();
 
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
@@ -1354,5 +1355,52 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
     {
         $this->CustomerImage->removeElement($customerImage);
         return $this;
+    }
+
+    /** @var Follow[] */
+    private $Follows;
+
+    /**
+     * @return Follow[]
+     */
+    public function getFollows()
+    {
+        return $this->Follows;
+    }
+
+    /**
+     * @param Follow $follow
+     * @return $this
+     */
+    public function addFollow(Follow $follow)
+    {
+        $this->Follows->add($follow);
+
+        return $this;
+    }
+
+    /**
+     * @param Follow $follow
+     * @return $this
+     */
+    public function removeFollow(Follow $follow)
+    {
+        $this->Follows->removeElement($follow);
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function isFollow($id)
+    {
+        $follows = $this->getFollows();
+        foreach ($follows as $follow) {
+            if ($follow->getTargetCustomer()->getId() == $id) {
+                return true;
+            }
+        }
+        return false;
     }
 }
