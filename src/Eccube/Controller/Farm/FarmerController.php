@@ -16,6 +16,8 @@ use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
+use Eccube\Entity\Follow;
+use Eccube\Entity\Master\CustomerRole;
 use Eccube\Entity\Master\ReceiptableDate;
 use Eccube\Entity\Notification;
 use Eccube\Entity\Product;
@@ -702,20 +704,26 @@ class FarmerController extends AbstractController
      * @param Application $app
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function countLike(Application $app, Request $request)
     {
-
         if (!$request->isXmlHttpRequest()) {
             throw new BadRequestHttpException('リクエストが不正です');
         }
+
+        if (!$app->isGranted(CustomerRole::RECIPIENT)) {
+            throw new NotFoundHttpException();
+        }
+
         $id = $request->get('product_id');
         $type = $request->get('type');
+        /** @var Product $Product */
         $Product = $app['eccube.repository.product']->find($id);
-        if ($id != null) {
+        if ($Product) {
             /**@var $ProductRate ProductRate*/
-            $ProductRate = $app['eccube.repository.product_rate']->findOneBy(array('Product' => $Product));
-            if ($ProductRate != null) {
+            $ProductRate = $Product->getProductRate();
+            if ($ProductRate instanceof ProductRate) {
                 switch ($type) {
                     case 'like_count' :
                         $count = $ProductRate->getLikeCount() + 1;
@@ -758,13 +766,49 @@ class FarmerController extends AbstractController
                         $ProductRate->setAromaCount(1);
                         break;
                 }
+                $Product->setProductRate($ProductRate);
             }
-            $app['orm.em']->persist($ProductRate);
-            $app['orm.em']->flush($ProductRate);
 
+            $app['orm.em']->persist($ProductRate);
+            $app['orm.em']->flush();
         }
 
         return $app->json(array('success' => true), 200);
+    }
 
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @throws Application\AuthenticationCredentialsNotFoundException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function follow(Application $app, Request $request, $id)
+    {
+        $this->isTokenValid($app);
+        if (!$app->isGranted(CustomerRole::RECIPIENT)) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var CustomerRepository $customerRepo */
+        $customerRepo = $app['eccube.repository.customer'];
+        $TargetCustomer = $customerRepo->find($id);
+        if (!$TargetCustomer) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+
+        $follow = new Follow();
+        $follow->setTargetCustomer($TargetCustomer);
+        $follow->setCustomer($Customer);
+        $Customer->addFollow($follow);
+        /** @var EntityManager $em */
+        $em = $app['orm.em'];
+        $em->persist($follow);
+        $em->flush();
+
+        return $app->redirect($app->url('farm_profile', array('id' => $id)));
     }
 }
