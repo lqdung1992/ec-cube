@@ -68,18 +68,6 @@ class Version20180315203900 extends AbstractMigration
             ->setRank(2)
             ->setName('生産方法から探す');
         $em->persist($searchType);
-
-        $searchType = new SearchType();
-        $searchType->setId(4)
-            ->setRank(3)
-            ->setName('検索履歴');
-        $em->persist($searchType);
-        $searchType = new SearchType();
-        $searchType->setId(5)
-            ->setRank(4)
-            ->setName('トマト');
-        $em->persist($searchType);
-
         $em->flush();
     }
 

@@ -127,13 +127,21 @@ class ProductRepository extends EntityRepository
             }
         }
 
+        // farmer
+        if (isset($searchData['farmer']) && is_numeric($searchData['farmer'])) {
+            $qb->andWhere('p.Creator = :Creator')
+                ->setParameter('Creator', $searchData['farmer']);
+        }
+
         // Order By
         // 価格低い順
         $config = $this->app['config'];
+        $isJoinProductClass = false;
         if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['product_order_price_lower']) {
             //@see http://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html
             $qb->addSelect('MIN(pc.price02) as HIDDEN price02_min');
             $qb->innerJoin('p.ProductClasses', 'pc');
+            $isJoinProductClass = true;
             $qb->groupBy('p');
             // postgres9.0以下は, groupBy('p.id')が利用できない
             // mysqlおよびpostgresql9.1以上であればgroupBy('p.id')にすることで性能向上が期待できる.
@@ -145,6 +153,7 @@ class ProductRepository extends EntityRepository
         } else if (!empty($searchData['orderby']) && $searchData['orderby']->getId() == $config['product_order_price_higher']) {
             $qb->addSelect('MAX(pc.price02) as HIDDEN price02_max');
             $qb->innerJoin('p.ProductClasses', 'pc');
+            $isJoinProductClass = true;
             $qb->groupBy('p');
             $qb->orderBy('price02_max', 'DESC');
             $qb->addOrderBy('p.id', 'DESC');
@@ -154,6 +163,7 @@ class ProductRepository extends EntityRepository
             // @see https://github.com/EC-CUBE/ec-cube/issues/1998
             if ($this->app['orm.em']->getFilters()->isEnabled('nostock_hidden') == true) {
                 $qb->innerJoin('p.ProductClasses', 'pc');
+                $isJoinProductClass = true;
             }
             $qb->orderBy('p.create_date', 'DESC');
             $qb->addOrderBy('p.id', 'DESC');
@@ -165,6 +175,14 @@ class ProductRepository extends EntityRepository
             }
             $qb
                 ->addOrderBy('p.id', 'DESC');
+        }
+
+        if (isset($searchData['method']) && is_numeric($searchData['method'])) {
+            if (!$isJoinProductClass) {
+                $qb->innerJoin('p.ProductClasses', 'pc');
+            }
+            $qb->andWhere('pc.CultivationMethod = :Method')
+                ->setParameter('Method', $searchData['method']);
         }
 
         return $qb;

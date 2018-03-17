@@ -13,7 +13,7 @@
         $(function () {
             $("ul li.list-group-item").click(function () {
                 var value = $(this).find("input").val();
-                $("#search-form").find("input[name=farmer]").val(value);
+                $("#search-form").find("input[name=method]").val(value);
                 $("#search-form").submit();
             });
         });
@@ -24,16 +24,14 @@
         <div class="product-section">
             <form action="?" method="get" name="search-form" id="search-form">
                 <input type="hidden" name="search_type" value="{{ constant('Eccube\\Entity\\Master\\SearchType::SEARCH_ITEM') }}"/>
-                {{ form_widget(form.farmer) }}
+                {{ form_widget(form.method) }}
             </form>
             <ul class="list-group">
-                {% for TargetCustomer in farmers %}
-                <li class="list-group-item line-height15">
-                    <input type="hidden" name="search_farmer" value="{{ TargetCustomer.id }}">
-                    <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" class="img-circle profile50">
-                    <span class="profile-name-medium">{{ TargetCustomer.__toString }}</span>
-                    <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
-                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top-30">
+                {% for method in methods %}
+                <li class="list-group-item">
+                    <input type="hidden" name="method" value="{{ method.id }}">
+                    {{ method.name }}
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top5">
                 </li>
                 {% endfor %}
             </ul>

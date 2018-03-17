@@ -17,4 +17,16 @@ use Doctrine\ORM\EntityRepository;
  */
 class SearchTypeRepository extends EntityRepository
 {
+    /**
+     * @return array
+     */
+    public function getAllIdAsKey()
+    {
+        $em = $this->getEntityManager();
+        $qb = $em->createQueryBuilder()->select('st')
+            ->from('Eccube\Entity\Master\SearchType', 'st', 'st.id')
+            ->orderBy('st.rank', 'ASC');
+
+        return $qb->getQuery()->getArrayResult();
+    }
 }

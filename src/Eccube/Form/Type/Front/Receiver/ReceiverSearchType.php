@@ -41,24 +41,13 @@ class ReceiverSearchType extends AbstractType
     {
         $builder
             ->add('name', 'search', array(
-                'required' => true,
-                'label' => false,
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                    new Assert\Length(
-                        array(
-                            'max' => $this->config['smtext_len'],
-                        )
-                    )
-                )
+                'required' => false,
             ))
-            ->add('search_type', 'entity', array(
-                'required' => true,
-                'class' => 'Eccube\Entity\Master\SearchType',
-                'constraints' => array(
-                    new Assert\NotBlank(),
-                )
-            ));
+            ->add('search_type', 'hidden', array(
+                'required' => false
+            ))
+            ->add('farmer', 'hidden')
+            ->add('method', 'hidden');
 
         $builder->add('pageno', 'hidden');
         $builder->add('orderby', 'product_list_order_by');
