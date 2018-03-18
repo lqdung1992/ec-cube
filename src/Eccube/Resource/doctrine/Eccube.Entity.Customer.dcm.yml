@@ -188,6 +188,17 @@ Eccube\Entity\Customer:
             joinColumn:
                 name: pref
                 referencedColumnName: id
+        ReceiverContainerType:
+            targetEntity: Eccube\Entity\Master\ReceiverContainerType
+            joinColumn:
+                name: receiver_container_type
+                referencedColumnName: id
+        ReceiverGetTime:
+            targetEntity: Eccube\Entity\Master\ReceiverGetTime
+            joinColumn:
+                name: receiver_get_time
+                referencedColumnName: id
+
     oneToMany:
         CustomerFavoriteProducts:
             targetEntity: Eccube\Entity\CustomerFavoriteProduct

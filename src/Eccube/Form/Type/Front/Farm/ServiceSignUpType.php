@@ -97,6 +97,20 @@ class ServiceSignUpType extends AbstractType
                 'empty_value' => '----------',
                 'property' => 'name',
                 'label' => '集荷先のバス停'
+            ))
+            ->add('receiver_container_type', 'entity', array(
+                'required' => true,
+                'class' => 'Eccube\Entity\Master\ReceiverContainerType',
+                'label' => '商品の梱包資材',
+                'multiple' => false,
+                'expanded' => true
+            ))
+            ->add('receiver_get_time', 'entity', array(
+                'required' => true,
+                'class' => 'Eccube\Entity\Master\ReceiverGetTime',
+                'label' => '商品の受け取り優先時間',
+                'multiple' => false,
+                'expanded' => true
             ));
     }
 

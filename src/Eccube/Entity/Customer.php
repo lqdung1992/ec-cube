@@ -27,6 +27,8 @@ namespace Eccube\Entity;
 use Eccube\Common\Constant;
 use Eccube\Entity\Master\ApprovalStatus;
 use Eccube\Entity\Master\CustomerRole;
+use Eccube\Entity\Master\ReceiverContainerType;
+use Eccube\Entity\Master\ReceiverGetTime;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -252,6 +254,13 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      * @var CustomerImage[]
      */
     private $CustomerImage;
+
+
+    /* @var ReceiverContainerType $ReceiverContainerTyp　*/
+    private $ReceiverContainerType;
+
+    /* @var ReceiverGetTime $ReceiverGetTime　*/
+    private $ReceiverGetTime;
 
     /**
      * Constructor
@@ -1403,4 +1412,38 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         }
         return false;
     }
+
+    /**
+     * @return ReceiverContainerType
+     */
+    public function getReceiverContainerType()
+    {
+        return $this->ReceiverContainerType;
+    }
+
+    /**
+     * @param ReceiverContainerType $ReceiverContainerType
+     */
+    public function setReceiverContainerType($ReceiverContainerType)
+    {
+        $this->ReceiverContainerType = $ReceiverContainerType;
+    }
+
+    /**
+     * @return ReceiverGetTime
+     */
+    public function getReceiverGetTime()
+    {
+        return $this->ReceiverGetTime;
+    }
+
+    /**
+     * @param ReceiverGetTime $ReceiverGetTime
+     */
+    public function setReceiverGetTime($ReceiverGetTime)
+    {
+        $this->ReceiverGetTime = $ReceiverGetTime;
+    }
+
+
 }
