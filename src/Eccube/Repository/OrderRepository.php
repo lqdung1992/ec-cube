@@ -567,6 +567,12 @@ class OrderRepository extends EntityRepository
         return $results;
     }
 
+    /**
+     * @param $id
+     * @return array
+     * @deprecated todo: remove this
+     * @see BusStopRepository::getByOrder()
+     */
     public function getFarmerBusStop($id) {
         $sql =  'SELECT dtb_bus_stop.bus_stop_id, dtb_bus_stop.name, dtb_bus_stop.address, move_time FROM dtb_order '.
                 'LEFT JOIN dtb_customer ON dtb_order.farmer_id = dtb_customer.customer_id '.

@@ -27,7 +27,6 @@ Eccube\Entity\Follow:
                 referencedColumnName: customer_id
         TargetCustomer:
             targetEntity: Eccube\Entity\Customer
-            inversedBy: Follows
             joinColumn:
                 name: follow_customer_id
                 referencedColumnName: customer_id
