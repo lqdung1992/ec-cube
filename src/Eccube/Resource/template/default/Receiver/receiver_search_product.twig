@@ -7,6 +7,49 @@
 {% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
+    <style type="text/css">
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 620px;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+
+        #search-form select {
+            height: 50px !important;
+            margin: 20px 0;
+        }
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            .thumbnail {
+                border: 1px solid #ddd !important;
+                height: 420px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 290px;
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            .thumbnail {
+                border: 1px solid #ddd !important;
+                height: 350px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 200px;
+            }
+        }
+    </style>
 {% endblock stylesheet %}
 {% block javascript %}
     <script type="text/javascript">
@@ -25,7 +68,7 @@
     </script>
 {% endblock javascript %}
 {% block main %}
-    <div class="wrapper container">
+    <div class="wrapper">
         <div class="product-section">
             <form action="?" method="get" name="search-form" id="search-form">
                 {{ form_widget(form.name) }}
@@ -42,7 +85,7 @@
                             {% set TargetCustomer = Product.Creator %}
                             <div class="col-sm-3 col-xs-6 thumbnail">
                                 <div class="image-box">
-                                    <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                    <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img class="main-img" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
                                     <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-inactive.svg" class="like-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: none;"{% endif %}>
                                     <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: block;"{% endif %}>
                                 </div>

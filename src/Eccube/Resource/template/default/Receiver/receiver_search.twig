@@ -7,25 +7,60 @@
 {% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
+    <style type="text/css">
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 620px;
+        }
+
+        .search-input {
+            margin: 15px 0 !important;
+            height: 45px !important;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+            height: 50px;
+            padding-top: 15px;
+        }
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            .wrapper {
+                padding: 20px 20% 0 20%;
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+
+        }
+    </style>
 {% endblock stylesheet %}
 {% block javascript %}
     <script type="text/javascript">
         $(function () {
             $(".list-group-item").click(function () {
-                var search_type = $(this).find("input[name=search_type]").val();
-                var search_name = $(this).find("input[name=name]").val();
-                var form = $('#search-form');
-                $("#search_type").val(search_type);
-                if (search_name) {
-                    $(form).find("input[name=name]").val(search_name);
+                if (!$(this).hasClass('disabled')) {
+                    var search_type = $(this).find("input[name=search_type]").val();
+                    var search_name = $(this).find("input[name=name]").val();
+                    var form = $('#search-form');
+                    $("#search_type").val(search_type);
+                    if (search_name) {
+                        $(form).find("input[name=name]").val(search_name);
+                    }
+                    $(form).submit();
                 }
-                $(form).submit();
             });
         });
     </script>
 {% endblock javascript %}
 {% block main %}
-    <div class="wrapper" id="search-menu">
+    <div class="wrapper">
         <form action="?" method="get" name="search-form" id="search-form">
             {{ form_widget(form.name, {attr: {placeholder: '品目・キーワードなどで探す', class: 'search-input'}}) }}
             <input type="hidden" id="search_type" name="search_type" value="">
@@ -39,7 +74,7 @@
             </li>
             {% endfor %}
             {% if history_type is not empty %}
-                <li class="list-group-item">
+                <li class="list-group-item disabled">
                     検索履歴
                 </li>
             {% for item in history_type|reverse %}

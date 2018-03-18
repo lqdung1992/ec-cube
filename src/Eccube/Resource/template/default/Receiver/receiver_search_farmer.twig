@@ -7,6 +7,32 @@
 {% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
+    <style type="text/css">
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 620px;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            .wrapper {
+                padding: 20px 20% 0 20%;
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+
+        }
+    </style>
 {% endblock stylesheet %}
 {% block javascript %}
     <script type="text/javascript">
@@ -20,7 +46,7 @@
     </script>
 {% endblock javascript %}
 {% block main %}
-    <div class="wrapper container">
+    <div class="wrapper">
         <div class="product-section">
             <form action="?" method="get" name="search-form" id="search-form">
                 <input type="hidden" name="search_type" value="{{ constant('Eccube\\Entity\\Master\\SearchType::SEARCH_ITEM') }}"/>
