@@ -1639,4 +1639,17 @@ class Order extends \Eccube\Entity\AbstractEntity
         return $this;
     }
 
+    /**
+     * @param Customer $customer
+     * @return bool
+     */
+    public function isFarmer(Customer $customer)
+    {
+        foreach ($this->getFarm() as $farmer) {
+            if ($farmer->getId() == $customer->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -18,11 +18,6 @@
                 margin-bottom: 20px;
             }
         }
-        /******************************
-            Media Query for smart phone
-        *******************************/
-        @media only screen and (max-width: 767px) {
-        }
 
         #order_id {
             border-bottom: 2px solid #333333;
@@ -33,21 +28,48 @@
 {% block javascript %}
 {% endblock javascript %}
 {% block main %}
+    {% set Shipping = Order.Shippings[0] %}
     <div id="receiver-status-wrapper" class="wrapper">
         <div class="stepwizard">
             <div class="stepwizard-row">
-                <div class="stepwizard-step">
-                    <span class="circle-symbol">&#x25CF;</span>
-                    <p class="color888 title12">出荷登録</p>
-                </div>
-                <div class="stepwizard-step">
-                    <span class="circle-symbol color-primary">&#x25CF;</span>
-                    <p class="color888 title12 color-primary">集荷</p>
-                </div>
-                <div class="stepwizard-step">
-                    <span class="circle-symbol">&#x25CF;</span>
-                    <p class="title12">配送</p>
-                </div>
+                {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                    <div class="stepwizard-step">
+                        <span class="circle-symbol">&#x25CF;</span>
+                        <p class="color888 title12">出荷登録</p>
+                    </div>
+                    <div class="stepwizard-step">
+                        <span class="circle-symbol color-primary">&#x25CF;</span>
+                        <p class="color888 title12 color-primary">配送中</p>
+                    </div>
+                {% else %}
+                    {% if constant('Eccube\\Entity\\Master\\OrderStatus::PICKUP_DONE') == Order.OrderStatus.id %}
+                        <div class="stepwizard-step">
+                            <span class="circle-symbol">&#x25CF;</span>
+                            <p class="color888 title12">出荷登録</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <span class="circle-symbol color-primary">&#x25CF;</span>
+                            <p class="color888 title12 color-primary">集荷</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <span class="circle-symbol">&#x25CF;</span>
+                            <p class="title12 color888">配送</p>
+                        </div>
+                    {% else %}
+                        <div class="stepwizard-step">
+                            <span class="circle-symbol">&#x25CF;</span>
+                            <p class="color888 title12">出荷登録</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <span class="circle-symbol">&#x25CF;</span>
+                            <p class="color888 title12">集荷</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <span class="circle-symbol color-primary">&#x25CF;</span>
+                            <p class="title12 color888 color-primary">配送</p>
+                        </div>
+                    {% endif %}
+                {% endif %}
                 <div class="stepwizard-step">
                     <span class="circle-symbol">&#x25CF;</span>
                     <p class="title12">受領確認</p>
@@ -56,9 +78,24 @@
         </div>
 
         <div id="cart-confirm-main">
-            <div class="title-section-medium">
-                <p>出荷登録が完了しました</p>
-            </div>
+            {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                {#Todo: time#}
+                <div class="title-section-medium">
+                    <p>
+                        <span class="title20">15時30分</span>
+                        <span>に到着予定です</span>
+                    </p>
+                    <p class="title11 color888">問題なく運行中です</p>
+                </div>
+            {% else %}
+                <div class="title-section-medium">
+                    {% if constant('Eccube\\Entity\\Master\\OrderStatus::PICKUP_DONE') == Order.OrderStatus.id %}
+                        <p>出荷登録が完了しました</p>
+                    {% else %}
+                        <p>商品を集荷しました。ただいま配送中です</p>
+                    {% endif %}
+                </div>
+            {% endif %}
             <div class="cart-content" id="cart-main-content3">
                 <p class="title14 margin-left10 margin-top10 order-title">注文情報</p>
                 <div class="receiver-status-profile clearfix">
@@ -97,6 +134,20 @@
                 {% endfor %}
                 <p class="title18 margin-left10 margin-top15">注文番号</p>
                 <p class="title20 margin-left10 margin-top15" id="order_id">{{ Order.id }}</p>
+
+                {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                    <div class="float-left margin-left10">
+                        <p class="title14">小計</p>
+                        <p class="title14">送料</p>
+                        <p class="title14">ご請求額</p>
+                    </div>
+                    <div class="float-right margin-right10">
+                        <p class="title14 text-align-right">{{ Order.subtotal|price }}</p>
+                        {#Todo: implement container#}
+                        <p class="title14 text-align-right">350円</p>
+                        <p class="title18 text-align-right">{{ Order.payment_total|price }}</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

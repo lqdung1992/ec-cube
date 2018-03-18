@@ -25,6 +25,8 @@
 namespace Eccube\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Eccube\Entity\BusStop;
+use Eccube\Entity\Order;
 
 /**
  * BusAreaRepository
@@ -70,5 +72,21 @@ class BusStopRepository extends EntityRepository
         }
 
         return true;
+    }
+
+
+    /**
+     * @param Order $order
+     * @return int
+     */
+    public function getByOrder(Order $order)
+    {
+        $qb = $this->createQueryBuilder('bs')
+            ->innerJoin('bs.Customers', 'c')
+            ->innerJoin('c.Orders', 'o')
+            ->where('o = :order')
+            ->setParameter('order', $order);
+
+        return $qb->getQuery()->getFirstResult();
     }
 }

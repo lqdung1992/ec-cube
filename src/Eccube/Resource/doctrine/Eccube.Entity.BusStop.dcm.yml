@@ -44,5 +44,17 @@ Eccube\Entity\BusStop:
             joinColumn:
                 name: route_status
                 referencedColumnName: id
-
+    oneToMany:
+        Customers:
+            targetEntity: Eccube\Entity\Customer
+            mappedBy: BusStop
+            joinColumn:
+                name: bus_stop_id
+                referencedColumnName: bus_stop
+        RouteDetails:
+            targetEntity: Eccube\Entity\RouteDetail
+            mappedBy: BusStop
+            joinColumn:
+                name: bus_stop_id
+                referencedColumnName: bus_stop_id
     lifecycleCallbacks: {  }

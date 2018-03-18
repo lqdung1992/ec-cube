@@ -39,6 +39,7 @@ Eccube\Entity\RouteDetail:
     manyToOne:
         BusStop:
             targetEntity: Eccube\Entity\BusStop
+            inversedBy: RouteDetails
             joinColumn:
                 name: bus_stop_id
                 referencedColumnName: bus_stop_id
@@ -47,5 +48,4 @@ Eccube\Entity\RouteDetail:
             joinColumn:
                 name: route_id
                 referencedColumnName: id
-
     lifecycleCallbacks: {  }

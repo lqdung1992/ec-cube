@@ -2549,3 +2549,9 @@ span.required {
     bottom: 5%;
     right: 5%;
 }
+
+#map {
+    width: 60% !important;
+    margin: auto;
+    height: 300px;
+}

@@ -165,6 +165,7 @@ Eccube\Entity\Customer:
                 referencedColumnName: id
         BusStop:
             targetEntity: Eccube\Entity\BusStop
+            inversedBy: Customers
             joinColumn:
                 name: bus_stop
                 referencedColumnName: bus_stop_id
