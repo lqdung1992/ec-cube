@@ -78,10 +78,9 @@ class OrderController extends AbstractController
         $masterDate = $app['eccube.repository.master.receiptable_date']->findAllWithKeyAsId();
 
         switch ($mode) {
-            // for role recipient
-            case "check_status":
             // for role farmer
             case "prepare":
+            // Receiver + driver
             case "pickup":
                 // is farmer and creator
                 if ($app->isGranted(CustomerRole::FARMER)
@@ -95,6 +94,7 @@ class OrderController extends AbstractController
                 $busStop = $busStopRepo->getByOrder($Order);
                 return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
                 break;
+
             case "delivery":
             case "pickup_done":
                 // Todo: driver confirm to change status
@@ -119,6 +119,7 @@ class OrderController extends AbstractController
                 $busStop = $busStopRepo->getByOrder($Order);
                 return $app->render('Order/receive.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
                 break;
+
             case "complete":
                 return $app->render('Order/complete.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
