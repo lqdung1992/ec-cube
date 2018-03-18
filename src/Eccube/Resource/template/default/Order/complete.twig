@@ -35,30 +35,50 @@
 <div id="receiver-status-wrapper" class="wrapper">
     <div class="stepwizard">
         <div class="stepwizard-row">
-            <div class="stepwizard-step">
-                <span class="circle-symbol">&#x25CF;</span>
-                <p class="color888 title12">出荷登録</p>
-            </div>
-            <div class="stepwizard-step">
-                <span class="circle-symbol">&#x25CF;</span>
-                <p class="color888 title12">集荷</p>
-            </div>
-            <div class="stepwizard-step">
-                <span class="circle-symbol">&#x25CF;</span>
-                <p class="title12 color888">配送</p>
-            </div>
-            <div class="stepwizard-step">
-                <span class="circle-symbol color-primary">&#x25CF;</span>
-                <p class="title12 color-primary">受領確認</p>
-            </div>
+            {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="color888 title12">出荷登録</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="color888 title12">配送中</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol color-primary">&#x25CF;</span>
+                    <p class="color888 title12 color-primary">受領確認</p>
+                </div>
+            {% else %}
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="color888 title12">出荷登録</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="color888 title12">集荷</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="title12 color888">配送</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol color-primary">&#x25CF;</span>
+                    <p class="title12 color888 color-primary">受領確認</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 
 
     <div id="cart-confirm-main">
         <div class="title-section-medium">
-            <p class="title12">商品の配送が完了しました</p>
-            <p class="title12">受領確認が完了すると、取引が完了します</p>
+            {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                <p>取引が完了しました</p>
+                <p>過去の取引情報は取引終了画面から見れます</p>
+            {% else %}
+                <p class="title12">商品の配送が完了しました</p>
+                <p class="title12">受領確認が完了すると、取引が完了します</p>
+            {% endif %}
         </div>
 
         <div class="cart-content" id="cart-main-content3">
@@ -102,6 +122,20 @@
 
             <p class="title18 margin-left10 margin-top15">注文番号</p>
             <p class="title20 margin-left10 margin-top15" id="order_id">{{ Order.id }}</p>
+
+            {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                <div class="float-left margin-left10">
+                    <p class="title14">小計</p>
+                    <p class="title14">送料</p>
+                    <p class="title14">ご請求額</p>
+                </div>
+                <div class="float-right margin-right10">
+                    <p class="title14 text-align-right">{{ Order.subtotal|price }}</p>
+                    {#Todo: implement container#}
+                    <p class="title14 text-align-right">350円</p>
+                    <p class="title18 text-align-right">{{ Order.payment_total|price }}</p>
+                </div>
+            {% endif %}
         </div>
 
     </div>

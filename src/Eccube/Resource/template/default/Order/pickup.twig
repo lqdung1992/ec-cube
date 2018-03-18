@@ -120,7 +120,9 @@
                 <div class="map">
                     {#Todo: map#}
                     <div id="map"></div>
+                    {% if busStop is not null %}
                     <input id="address" type="hidden" value="{{ busStop.address }}">
+                    {% endif %}
                     <button class="btn btn-inactive popup" id="farmer-qr-code">QRコードを読み込んで出荷完了する</button>
                     <p class="title12 margin-top10 color888">QRコードは持ち込みの◯時間前から表示できます-15</p>
                 </div>

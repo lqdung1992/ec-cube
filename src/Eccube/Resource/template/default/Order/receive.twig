@@ -67,12 +67,12 @@
                         <p class="color888 title12">集荷</p>
                     </div>
                     <div class="stepwizard-step">
-                        <span class="circle-symbol color-primary">&#x25CF;</span>
-                        <p class="title12 color888 color-primary">配送</p>
+                        <span class="circle-symbol">&#x25CF;</span>
+                        <p class="title12 color888">配送</p>
                     </div>
                     <div class="stepwizard-step">
-                        <span class="circle-symbol">&#x25CF;</span>
-                        <p class="title12">受領確認</p>
+                        <span class="circle-symbol color-primary">&#x25CF;</span>
+                        <p class="title12 color888 color-primary">受領確認</p>
                     </div>
                 {% endif %}
             </div>
@@ -91,8 +91,10 @@
                         <div id="map"></div>
                         <form name="form-receive" method="post" action="?">
                             <input type="hidden" name="mode" value="receiver_confirm">
+                            {% if busStop is not null %}
                             <input id="address" type="hidden" value="{{ busStop.address }}">
                             <p class="color888 margin-top15">{{ busStop.address }}</p>
+                            {% endif %}
                             <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/status-qr.svg" class="qr-camera">
                             <input type="text" class="input9" name="id" placeholder="{{ Order.id }}" readonly>
                             <button type="submit" class="btn btn-inactive">受領確認</button>

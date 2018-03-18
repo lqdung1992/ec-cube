@@ -52,9 +52,8 @@ class OrderController extends AbstractController
         // Check permission to action
         /** @var Customer $Customer */
         $Customer = $app->user();
-        $farms = $Order->getFarm();
         if (!$app->isGranted(CustomerRole::DRIVER)) {
-            if ($Order->getCustomer()->getId() != $Customer->getId() && $farms[0]->getId() != $Customer->getId()) {
+            if ($Order->getCustomer()->getId() != $Customer->getId() && $Order->isFarmer($Customer)) {
                 throw new NotFoundHttpException();
             }
         }
@@ -86,7 +85,7 @@ class OrderController extends AbstractController
             case "pickup":
                 // is farmer and creator
                 if ($app->isGranted(CustomerRole::FARMER)
-                    && $farms[0]->getId() == $Customer->getId()
+                    && $Order->isFarmer($Customer)
                     && $Order->getOrderStatus()->getId() == $app['config']['order_new']) {
                     $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PICKUP);
                     $orderRepo->changeStatus($id, $OrderStatus);
@@ -98,6 +97,7 @@ class OrderController extends AbstractController
                 break;
             case "delivery":
             case "pickup_done":
+                // Todo: driver confirm to change status
                 return $app->render('Order/pickup_done.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
 
@@ -105,7 +105,9 @@ class OrderController extends AbstractController
             case "receiver_confirm":
                 if ($request->getMethod() == "POST") {
                     if ($app->isGranted(CustomerRole::RECIPIENT)
-                        && $Order->getOrderStatus()->getId() == OrderStatus::DELIVERY_DONE) {
+                        && $Order->getOrderStatus()->getId() == OrderStatus::DELIVERY_DONE
+                        && $Order->getCustomer()->getId() == $Customer->getId()
+                    ) {
                         $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_DONE);
                         $orderRepo->changeStatus($id, $OrderStatus);
 
@@ -115,7 +117,6 @@ class OrderController extends AbstractController
                 /** @var BusStopRepository $busStopRepo */
                 $busStopRepo = $app['eccube.repository.bus_stop'];
                 $busStop = $busStopRepo->getByOrder($Order);
-                dump($busStop);
                 return $app->render('Order/receive.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
                 break;
             case "complete":
