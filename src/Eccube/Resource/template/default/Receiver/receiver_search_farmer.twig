@@ -17,6 +17,13 @@
             cursor: pointer;
         }
 
+        .follow {
+            background-color: #1bc929 !important;
+            margin-left: 5px;
+            margin-top: -30px;
+            margin-right: 20px;
+        }
+
         /******************************
             Media Query for tablet, PC...
         *******************************/
@@ -58,6 +65,11 @@
                     <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" class="img-circle profile50">
                     <span class="profile-name-medium">{{ TargetCustomer.__toString }}</span>
                     <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                    <label class="follow badge float-right">
+                        {% if app.user.isFollow(TargetCustomer.id) %}
+                            フォロー中
+                        {% endif %}
+                    </label>
                     <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="float-right margin-top-30">
                 </li>
                 {% endfor %}
