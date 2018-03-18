@@ -585,4 +585,21 @@ class OrderRepository extends EntityRepository
 
         return $results;
     }
+
+    public function getSaleByMonth ($farmer_id) {
+        //need move to my sql
+        $sql =  'SELECT SUM(payment_total) as total, strftime(\'%m\', order_date) as month '.
+                'FROM dtb_order '.
+                'WHERE order_date LIKE ? AND farmer_id = ?'.
+                'GROUP BY strftime("%y-%m", order_date) ';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('total', 'total');
+        $rsm->addScalarResult('month', 'month');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, date('Y%'));
+        $query->setParameter(2, $farmer_id);
+        $results = $query->getResult();
+
+        return $results;
+    }
 }

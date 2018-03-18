@@ -123,6 +123,10 @@ class FrontControllerProvider implements ControllerProviderInterface
         // Farm change password
         $c->match('/farm/farmer/password/change', '\Eccube\Controller\Farm\FarmerController::changePassword')->bind('farm_farmer_password_change');
 
+        //Farm sale and discount
+        $c->match('/farm/sale', '\Eccube\Controller\Farm\FarmSaleController::sale')->bind('farm_sale');
+
+
         // farm - profile
         $c->match('/farm/profile', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile_own');
         $c->match('/farm/profile/{id}', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile')->assert('id', '\d+');

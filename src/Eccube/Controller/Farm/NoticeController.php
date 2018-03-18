@@ -32,9 +32,9 @@ class NoticeController extends AbstractController
      */
     public function index(Application $app, Request $request, $id = null)
     {
-        if (!$app->isGranted(CustomerRole::FARMER)) {
-            return $app->redirect($app->url('mypage_login'));
-        }
+//        if ($app->isGranted(CustomerRole::FARMER)) {
+//            return $app->redirect($app->url('mypage_login'));
+//        }
         $Customer = $app->user();
 
         /** @var NotificationRepository $noticeRepo */
