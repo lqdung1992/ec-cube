@@ -67,12 +67,12 @@
                         <p class="color888 title12">集荷</p>
                     </div>
                     <div class="stepwizard-step">
-                        <span class="circle-symbol">&#x25CF;</span>
-                        <p class="title12 color888">配送</p>
+                        <span class="circle-symbol color-primary">&#x25CF;</span>
+                        <p class="title12 color888 color-primary">配送</p>
                     </div>
                     <div class="stepwizard-step">
-                        <span class="circle-symbol color-primary">&#x25CF;</span>
-                        <p class="title12 color888 color-primary">受領確認</p>
+                        <span class="circle-symbol">&#x25CF;</span>
+                        <p class="title12 color888">受領確認</p>
                     </div>
                 {% endif %}
             </div>
@@ -102,8 +102,7 @@
                     </div>
                 {% else %}
                     <div class="title-section-medium">
-                        <p>商品の配送が完了しました</p>
-                        <p>受領確認が完了すると、取引が完了します</p>
+                        <p>商品を集荷しました。ただいま配送中です</p>
                     </div>
                 {% endif %}
             </div>
@@ -117,9 +116,15 @@
             <div class="cart-content" id="cart-main-content3">
                 <p class="title14 margin-left10 margin-top10 order-title">注文情報</p>
                 <div class="receiver-status-profile clearfix">
-                    <p>お届け先</p>
-                    <img src="{{ app.config.image_save_urlpath }}/{{ Order.Customer.profile_image|no_image_product }}" class="profile50 img-circle">
-                    <span class="profile-name-medium padding-top15">{{ Shipping.name01 }}{{ Shipping.name02 }}</span>
+                    {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                        <p>生産者</p>
+                        <img src="{{ app.config.image_save_urlpath }}/{{ farmer.profile_image|no_image_product }}" class="profile50 img-circle">
+                        <span class="profile-name-medium padding-top15">{{ farmer.name01 }}{{ farmer.name02 }}</span>
+                    {% else %}
+                        <p>お届け先</p>
+                        <img src="{{ app.config.image_save_urlpath }}/{{ Order.Customer.profile_image|no_image_product }}" class="profile50 img-circle">
+                        <span class="profile-name-medium padding-top15">{{ Order.name01 }}{{ Order.name02 }}</span>
+                    {% endif %}
                 </div>
 
                 <div class="margin-left10 order-title2">
@@ -129,6 +134,7 @@
 
                 <p class="title12 margin-left10 margin-top15">折りたたみコンテナの数</p>
                 <div class="margin-left10 clearfix cart-container margin-right10 margin-bottom15 padding-bottom15">
+                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg">
                     <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg">
                 </div>
 
@@ -160,7 +166,7 @@
                     <div class="float-right margin-right10">
                         <p class="title14 text-align-right">{{ Order.subtotal|price }}</p>
                         {#Todo: implement container#}
-                        <p class="title14 text-align-right">350円</p>
+                        <p class="title14 text-align-right">0円</p>
                         <p class="title18 text-align-right">{{ Order.payment_total|price }}</p>
                     </div>
                 {% endif %}

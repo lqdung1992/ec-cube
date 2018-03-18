@@ -594,7 +594,6 @@ class OrderRepository extends EntityRepository
     /**
      * @param $id
      * @return array
-     * @deprecated todo: remove this
      * @see BusStopRepository::getByOrder()
      */
     public function getFarmerBusStop($id) {

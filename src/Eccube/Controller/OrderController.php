@@ -52,11 +52,11 @@ class OrderController extends AbstractController
         // Check permission to action
         /** @var Customer $Customer */
         $Customer = $app->user();
-        if (!$app->isGranted(CustomerRole::DRIVER)) {
-            if ($Order->getCustomer()->getId() != $Customer->getId() && $Order->isFarmer($Customer)) {
-                throw new NotFoundHttpException();
-            }
-        }
+//        if (!$app->isGranted(CustomerRole::DRIVER)) {
+//            if ($Order->getCustomer()->getId() != $Customer->getId() && $Order->isFarmer($Customer)) {
+//                throw new NotFoundHttpException();
+//            }
+//        }
 
         $mode = $request->get('mode');
         if (!$mode) {
@@ -76,6 +76,7 @@ class OrderController extends AbstractController
             }
         }
         $masterDate = $app['eccube.repository.master.receiptable_date']->findAllWithKeyAsId();
+        $Farmer = $app['eccube.repository.customer']->find($Order->getFarmerId());
 
         switch ($mode) {
             // for role farmer
@@ -91,18 +92,19 @@ class OrderController extends AbstractController
                 }
                 /** @var BusStopRepository $busStopRepo */
                 $busStopRepo = $app['eccube.repository.bus_stop'];
-                $busStop = $busStopRepo->getByOrder($Order);
-                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
+                $busStop = $orderRepo->getFarmerBusStop($id);
+                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop[0], 'farmer' => $Farmer));
                 break;
 
             case "delivery":
             case "pickup_done":
                 // Todo: driver confirm to change status
-                return $app->render('Order/pickup_done.twig', array('Order' => $Order, 'days' => $masterDate));
+                return $app->render('Order/pickup_done.twig', array('Order' => $Order, 'days' => $masterDate, 'farmer' => $Farmer));
                 break;
 
             case "receive":
             case "receiver_confirm":
+
                 if ($request->getMethod() == "POST") {
                     if ($app->isGranted(CustomerRole::RECIPIENT)
                         && $Order->getOrderStatus()->getId() == OrderStatus::DELIVERY_DONE
@@ -111,23 +113,23 @@ class OrderController extends AbstractController
                         $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_DONE);
                         $orderRepo->changeStatus($id, $OrderStatus);
 
-                        return $app->redirect($app->url('order', array('id' => $id, 'mode' => 'complete')));
+                        return $app->redirect($app->url('order', array('id' => $id, 'mode' => 'complete', 'farmer' => $Farmer)));
                     }
                 }
                 /** @var BusStopRepository $busStopRepo */
                 $busStopRepo = $app['eccube.repository.bus_stop'];
-                $busStop = $busStopRepo->getByOrder($Order);
-                return $app->render('Order/receive.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
+                $busStop = $orderRepo->getFarmerBusStop($id);
+                return $app->render('Order/receive.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop[0], 'farmer' => $Farmer));
                 break;
 
             case "complete":
-                return $app->render('Order/complete.twig', array('Order' => $Order, 'days' => $masterDate));
+                return $app->render('Order/complete.twig', array('Order' => $Order, 'days' => $masterDate, 'farmer' => $Farmer));
                 break;
             default:
                 break;
         }
 
-        return $app->render('Order/index.twig', array('Order' => $Order, 'days' => $masterDate));
+        return $app->render('Order/index.twig', array('Order' => $Order, 'days' => $masterDate, 'farmer' => $Farmer));
     }
 
 }
