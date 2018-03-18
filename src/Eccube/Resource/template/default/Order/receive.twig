@@ -1,58 +1,42 @@
 {#
  # Created by PhpStorm.
  # User: lqdung1992@gmail.com
- # Date: 3/1/2018
- # Time: 9:42 PM
- #}{% extends 'default_frame.twig' %}
+ # Date: 3/18/2018
+ # Time: 12:23 PM
+ #}
+{% extends 'default_frame.twig' %}
 {% set body_class = ' ' %}
 {% block stylesheet %}
-    <style type="text/css">
-
-        /******************************
-            Media Query for tablet, PC...
-        *******************************/
-        @media only screen and (min-width: 768px) {
-            #farmer-status-order-button {
-                width: 97% !important;
-                margin-bottom: 20px;
-            }
-        }
-
-        #order_id {
-            border-bottom: 2px solid #333333;
-            margin-right: 10px;
-        }
-    </style>
 {% endblock stylesheet %}
 {% block javascript %}
-    {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::FARMER')) or is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::DRIVER')) %}
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPVy-7CF4XBqC_QPWoRfo-kfI9j9dm_7A&callback=initMap"></script>
-    <script>
-        function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 16,
-                center: {lat: -34.397, lng: 150.644}
-            });
-            var geocoder = new google.maps.Geocoder();
-            var address = $('#address').val();
-            geocodeAddress(geocoder, map);
-        }
+    {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPVy-7CF4XBqC_QPWoRfo-kfI9j9dm_7A&callback=initMap"></script>
+        <script>
+            function initMap() {
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 16,
+                    center: {lat: -34.397, lng: 150.644}
+                });
+                var geocoder = new google.maps.Geocoder();
+                var address = $('#address').val();
+                geocodeAddress(geocoder, map);
+            }
 
-        function geocodeAddress(geocoder, resultsMap) {
-            var address = document.getElementById('address').value;
-            geocoder.geocode({'address': address}, function(results, status) {
-                if (status === 'OK') {
-                    resultsMap.setCenter(results[0].geometry.location);
-                    var marker = new google.maps.Marker({
-                        map: resultsMap,
-                        position: results[0].geometry.location
-                    });
-                } else {
-                    alert('Geocode was not successful for the following reason: ' + status);
-                }
-            });
-        }
-    </script>
+            function geocodeAddress(geocoder, resultsMap) {
+                var address = document.getElementById('address').value;
+                geocoder.geocode({'address': address}, function(results, status) {
+                    if (status === 'OK') {
+                        resultsMap.setCenter(results[0].geometry.location);
+                        var marker = new google.maps.Marker({
+                            map: resultsMap,
+                            position: results[0].geometry.location
+                        });
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                });
+            }
+        </script>
     {% endif %}
 {% endblock javascript %}
 {% block main %}
@@ -64,72 +48,67 @@
                     <div class="stepwizard-step">
                         <span class="circle-symbol">&#x25CF;</span>
                         <p class="color888 title12">出荷登録</p>
-                        </div>
+                    </div>
+                    <div class="stepwizard-step">
+                        <span class="circle-symbol">&#x25CF;</span>
+                        <p class="color888 title12">配送中</p>
+                    </div>
                     <div class="stepwizard-step">
                         <span class="circle-symbol color-primary">&#x25CF;</span>
-                        <p class="color888 title12 color-primary">配送中</p>
+                        <p class="color888 title12 color-primary">受領確認</p>
                     </div>
                 {% else %}
                     <div class="stepwizard-step">
-                        <span class="circle-symbol color-primary">&#x25CF;</span>
-                        <p class="color888 title12 color-primary">出荷登録</p>
+                        <span class="circle-symbol">&#x25CF;</span>
+                        <p class="color888 title12">出荷登録</p>
                     </div>
                     <div class="stepwizard-step">
                         <span class="circle-symbol">&#x25CF;</span>
                         <p class="color888 title12">集荷</p>
                     </div>
                     <div class="stepwizard-step">
+                        <span class="circle-symbol color-primary">&#x25CF;</span>
+                        <p class="title12 color888 color-primary">配送</p>
+                    </div>
+                    <div class="stepwizard-step">
                         <span class="circle-symbol">&#x25CF;</span>
-                        <p class="title12 color888">配送</p>
+                        <p class="title12">受領確認</p>
                     </div>
                 {% endif %}
-                <div class="stepwizard-step">
-                    <span class="circle-symbol">&#x25CF;</span>
-                    <p class="title12">受領確認</p>
-                </div>
             </div>
         </div>
 
         <div id="map-content-wrapper">
             <div id="map-content" class="cart-content">
                 {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
-                    {#Todo: time#}
                     <div class="title-section-medium">
-                        <p>
-                            <span class="title20">15時30分</span>
-                            <span>に到着予定です</span>
-                        </p>
-                        <p class="title11 color888">問題なく運行中です</p>
+                        <p class="title20">商品がバス停に到着しました！</p>
+                        <p class="title11 color888">QRコード・出荷番号から受領確認をお願いします</p>
+                    </div>
+
+                    <div class="map">
+                        {#Todo: map#}
+                        <div id="map"></div>
+                        <form name="form-receive" method="post" action="?">
+                            <input type="hidden" name="mode" value="receiver_confirm">
+                            <input id="address" type="hidden" value="{{ busStop.address }}">
+                            <p class="color888 margin-top15">{{ busStop.address }}</p>
+                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/status-qr.svg" class="qr-camera">
+                            <input type="text" class="input9" name="id" placeholder="{{ Order.id }}" readonly>
+                            <button type="submit" class="btn btn-inactive">受領確認</button>
+                        </form>
                     </div>
                 {% else %}
-                <div class="title-section-medium">
-                    <p>
-                        <span class="title18">
-                            {{ Order.receiptable_date|date('m月d日') }} ({{ days[Order.receiptable_date|date('N')] }}) ！
-                            {{ busStop.move_time }}
-                        </span>
-                        <span>までに</span>
-                    </p>
-                    <p>
-                        <span class="title18">{{ busStop.name }}</span>
-                        <span>へお持ちください</span>
-                    </p>
-                    <p class="color888 margin-top15">{{ busStop.address }}</p>
-                </div>
-
-                <div class="map">
-                    {#Todo: map#}
-                    <div id="map"></div>
-                    <input id="address" type="hidden" value="{{ busStop.address }}">
-                    <button class="btn btn-inactive popup" id="farmer-qr-code">QRコードを読み込んで出荷完了する</button>
-                    <p class="title12 margin-top10 color888">QRコードは持ち込みの◯時間前から表示できます-15</p>
-                </div>
+                    <div class="title-section-medium">
+                        <p>商品の配送が完了しました</p>
+                        <p>受領確認が完了すると、取引が完了します</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
 
-        {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::DRIVER')) %}
-        <p class="float-right margin-right13"><a class="color888 title11" href="{{ url('contact') }}" target="_blank">商品の出荷が難しい場合</a></p>
+        {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+            <p class="float-right margin-right13"><a class="color888 title11" href="{{ url('contact') }}" target="_blank">商品の出荷が難しい場合</a></p>
         {% endif %}
 
         <div id="cart-confirm-main">
@@ -169,8 +148,6 @@
                         </div>
                     </div>
                 {% endfor %}
-                <p class="title18 margin-left10 margin-top15">注文番号</p>
-                <p class="title20 margin-left10 margin-top15" id="order_id">{{ Order.id }}</p>
 
                 {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
                     <div class="float-left margin-left10">
@@ -201,5 +178,4 @@
             伝票が出力されます
         </p>
     </div>
-
 {% endblock main %}

@@ -14,6 +14,7 @@ use Eccube\Entity\Customer;
 use Eccube\Entity\Master\CustomerRole;
 use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Order;
+use Eccube\Repository\BusStopRepository;
 use Eccube\Repository\OrderRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +29,18 @@ class OrderController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      * @throws Application\AuthenticationCredentialsNotFoundException
      */
-    public function index(Application $app, Request $request, $id)
+    public function index(Application $app, Request $request, $id = null)
     {
         if (!$app->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $app->redirect($app->url('mypage_login'));
         }
+        if (is_null($id)) {
+            $id = $request->get('id');
+            if (!$id) {
+                throw new NotFoundHttpException();
+            }
+        }
+
         /** @var OrderRepository $orderRepo */
         $orderRepo = $app['eccube.repository.order'];
         /** @var Order $Order */
@@ -45,8 +53,10 @@ class OrderController extends AbstractController
         /** @var Customer $Customer */
         $Customer = $app->user();
         $farms = $Order->getFarm();
-        if ($Order->getCustomer()->getId() != $Customer->getId() && $farms[0]->getId() != $Customer->getId()) {
-            throw new NotFoundHttpException();
+        if (!$app->isGranted(CustomerRole::DRIVER)) {
+            if ($Order->getCustomer()->getId() != $Customer->getId() && $farms[0]->getId() != $Customer->getId()) {
+                throw new NotFoundHttpException();
+            }
         }
 
         $mode = $request->get('mode');
@@ -56,10 +66,10 @@ class OrderController extends AbstractController
                     $mode = 'pickup';
                     break;
                 case OrderStatus::PICKUP_DONE:
-                    $mode = 'pickup_done';
+                    $mode = 'delivery';
                     break;
                 case OrderStatus::DELIVERY_DONE:
-                    $mode = 'delivery';
+                    $mode = 'receive';
                     break;
                 case OrderStatus::ORDER_DONE:
                     $mode = 'complete';
@@ -81,15 +91,32 @@ class OrderController extends AbstractController
                     $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PICKUP);
                     $orderRepo->changeStatus($id, $OrderStatus);
                 }
-                $busStop = $orderRepo->getFarmerBusStop($id);
-                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop[0]));
+                /** @var BusStopRepository $busStopRepo */
+                $busStopRepo = $app['eccube.repository.bus_stop'];
+                $busStop = $busStopRepo->getByOrder($Order);
+                return $app->render('Order/pickup.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
                 break;
-
+            case "delivery":
             case "pickup_done":
                 return $app->render('Order/pickup_done.twig', array('Order' => $Order, 'days' => $masterDate));
                 break;
-            case "delivery":
-                return $app->render('Order/delivery.twig', array('Order' => $Order, 'days' => $masterDate));
+
+            case "receive":
+            case "receiver_confirm":
+                if ($request->getMethod() == "POST") {
+                    if ($app->isGranted(CustomerRole::RECIPIENT)
+                        && $Order->getOrderStatus()->getId() == OrderStatus::DELIVERY_DONE) {
+                        $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_DONE);
+                        $orderRepo->changeStatus($id, $OrderStatus);
+
+                        return $app->redirect($app->url('order', array('id' => $id, 'mode' => 'complete')));
+                    }
+                }
+                /** @var BusStopRepository $busStopRepo */
+                $busStopRepo = $app['eccube.repository.bus_stop'];
+                $busStop = $busStopRepo->getByOrder($Order);
+                dump($busStop);
+                return $app->render('Order/receive.twig', array('Order' => $Order, 'days' => $masterDate, 'busStop' => $busStop));
                 break;
             case "complete":
                 return $app->render('Order/complete.twig', array('Order' => $Order, 'days' => $masterDate));
