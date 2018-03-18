@@ -1,0 +1,19 @@
+Eccube\Entity\Master\SearchType:
+    type: entity
+    table: mtb_search_type
+    repositoryClass: Eccube\Repository\Master\SearchTypeRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }

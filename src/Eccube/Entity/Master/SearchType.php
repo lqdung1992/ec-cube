@@ -1,38 +1,17 @@
 <?php
-/*
- * This file is part of EC-CUBE
- *
- * Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
- *
- * http://www.lockon.co.jp/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 
 namespace Eccube\Entity\Master;
 
 /**
- * ProductListOrderBy
+ * SearchType
  */
-class ProductListOrderBy extends \Eccube\Entity\AbstractEntity
+class SearchType extends \Eccube\Entity\AbstractEntity
 {
-    const PRICE_LOWER = 1;
-    const ORDER_NEWER = 2;
-    const PRICE_HIGHER = 3;
-    const EARLY_ARRIVAL = 4;
-    const ORDER_LIKER = 5;
+    const SEARCH_ITEM = 1;
+    CONST SEARCH_FARMER = 2;
+    CONST SEARCH_METHOD = 3;
+    CONST SEARCH_HISTORY = 4;
+    CONST SEARCH_OTHER = 5;
 
     /**
      * @return string
@@ -71,7 +50,7 @@ class ProductListOrderBy extends \Eccube\Entity\AbstractEntity
      * Set name
      *
      * @param  string $name
-     * @return ProductListOrderBy
+     * @return SearchType
      */
     public function setName($name)
     {
@@ -94,7 +73,7 @@ class ProductListOrderBy extends \Eccube\Entity\AbstractEntity
      * Set rank
      *
      * @param  integer $rank
-     * @return ProductListOrderBy
+     * @return SearchType
      */
     public function setRank($rank)
     {
@@ -117,7 +96,7 @@ class ProductListOrderBy extends \Eccube\Entity\AbstractEntity
      * Set id
      *
      * @param integer $id
-     * @return ProductListOrderBy
+     * @return SearchType
      */
     public function setId($id)
     {
