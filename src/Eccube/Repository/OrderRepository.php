@@ -557,6 +557,30 @@ class OrderRepository extends EntityRepository
         return $qb;
     }
 
+    /**
+     * @param Customer $Customer
+     * @param array $OrderStatuses
+     * @return QueryBuilder
+     */
+    public function getQueryBuilderByReceiver(Customer $Customer, array $OrderStatuses = array())
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->where('o.Customer = :Customer')
+            ->setParameter('Customer', $Customer);
+
+        if (count($OrderStatuses) > 0) {
+            $qb->andWhere('o.OrderStatus in (:OrderStatuses)')
+                ->setParameter('OrderStatuses', $OrderStatuses);
+        }
+
+//        $qb->groupBy('o.id');
+
+        // Order By
+        $qb->addOrderBy('o.receiptable_date', 'ASC');
+
+        return $qb;
+    }
+
     public function driverChangeStatus($orderIdArr, $status) {
         $in = '(' . implode(',', $orderIdArr) .')';
         $sql = 'UPDATE dtb_order SET status = ? WHERE order_id IN ' . $in;

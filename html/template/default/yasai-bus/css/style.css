@@ -2496,7 +2496,6 @@ input[readonly], textarea[readonly] {
     font-weight: bold;
 }
 .transaction-section .trans-detail, .delivery-section .delivery-detail, .complete-section .complete-detail {
-    height: 99px;
     border-radius: 3px;
     background-color: #ffffff;
     border: solid 0.5px #cccccc;
