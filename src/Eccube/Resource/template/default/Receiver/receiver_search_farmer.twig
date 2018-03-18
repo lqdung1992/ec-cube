@@ -38,9 +38,8 @@
     <script type="text/javascript">
         $(function () {
             $("ul li.list-group-item").click(function () {
-                var value = $(this).find("input").val();
-                $("#search-form").find("input[name=farmer]").val(value);
-                $("#search-form").submit();
+                var url = $(this).find("input").val();
+                window.location =  url;
             });
         });
     </script>
@@ -55,7 +54,7 @@
             <ul class="list-group">
                 {% for TargetCustomer in farmers %}
                 <li class="list-group-item line-height15">
-                    <input type="hidden" name="search_farmer" value="{{ TargetCustomer.id }}">
+                    <input type="hidden" name="search_farmer" value="{{ url('farm_profile', {'id': TargetCustomer.id}) }}">
                     <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" class="img-circle profile50">
                     <span class="profile-name-medium">{{ TargetCustomer.__toString }}</span>
                     <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
