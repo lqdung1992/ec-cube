@@ -39,14 +39,21 @@
                 <span class="circle-symbol color-primary">&#x25CF;</span>
                 <p class="color888 title12 color-primary">出荷登録</p>
             </div>
-            <div class="stepwizard-step">
-                <span class="circle-symbol">&#x25CF;</span>
-                <p class="color888 title12">集荷</p>
-            </div>
-            <div class="stepwizard-step">
-                <span class="circle-symbol">&#x25CF;</span>
-                <p class="title12 color888">配送</p>
-            </div>
+            {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                <div class="stepwizard-step">
+                    <span class="circle-symbol ">&#x25CF;</span>
+                    <p class="color888 title12">配送中</p>
+                </div>
+            {% else %}
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="color888 title12">集荷</p>
+                </div>
+                <div class="stepwizard-step">
+                    <span class="circle-symbol">&#x25CF;</span>
+                    <p class="title12 color888">配送</p>
+                </div>
+            {% endif %}
             <div class="stepwizard-step">
                 <span class="circle-symbol">&#x25CF;</span>
                 <p class="title12 color888">受領確認</p>
@@ -103,13 +110,25 @@
             <p class="title18 margin-left10 margin-top15">注文番号</p>
             <p class="title20 margin-left10 margin-top15" id="order_id">{{ Order.id }}</p>
 
-            {% if is_granted("ROLE_FARMER") and app.user.id == Order.farm[0].id %}
+            {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::FARMER')) and app.user.id == Order.farm[0].id %}
             <p class="float-right margin-top10 margin-right10"><a href="{{ url('contact') }}" target="_blank" class="color888 title11">商品の出荷が難しい場合</a></p>
             <form method="post" action="?" name="form-prepare">
                 <input type="hidden" name="mode" value="prepare"/>
                 <input type="hidden" name="id" value="{{ Order.id }}">
                 <button type="submit" class="btn btn-success" id="farmer-status-order-button">出荷登録に進む</button>
             </form>
+            {% elseif is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                <div class="float-left margin-left10">
+                    <p class="title14">小計</p>
+                    <p class="title14">送料</p>
+                    <p class="title14">ご請求額</p>
+                </div>
+                <div class="float-right margin-right10">
+                    <p class="title14 text-align-right">{{ Order.subtotal|price }}</p>
+                    {#Todo: implement container#}
+                    <p class="title14 text-align-right">350円</p>
+                    <p class="title18 text-align-right">{{ Order.payment_total|price }}</p>
+                </div>
             {% endif %}
         </div>
 

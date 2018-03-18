@@ -10,6 +10,8 @@ namespace Eccube\Controller;
 
 
 use Eccube\Application;
+use Eccube\Entity\Customer;
+use Eccube\Entity\Master\CustomerRole;
 use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Order;
 use Eccube\Repository\OrderRepository;
@@ -28,7 +30,6 @@ class OrderController extends AbstractController
      */
     public function index(Application $app, Request $request, $id)
     {
-        // Todo: check permission: ROLE_FARMER|ALL
         if (!$app->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $app->redirect($app->url('mypage_login'));
         }
@@ -37,6 +38,14 @@ class OrderController extends AbstractController
         /** @var Order $Order */
         $Order = $orderRepo->find($id);
         if (!$Order) {
+            throw new NotFoundHttpException();
+        }
+
+        // Check permission to action
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+        $farms = $Order->getFarm();
+        if ($Order->getCustomer()->getId() != $Customer->getId() && $farms[0]->getId() != $Customer->getId()) {
             throw new NotFoundHttpException();
         }
 
@@ -65,10 +74,10 @@ class OrderController extends AbstractController
             // for role farmer
             case "prepare":
             case "pickup":
-                $customer = $app->user();
-                $farms = $Order->getFarm();
                 // is farmer and creator
-                if ($app->isGranted('ROLE_FARMER') && $farms[0]->getId() == $customer->getId() && $Order->getOrderStatus()->getId() == $app['config']['order_new']) {
+                if ($app->isGranted(CustomerRole::FARMER)
+                    && $farms[0]->getId() == $Customer->getId()
+                    && $Order->getOrderStatus()->getId() == $app['config']['order_new']) {
                     $OrderStatus = $app['eccube.repository.master.order_status']->find(OrderStatus::ORDER_PICKUP);
                     $orderRepo->changeStatus($id, $OrderStatus);
                 }
