@@ -11,12 +11,16 @@
     <style type="text/css">
 
         /******************************
-            Media Query for tablet, PC...
-        *******************************/
+           Media Query for tablet, PC...
+       *******************************/
         @media only screen and (min-width: 768px) {
             .thumbnail {
                 border: 1px solid #ddd !important;
                 height: 420px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 290px;
             }
         }
         /******************************
@@ -26,6 +30,10 @@
             .thumbnail {
                 border: 1px solid #ddd !important;
                 height: 350px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 200px;
             }
         }
 
@@ -112,7 +120,7 @@
                     {% if Products|length > 0 %}
                         {% for Product in Products %}
                             <div class="col-sm-3 col-xs-6 thumbnail">
-                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}" alt="no image"></a>
+                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img class="main-img" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}" alt="no image"></a>
                                 <div class="caption">
                                     <h5 class="font-weight mg10">{{ Product.name }}</h5>
                                     <div class="row mg20">

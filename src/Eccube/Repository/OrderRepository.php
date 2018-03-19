@@ -607,10 +607,10 @@ class OrderRepository extends EntityRepository
 
     public function getSaleByMonth ($farmer_id) {
         //need move to my sql
-        $sql =  'SELECT SUM(payment_total) as total, strftime(\'%m\', order_date) as month '.
+        $sql =  'SELECT SUM(payment_total) as total, MONTH(order_date) as month '.
                 'FROM dtb_order '.
-                'WHERE order_date LIKE ? AND farmer_id = ?'.
-                'GROUP BY strftime("%y-%m", order_date) ';
+                'WHERE order_date LIKE ? AND farmer_id = ? '.
+                'GROUP BY DATE_FORMAT(order_date, "%Y-%m")';
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('total', 'total');
         $rsm->addScalarResult('month', 'month');
