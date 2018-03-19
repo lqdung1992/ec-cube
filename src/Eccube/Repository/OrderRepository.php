@@ -581,16 +581,6 @@ class OrderRepository extends EntityRepository
         return $qb;
     }
 
-    public function driverChangeStatus($orderIdArr, $status) {
-        $in = '(' . implode(',', $orderIdArr) .')';
-        $sql = 'UPDATE dtb_order SET status = ? WHERE order_id IN ' . $in;
-        $rsm = new ResultSetMapping();
-        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter(1, $status);
-        $results = $query->getResult();
-        return $results;
-    }
-
     /**
      * @param $id
      * @return array

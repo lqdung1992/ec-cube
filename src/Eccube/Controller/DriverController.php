@@ -25,6 +25,7 @@
 namespace Eccube\Controller;
 
 use Eccube\Application;
+use Eccube\Entity\Order;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -127,6 +128,7 @@ class DriverController extends AbstractController
             $orderIdArr = null;
             $status = 11;
             $results = null;
+            $OrderStatus = $app['eccube.repository.master.order_status']->find($status);
             if ($BusStop != null) {
                 $results = $app['eccube.repository.route_detail']->getDriveCargoDetail($id, date('Y-m-d'));
                 foreach ($results as $result) {
@@ -134,7 +136,13 @@ class DriverController extends AbstractController
                 }
                 $delivery = $request->get('delivery');
                 if ($delivery == self::DELIVERY) {
-                    $app['eccube.repository.order']->driverChangeStatus($orderIdArr, $status);
+                    foreach ($orderIdArr as $orderId) {
+                        /* @var $Order Order*/
+                        $Order = $app['eccube.repository.order']->find($orderId);
+                        $Order->setOrderStatus($OrderStatus);
+                        $app['orm.em']->persist($Order);
+                    }
+                    $app['orm.em']->flush();
                     return $app->redirect($app->url('driver_home'));
                 }
             }
@@ -151,6 +159,7 @@ class DriverController extends AbstractController
             $results = null;
             $orderIdArr = null;
             $status = 13;
+            $OrderStatus = $app['eccube.repository.master.order_status']->find($status);
             if ($BusStop != null) {
                 $results = $app['eccube.repository.route_detail']->getDriveCargoPick($id, date('Y-m-d'));
                 foreach ($results as $result) {
@@ -159,7 +168,13 @@ class DriverController extends AbstractController
             }
             $pick_up = $request->get('pick_up');
             if ($pick_up == self::PICK_UP) {
-                $app['eccube.repository.order']->driverChangeStatus($orderIdArr, $status);
+                foreach ($orderIdArr as $orderId) {
+                    /* @var $Order Order*/
+                    $Order = $app['eccube.repository.order']->find($orderId);
+                    $Order->setOrderStatus($OrderStatus);
+                    $app['orm.em']->persist($Order);
+                }
+                $app['orm.em']->flush();
                 return $app->redirect($app->url('driver_home'));
             }
 
