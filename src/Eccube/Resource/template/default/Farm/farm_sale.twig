@@ -107,10 +107,10 @@
     <div id="reicever-wrapper" class="wrapper">
         <div id="button-group">
             {% set month = 'now'|date('m') %}
-            <input value="{{ month }}" id="month" type="hidden">
             {% for i in 1..12 %}
                 {% if month == i %}
                     <button class="btn btn-success btn-month{{ i }}" month="{{ i }}">{{ i }}月</button>
+                    <input value="{{ i }}" id="month" type="hidden">
                 {% else %}
                     {% if month < i %}
                         <button class="btn btn-default disabled">{{ i }}月</button>
