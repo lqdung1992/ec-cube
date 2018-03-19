@@ -94,10 +94,6 @@
                 if (!element.hasClass('disabled')) {
                     var mm = element.attr('month');
                     var mm_now = $('#button-group .btn-success').attr('month');
-                    if (mm < 10)
-                        mm = '0' + mm;
-                    if (mm_now < 10)
-                        mm_now = '0' + mm_now;
                     $('#button-group .btn-success').removeClass('btn-success').addClass('btn-default');
                     element.addClass('btn-success').removeClass('btn-default');
                     $('.month' + mm).show();

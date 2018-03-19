@@ -618,6 +618,7 @@ class OrderRepository extends EntityRepository
         $query->setParameter(1, date('Y%'));
         $query->setParameter(2, $farmer_id);
         $results = $query->getResult();
+        dump($results());
 
         return $results;
     }
