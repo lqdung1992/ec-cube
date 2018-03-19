@@ -506,4 +506,30 @@ class CustomerRepository extends EntityRepository implements UserProviderInterfa
         $app['orm.em']->persist($Customer);
         $app['orm.em']->flush();
     }
+
+    /**
+     * @param $searchData
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getQueryBuilderForReceiver($searchData)
+    {
+        // find farmer
+        $qb = $this->createQueryBuilder('c')
+            ->select('c')
+            ->andWhere('c.del_flg = 0')
+            ->andWhere('c.CustomerRole = 2');
+
+        if (isset($searchData['name']) && Str::isNotBlank($searchData['name'])) {
+            $clean_key_multi = preg_replace('/\s+|[　]+/u', '', $searchData['name']);
+            $qb
+                ->andWhere('CONCAT(c.name01, c.name02) LIKE :name OR c.email LIKE :email')
+                ->setParameter('name', '%' . $clean_key_multi . '%')
+                ->setParameter('email', '%' . $clean_key_multi . '%');
+        }
+
+        // Order By
+        $qb->addOrderBy('c.update_date', 'DESC');
+
+        return $qb;
+    }
 }

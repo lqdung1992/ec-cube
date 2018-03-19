@@ -45,15 +45,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
             $(".plus").on("click", function() {
                 var $button = $(this);
                 var oldValue = $button.parent().find("input").val();
-
                 var newVal = parseInt(oldValue) + 1;
-
+                var max = $button.parent().find("input").attr('max');
+                if (newVal > max) {
+                    return false;
+                }
                 var priceSpan = $button.parent().parent().find(".count-price").find("span");
-                console.log(priceSpan);
                 var priceOld = parseInt(priceSpan.text());
-                console.log(priceOld);
                 var priceNew = priceOld / oldValue * newVal;
-                console.log(priceNew);
                 priceSpan.text(priceNew);
                 $button.parent().find("input").val(newVal);
             });
@@ -62,7 +61,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 var $button = $(this);
                 var oldValue = $button.parent().find("input").val();
 
-                if (oldValue > 0) {
+                if (oldValue > 1) {
                     var newVal = parseInt(oldValue) - 1;
                 } else return false;
 
@@ -72,35 +71,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 priceSpan.text(priceNew);
 
                 $button.parent().find("input").val(newVal);
-            });
-
-            var createForm = function (action, data) {
-                var $form = $('<form action="' + action + '" method="post"></form>');
-                for (input in data) {
-                    if (data.hasOwnProperty(input)) {
-                        $form.append('<input name="' + input + '" value="' + data[input] + '">');
-                    }
-                }
-                return $form;
-            };
-
-            $('a[token-for-anchor]').click(function (e) {
-                e.preventDefault();
-                var $this = $(this);
-                var data = $this.data();
-                if (data.confirm != false) {
-                    if (!confirm(data.message ? data.message : '削除してもよろしいですか?')) {
-                        return false;
-                    }
-                }
-
-                var $form = createForm($this.attr('href'), {
-                    _token: $this.attr('token-for-anchor'),
-                    _method: data.method
-                }).hide();
-
-                $('body').append($form); // Firefox requires form to be on the page to allow submission
-                $form.submit();
             });
 
             // reset modal
@@ -178,7 +148,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                                 <div class="cart-content" id="cart-main-content">
                                     <form method="post" action="?">
                                         <input type="hidden" name="mode" value="confirm">
-                                        <input type="hidden" name="date_id" value="{{ reception_date|date('N') }}">
+                                        <input type="hidden" name="date" value="{{ reception_date|date('Y/m/d') }}">
                                     {% for CartItem in Cart.CartItems %}
                                         {% if CartItem.reception_date|date('U') == reception_date|date('U') %}
                                             {% set ProductClass = CartItem.Object %}
@@ -202,8 +172,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                                                         <p>小計：{{ CartItem.total_price|number_format }}</p>
                                                     </div>
                                                     <div class="float-right">
-                                                        <a href="#" class="cart-link" data-toggle="modal" data-target="#exampleModal">注文内容の変更</a>
-                                                        <a href="{{ url('cart_remove', {'productClassId': ProductClass.id, 'date_id': reception_date|date('N') }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="カートから商品を削除してもよろしいですか?" class="delete-link">削除</a>
+                                                        <a href="#" class="cart-link" data-toggle="modal" data-target="#cartModal">注文内容の変更</a>
+                                                        <a href="{{ url('cart_remove', {'productClassId': ProductClass.id, 'date': reception_date|date('Y/m/d') }) }}" {{ csrf_token_for_anchor() }} data-method="put" data-message="カートから商品を削除してもよろしいですか?" class="delete-link">削除</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -233,12 +203,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     </div>
 
     {% if Cart.CartItems|length > 0 %}
-        <div class="modal fade" id="exampleModal" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="cartModal" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form name="modify-cart" id="modify-cart" method="post" action="{{ url('cart_modify') }}">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">配送日をお選びください</h5>
+                            <h5 class="modal-title" id="cartModalLabel">配送日をお選びください</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -252,12 +222,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                                     <div class="col-sm-12 col-xs-12 count-modal">
                                         <div class="col-sm-8 col-xs-8 float-left">
                                             <span class="count-date">{{ CartItem.reception_date|date('m月d日') }}({{ master_date[CartItem.reception_date|date('N')].name }})</span>
+                                            <span>{{ Product.name }}</span>
                                             <input type="hidden" class="old-price" value="{{ CartItem.total_price }}">
                                             <p class="count-price">小計：<span class="price_{{ ProductClass.id }}_{{ CartItem.reception_date|date('N') }}">{{ CartItem.total_price }}</span>円</p>
                                         </div>
                                         <div class="col-sm-4 col-xs-4 float-right count-right">
                                             <img class="minus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-minus-inactive.svg">
-                                            <input type="number" min="0" step="1" pattern="[0-9]*" class="count-number" name="quantity[{{ ProductClass.id }}][{{ CartItem.reception_date|date('N') }}]" value="{{ CartItem.quantity }}">
+                                            <input type="number" min="1" max="{{ Product.getStockByDate(CartItem.reception_date) }}" step="1" pattern="[0-9]*" class="count-number"
+                                                   name="quantity[{{ ProductClass.id }}][{{ CartItem.reception_date|date('Y/m/d') }}]"
+                                                   value="{{ CartItem.quantity }}">
                                             <img class="plus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-plus-active.svg">
                                         </div>
                                     </div>

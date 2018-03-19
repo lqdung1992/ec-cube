@@ -61,6 +61,7 @@ cart.over.price_limit: 商品を購入できる金額の上限を超えており
 cart.product.type.kind: この商品は同時に購入することはできません。
 cart.product.payment.kind: お支払方法が異なるためこの商品は同時に購入することはできません。
 cart.product.delete:  現時点で販売していない商品が含まれておりました。該当商品をカートから削除しました。
+cart.receiptable_date.notfound: 受領可能な日付が見つかりません。
 cart.product.not.status: 現時点で購入できない商品が含まれておりました。該当商品をカートから削除しました。
 cart.product.not.producttype: |-
   「%product%」はまだ配送の準備ができておりません。
@@ -217,3 +218,6 @@ normal_price_title: 通常価格    # 未使用
 sale_price_title: 販売価格
 form.address1.help: '市区町村名 (例：千代田区神田神保町)'
 form.address2.help: '番地・ビル名 (例：1-3-5)'
+notification.product.detail: %name%さんから%product_name%にメッセージが届きました
+notification.farm.profile: %name%さんからコメントが届きました
+nofitication.order.new: %name%さんから注文が届きました。

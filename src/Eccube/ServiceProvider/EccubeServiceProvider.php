@@ -115,10 +115,28 @@ class EccubeServiceProvider implements ServiceProviderInterface
         $app['eccube.repository.master.csv_type'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CsvType');
         });
+
+        $app['eccube.repository.product_rate'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\ProductRate');
+        });
         // Farm
+        $app['eccube.repository.notification'] = $app->share(function () use ($app) {
+            $repository = $app['orm.em']->getRepository('Eccube\Entity\Notification');
+            $repository->setApplication($app);
+
+            return $repository;
+        });
         $app['eccube.repository.master.customer_role'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\CustomerRole');
         });
+
+        $app['eccube.repository.master.receiver_container_type'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\ReceiverContainerType');
+        });
+        $app['eccube.repository.master.receiver_get_time'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\ReceiverGetTime');
+        });
+
         $app['eccube.repository.master.safety_percent'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\SafetyPercent');
         });
@@ -143,6 +161,11 @@ class EccubeServiceProvider implements ServiceProviderInterface
         });
         $app['eccube.repository.master.receiptable_date'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Eccube\Entity\Master\ReceiptableDate');
+        });
+
+        // Receiver
+        $app['eccube.repository.master.search'] = $app->share(function () use ($app) {
+            return $app['orm.em']->getRepository('Eccube\Entity\Master\SearchType');
         });
 
         $app['eccube.repository.delivery'] = $app->share(function () use ($app) {
@@ -413,6 +436,8 @@ class EccubeServiceProvider implements ServiceProviderInterface
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\ItemClassType($app);
             $types[] = new \Eccube\Form\Type\Front\Farm\HomeCompleteType();
+            // Receiver search
+            $types[] = new \Eccube\Form\Type\Front\Receiver\ReceiverSearchType($app['config']);
 
             // admin
             $types[] = new \Eccube\Form\Type\Admin\LoginType($app['session']);

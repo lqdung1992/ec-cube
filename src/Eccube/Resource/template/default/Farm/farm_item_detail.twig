@@ -9,8 +9,13 @@
 {% set body_class = ' ' %}
 {% block stylesheet %}
     <style type="text/css">
-        #farm_voice_comment {
-            height: 120px;
+        #order_button {
+            width: 92% !important;
+        }
+
+        textarea {
+            height: 80px !important;
+            margin-top: 20px;
         }
     </style>
 {% endblock stylesheet %}
@@ -104,11 +109,77 @@
                     return '<button class="thumbnail">' + $(slider.$slides[i]).find('img').prop('outerHTML') + '</button>';
                 }
             });
+
+            // reset modal
+            $('.modal').on('hidden.bs.modal', function(){
+                $(this).find('form')[0].reset();
+                $('.modal-price').text(0);
+            });
+
+            var defaultPrice = '{{ Product.getPrice02IncTaxMin }}';
+
+            $(".plus").on("click", function() {
+                var $button = $(this);
+                var inputMax = $button.parent().find("input").attr('max');
+                var oldValue = $button.parent().find("input").val();
+                var newVal = parseInt(oldValue) + 1;
+                if (newVal > inputMax) {
+                    return;
+                }
+                var priceSpan = $button.parent().parent().find(".count-price").find("span");
+                var priceNew = defaultPrice * newVal;
+                priceSpan.text(priceNew);
+                $button.parent().find("input").val(newVal);
+            });
+
+            $(".minus").on("click", function() {
+                var $button = $(this);
+                var oldValue = $button.parent().find("input").val();
+
+                if (oldValue > 0) {
+                    var newVal = parseInt(oldValue) - 1;
+                } else return false;
+
+                var priceSpan = $button.parent().parent().find(".count-price").find("span");
+                var priceOld = parseInt(priceSpan.text());
+                var priceNew = defaultPrice * newVal;
+                priceSpan.text(priceNew);
+                $button.parent().find("input").val(newVal);
+            });
+
+            $("#pc-detail-rate img").click(function () {
+                var customer_role = $('#customer_role').val();
+                if (customer_role == "role_receiver") {
+                    var ajaxData = {};
+                    ajaxData.product_id = $("#product_id").val();
+                    ajaxData.type = $(this).attr('like-type');
+                    var like_count = $(this).parent().find('span.display-block');
+                    var count = parseInt(like_count.text(), 10) + 1;
+                    like_count.text(count);
+                    $.ajax({
+                        url: '{{ url('farm_count_like') }}',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: ajaxData
+                    }).done(function(data){
+
+                        //$('body').prepend(data);
+                    }).fail(function(data){
+                    });
+                }
+            });
         });
     </script>
 {% endblock %}
 
 {% block main %}
+    <input type="hidden" value="{{ Product.id }}" id="product_id">
+
+    {% if is_granted("ROLE_RECIPIENT") %}
+        <input type="hidden" value="role_receiver" id="customer_role">
+    {% else %}
+        <input type="hidden" value="role_farmer" id="customer_role">
+    {% endif %}
     {% set TargetCustomer = Product.Creator %}
     <div id="reicever-wrapper" class="wrapper">
         <div class="wrapper">
@@ -156,17 +227,11 @@
                             </div>
                             <div class="float-right">
                             {% if is_granted("IS_AUTHENTICATED_FULLY") and app.user.id == TargetCustomer.id %}
-                                <a href="?" id="farmer-button-confirm" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</a>
+                                <a href="#" data-toggle="modal" data-target="#cartModal" class="btn btn-success margin-top15 background344250 order_again">注文数の確認</a>
                                 <a href="{{ url('farm_item_edit', {'id': Product.id}) }}" id="farmer-button-edit" class="btn btn-success margin-top15">編集</a>
                             {% elseif is_granted("ROLE_RECIPIENT") %}
-                                <form method="post" action="?" id="add-cart-form" name="add-cart-form">
-                                    <input type="hidden" name="mode" value="add_cart"/>
-                                    {{ form_widget(cartForm._token) }}
-                                    <input type="hidden" name="product_class_id" id="product_class_id" value="{{ Product.getProductClasses[0].id }}">
-                                    <input type="hidden" name="quantity" id="quantity" value="1">
-                                    <input type="hidden" name="product_id" id="product_id" value="{{ Product.id }}">
-                                    <button class="btn btn-success" id="receiver-cart-button" type="submit">注文へ進む</button>
-                                </form>
+                                {{ form_errors(cartForm.quantity) }}
+                                <button class="btn btn-success" data-toggle="modal" data-target="#cartModal">注文へ進む</button>
                             {% endif %}
                             </div>
                         </div>
@@ -203,41 +268,35 @@
                         <div id="pc-detail-rate">
                             <ul class="list-inline">
                                 <li class="list-group-item">
-                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-like.svg" class="display-block">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-like.svg" class="display-block" like-type="like_count">
                                     <span class="pc-rate-des">ありがとう</span>
                                     <span class="display-block">
-                                        {% if ProductRate is not empty %}
-                                            {{ Product.ProductRate.like_count }}
-                                        {% endif %}
+                                            {{ Product.ProductRate.like_count|default(0) }}
                                     </span>
                                 </li>
                                 <li class="list-group-item">
-                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-tasty.svg" class="display-block">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-tasty.svg" class="display-block" like-type="delicious_count">
                                     <span class="pc-rate-des">おいしい</span>
                                     <span class="display-block">
-                                        {% if ProductRate is not empty %}
                                         {{ Product.ProductRate.delicious_count|default(0) }}
-                                        {% endif %}
                                     </span>
                                 </li>
                                 <li class="list-group-item">
-                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-freshness.svg" class="display-block">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-freshness.svg" class="display-block" like-type="fresh_count">
                                     <span class="pc-rate-des">新鮮</span>
                                     <span class="display-block">
-                                        {% if ProductRate is not empty %}
                                         {{ Product.ProductRate.fresh_count|default(0) }}
-                                        {% endif %}
                                     </span>
                                 </li>
                                 <li class="list-group-item">
-                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-vivid.svg" class="display-block">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-vivid.svg" class="display-block" like-type="vivid_count">
                                     <span class="pc-rate-des">色あざやか</span>
-                                    <span class="display-block">{% if ProductRate is not empty %}{{ Product.ProductRate.vivid_count|default(0) }}{% endif %}</span>
+                                    <span class="display-block">{{ Product.ProductRate.vivid_count|default(0) }}</span>
                                 </li>
                                 <li class="list-group-item">
-                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-smell.svg" class="display-block">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/rate-smell.svg" class="display-block" like-type="aroma_count">
                                     <span class="pc-rate-des">香りがよい</span>
-                                    <span class="display-block">{% if ProductRate is not empty %}{{ Product.ProductRate.aroma_count|default(0) }}{% endif %}</span>
+                                    <span class="display-block">{{ Product.ProductRate.aroma_count|default(0) }}</span>
                                 </li>
                             </ul>
                         </div>
@@ -254,7 +313,7 @@
                                 <form name="comment" id="comment" method="post" action="?" enctype="multipart/form-data">
                                     <input type="hidden" name="mode" value="add_voice"/>
                                     {{ form_widget(form._token) }}
-                                    <div class="col-sm-12 col-xs-12 margin-bottom10">
+                                    <div class="col-sm-12 col-xs-12 margin-bottom10 margin-top15">
                                         {{ form_widget(form.comment, {attr: {placeholder: 'コメントを入力。。。'}}) }}
                                         <div class="help">
                                             <span class="farmer-comment-text-limit color888">200</span>
@@ -276,7 +335,7 @@
                 {% endif %}
 
                 {% if CustomerVoice %}
-                    <div class="row">
+                    <div class="row" id="comment">
                         <div class="col-sm-12 col-xs-12">
                             {% for Voice in CustomerVoice %}
                                 <div class="div-comment-profile clearfix">
@@ -337,5 +396,51 @@
         <span class="close">&times;</span>
         <img class="modal-content" id="model-image"/>
         <div id="caption"></div>
+    </div>
+
+    <div class="modal fade" id="cartModal" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form name="add-cart-form" id="add-cart-form" method="post" action="?">
+                    <input type="hidden" name="mode" value="add_cart"/>
+                    {{ form_widget(cartForm._token) }}
+                    {{ form_widget(cartForm.product_id) }}
+                    {{ form_widget(cartForm.product_class_id) }}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="top:-6px; right: 6px">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_errors(cartForm.quantity) }}
+                        {% set ProductRDs = Product.ProductReceiptableDates %}
+                        {% for ProductRD in ProductRDs %}
+                            <div class="row">
+                                <div class="col-sm-12 col-xs-12 count-modal">
+                                    <div class="col-sm-8 col-xs-8 float-left">
+                                        <span class="count-date">{{ ProductRD.date|date('m月d日') }}({{ ProductRD.ReceiptableDate.name }})</span>
+                                        <label class="count-quality ">残り{{ ProductRD.max_quantity }}点</label>
+                                        <p class="count-price">小計：<span class="modal-price">0</span>円</p>
+                                    </div>
+                                    {% if is_granted("ROLE_RECIPIENT") %}
+                                    <div class="col-sm-4 col-xs-4 float-right count-right">
+                                        <img class="minus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-minus-inactive.svg">
+                                        <input type="number" min="0" step="1" max="{{ ProductRD.max_quantity }}" pattern="[0-9]*" class="count-number"
+                                               name="quantity[{{ ProductRD.date|date('Y/m/d') }}]" value="0">
+                                        <img class="plus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-plus-active.svg">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if is_granted("ROLE_RECIPIENT") %}
+                    <div class="modal-footer">
+                        <button id="order_button" class="btn btn-success" type="submit">注文票に追加する</button>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock %}

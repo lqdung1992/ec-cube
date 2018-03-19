@@ -1,0 +1,134 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            #button-group {
+                padding: 80px 35% 30px 35%;
+            }
+
+            #sale-number {
+                padding: 10px 35% 30px 35.5%;
+            }
+
+            #button-group button {
+                margin: 5px;
+                width: 50px;
+                font-weight: bold;
+            }
+            .sale-contact {
+                float: right;
+                margin-right: 10px
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            #button-group button {
+                margin: 5px;
+                width: 45px;
+                font-weight: bold;
+            }
+            .sale-contact {
+                float: right;
+                margin-right: 10px;
+            }
+
+            #button-group {
+                padding: 10px 0 10px 10px;
+            }
+
+            .sale-pass {
+                margin-left: 15px;
+            }
+        }
+
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 630px;
+        }
+
+        .sale-title {
+            margin-top: 10px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .sale-total {
+            font-size: 50px;
+            text-align: center;
+            margin-top: 10px;
+            border-top: 3px solid #c3c3c3;
+        }
+
+        #sale-number button {
+            width: 100%;
+            margin: 20px 0;
+            height: 45px;
+        }
+
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            var month = $('#month').val();
+            $('.sale-total').hide();
+            $('.month' + month).show();
+            $('.btn').click(function () {
+                var element = $(this);
+                if (!element.hasClass('disabled')) {
+                    var mm = element.attr('month');
+                    var mm_now = $('#button-group .btn-success').attr('month');
+                    $('#button-group .btn-success').removeClass('btn-success').addClass('btn-default');
+                    element.addClass('btn-success').removeClass('btn-default');
+                    $('.month' + mm).show();
+                    $('.month' + mm_now).hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper">
+        <div id="button-group">
+            {% set month = 'now'|date('m') %}
+            {% for i in 1..12 %}
+                {% if month == i %}
+                    <button class="btn btn-success btn-month{{ i }}" month="{{ i }}">{{ i }}月</button>
+                    <input value="{{ i }}" id="month" type="hidden">
+                {% else %}
+                    {% if month < i %}
+                        <button class="btn btn-default disabled">{{ i }}月</button>
+                    {% else %}
+                        <button class="btn btn-default btn-month{{ i }}" month="{{ i }}">{{ i }}月</button>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div id="sale-number">
+            <a href="#" class="display-block color888 sale-pass">2017年</a>
+            <p class="sale-title">売上</p>
+            {% for result in results %}
+                <p class="sale-total month{{ result.month }}">{{ result.total|price }}</p>
+            {% endfor %}
+            <button class="btn btn-success">承認済み</button>
+            <a class="display-block color888 sale-contact" href="{{ url('contact') }}">売上金額が違う場合</a>
+        </div>
+    </div>
+{% endblock %}

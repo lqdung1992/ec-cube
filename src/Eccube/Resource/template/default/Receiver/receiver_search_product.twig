@@ -1,0 +1,131 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/15/2018
+ # Time: 8:03 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 620px;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+
+        #search-form select {
+            height: 50px !important;
+            margin: 20px 0;
+        }
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            .thumbnail {
+                border: 1px solid #ddd !important;
+                height: 420px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 290px;
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            .thumbnail {
+                border: 1px solid #ddd !important;
+                height: 350px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 200px;
+            }
+        }
+    </style>
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        function fnChangeOrderBy(orderby) {
+            var form = $("form#search-form");
+            form.find("*[name=orderby]").val(orderby);
+            form.find("*[name=pageno]").val(1);
+            form.submit();
+        };
+
+        $(function () {
+            $(window).load(function() {
+                $('.thumbnail').matchHeight();
+            });
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div class="wrapper">
+        <div class="product-section">
+            <form action="?" method="get" name="search-form" id="search-form">
+                {{ form_widget(form.name) }}
+                {{ form_widget(form.search_type) }}
+                {{ form_widget(form.method) }}
+                {{ form_widget(form.farmer) }}
+                {{ form_widget(order_by_form, {'id': '', 'attr': {'onchange': "javascript:fnChangeOrderBy(this.value);"}}) }}
+            </form>
+
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if Products|length > 0 %}
+                        {% for Product in Products %}
+                            {% set TargetCustomer = Product.Creator %}
+                            <div class="col-sm-3 col-xs-6 thumbnail">
+                                <div class="image-box">
+                                    <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img class="main-img" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}"/></a>
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-inactive.svg" class="like-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: none;"{% endif %}>
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/like-active.svg" class="unlike-icon" data-id="{{ Product.id }}" {% if Product.isFavorite(Customer) %}style="display: block;"{% endif %}>
+                                </div>
+                                <div class="caption">
+                                    <h5 class="font-weight mg10">{{ Product.name }}</h5>
+                                    <div class="row mg20">
+                                        <div class="col-sm-12 col-xs-12">
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getPrice02IncTaxMin|price }}</h5>
+                                            </div>
+                                            <div class="col-sm-6 col-xs-6">
+                                                <h5 class="font-weight">{{ Product.getAmountFollowPrice02Min }} {{ Product.getAmountUnitTypeFollowPrice02Min.name }}箱</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                                        <span class="profile-name">{{ TargetCustomer.__toString }}</span>
+                                        <span class="profile-address">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty">
+                            <p>
+                                <span class="title12 display-block">出品されている商品はありません</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if Products.totalItemCount > 0 %}
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        {% include "pagination.twig" with { 'pages' : Products.paginationData } %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock main %}

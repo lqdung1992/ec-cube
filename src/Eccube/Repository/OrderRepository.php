@@ -30,6 +30,8 @@ use Eccube\Util\Str;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Silex\Tests\Provider\ValidatorServiceProviderTest\Constraint\Custom;
+use Doctrine\ORM\Query\ResultSetMapping;
+
 
 /**
  * OrderRepository
@@ -56,7 +58,7 @@ class OrderRepository extends EntityRepository
         switch ($Status->getId()) {
             // Todo: set commit date with new status
             // Maybe OrderStatus::ORDER_PICKUP
-            case '5': // 発送済へ
+            case OrderStatus::ORDER_PICKUP: // 発送済へ
                 $Order->setCommitDate(new \DateTime());
                 break;
             case '6': // 入金済へ
@@ -553,5 +555,70 @@ class OrderRepository extends EntityRepository
         $qb->addOrderBy('o.receiptable_date', 'ASC');
 
         return $qb;
+    }
+
+    /**
+     * @param Customer $Customer
+     * @param array $OrderStatuses
+     * @return QueryBuilder
+     */
+    public function getQueryBuilderByReceiver(Customer $Customer, array $OrderStatuses = array())
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->where('o.Customer = :Customer')
+            ->setParameter('Customer', $Customer);
+
+        if (count($OrderStatuses) > 0) {
+            $qb->andWhere('o.OrderStatus in (:OrderStatuses)')
+                ->setParameter('OrderStatuses', $OrderStatuses);
+        }
+
+//        $qb->groupBy('o.id');
+
+        // Order By
+        $qb->addOrderBy('o.receiptable_date', 'ASC');
+
+        return $qb;
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @see BusStopRepository::getByOrder()
+     */
+    public function getFarmerBusStop($id) {
+        $sql =  'SELECT dtb_bus_stop.bus_stop_id, dtb_bus_stop.name, dtb_bus_stop.address, move_time FROM dtb_order '.
+                'LEFT JOIN dtb_customer ON dtb_order.farmer_id = dtb_customer.customer_id '.
+                'LEFT JOIN dtb_bus_stop ON dtb_customer.bus_stop = dtb_bus_stop.bus_stop_id '.
+                'LEFT JOIN dtb_route_detail ON dtb_bus_stop.bus_stop_id = dtb_route_detail.bus_stop_id '.
+                'WHERE order_id = ?';
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('bus_stop_id', 'bus_stop_id');
+        $rsm->addScalarResult('name', 'name');
+        $rsm->addScalarResult('address', 'address');
+        $rsm->addScalarResult('move_time', 'move_time');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, $id);
+        $results = $query->getResult();
+
+        return $results;
+    }
+
+    public function getSaleByMonth ($farmer_id) {
+        //need move to my sql
+        $sql =  'SELECT SUM(payment_total) as total, MONTH(order_date) as month '.
+                'FROM dtb_order '.
+                'WHERE order_date LIKE ? AND farmer_id = ? '.
+                'GROUP BY DATE_FORMAT(order_date, "%Y-%m")';
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('total', 'total');
+        $rsm->addScalarResult('month', 'month');
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter(1, date('Y%'));
+        $query->setParameter(2, $farmer_id);
+        $results = $query->getResult();
+
+        return $results;
     }
 }

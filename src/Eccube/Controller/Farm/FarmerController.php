@@ -16,19 +16,21 @@ use Eccube\Entity\ChangePassword;
 use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerImage;
 use Eccube\Entity\CustomerVoice;
-use Eccube\Entity\Master\OrderStatus;
+use Eccube\Entity\Follow;
+use Eccube\Entity\Master\CustomerRole;
 use Eccube\Entity\Master\ReceiptableDate;
-use Eccube\Entity\Order;
+use Eccube\Entity\Notification;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
 use Eccube\Entity\ProductImage;
+use Eccube\Entity\ProductRate;
 use Eccube\Entity\ProductReceiptableDate;
 use Eccube\Entity\ProductTag;
 use Eccube\Exception\CartException;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\CustomerVoiceRepository;
-use Eccube\Repository\OrderRepository;
 use Eccube\Repository\ProductRepository;
+use Eccube\Service\CartService;
 use Eccube\Util\EntityUtil;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormBuilder;
@@ -51,19 +53,19 @@ class FarmerController extends AbstractController
      *
      * @param Application $app
      * @param Request $request
-     * @param $id
+     * @param null $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function index(Application $app, Request $request, $id = null)
     {
+        if (!$app->isGranted("IS_AUTHENTICATED_FULLY")) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+
         $isOwner = false;
         /** @var Customer $Customer */
         $Customer = $app->user();
-        // Todo: check is farmer
-        // || !$app->isGranted(CustomerRole::FARMER)
-        if (!($Customer instanceof Customer)) {
-            return $app->redirect($app->url('mypage_login'));
-        }
         if ($id) {
             /** @var CustomerRepository $repo */
             $repo = $app['eccube.repository.customer'];
@@ -98,6 +100,11 @@ class FarmerController extends AbstractController
             $voice->setTargetCustomer($TargetCustomer);
             $app['orm.em']->persist($voice);
             $app['orm.em']->flush();
+
+            if ($TargetCustomer->getId() != $Customer->getId()) {
+                $app['eccube.repository.notification']
+                    ->insertNotice($Customer, $TargetCustomer, Notification::TYPE_PROFILE, $id);
+            }
 
             return $app->redirect($app->url('farm_profile', array('id' => $TargetCustomer->getId(), 'voice' => 1)));
         }
@@ -321,103 +328,6 @@ class FarmerController extends AbstractController
     /**
      * @param Application $app
      * @param Request $request
-     * @param $id
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function home(Application $app, Request $request, $id = null)
-    {
-        /** @var Customer $Customer */
-        $Customer = $app->user();
-        if (!($Customer instanceof Customer)) {
-            return $app->redirect($app->url('mypage_login'));
-        }
-        $TargetCustomer = null;
-        if ($id) {
-            $TargetCustomer = $app['eccube.repository.customer']->find($id);
-            if (!$TargetCustomer) {
-                throw new NotFoundHttpException();
-            }
-        }
-        if (!$TargetCustomer) {
-            $TargetCustomer = $Customer;
-        }
-
-        /** @var ProductRepository $productRepo */
-        $productRepo = $app['eccube.repository.product'];
-        $productList = $productRepo->getProductQueryBuilderByCustomer($TargetCustomer)->getQuery()->getResult();
-        /** @var OrderRepository $orderRepos */
-        $orderRepos = $app['eccube.repository.order'];
-        $arrStatusTransaction = array(
-            $app['config']['order_new'],
-        );
-        /** @var Order[] $orderTransaction */
-        $orderTransaction = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusTransaction)->getQuery()->getResult();
-        $orderTransactionByDate = array();
-        if ($orderTransaction) {
-            foreach ($orderTransaction as $order) {
-                if ($order->getReceiptableDate()) {
-                    $orderTransactionByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
-                }
-            }
-        }
-
-        $arrStatusDelivery = array(
-            OrderStatus::ORDER_PREPARE,
-            OrderStatus::ORDER_PICKUP,
-        );
-        /** @var Order[] $orderDelivery */
-        $orderDelivery = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusDelivery)->getQuery()->getResult();
-        $orderDeliveryByDate = array();
-        if ($orderDelivery) {
-            foreach ($orderDelivery as $order) {
-                if ($order->getReceiptableDate()) {
-                    $orderDeliveryByDate[$order->getReceiptableDate()->format('m月d日')][] = $order;
-                }
-            }
-        }
-
-        $arrStatusComplete = array(
-            OrderStatus::ORDER_DONE,
-        );
-
-        /** @var FormBuilder $builder */
-        $builder = $app['form.factory']->createNamedBuilder('', 'home_complete');
-        if ($request->getMethod() === 'GET') {
-            $builder->setMethod('GET');
-        }
-
-        $formOrderBy = $builder->getForm();
-        $formOrderBy->handleRequest($request);
-        $queryBuilder = $orderRepos->getQueryBuilderByOwner($TargetCustomer, $arrStatusComplete);
-        $queryBuilder->resetDQLPart('orderBy');
-        $data = $formOrderBy->getData();
-        $orderBy = isset($data['order_by']) ? $data['order_by'] : Order::SORT_BY_NEW;
-        switch ($orderBy) {
-            case Order::SORT_BY_TOTAL:
-                $queryBuilder->orderBy('o.total', 'DESC');
-                break;
-            case Order::SORT_BY_NEW:
-            default:
-                $queryBuilder->orderBy('o.update_date', 'DESC');
-                break;
-
-        }
-        /** @var Order[] $orderComplete */
-        $orderComplete = $queryBuilder->getQuery()->getResult();
-
-        return $app->render('Farm/farm_home.twig', array(
-            'Products' => $productList,
-            'TargetCustomer' => $TargetCustomer,
-            'OrderTransactionByDate' => $orderTransactionByDate,
-            'OrderDeliveryByDate' => $orderDeliveryByDate,
-            'formOrderBy' => $formOrderBy->createView(),
-            'OrderComplete' => $orderComplete,
-        ));
-    }
-
-    /**
-     * @param Application $app
-     * @param Request $request
      * @param null $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -466,8 +376,7 @@ class FarmerController extends AbstractController
         /** @var FormBuilder $builder */
         $builder = $app['form.factory']->createBuilder('item_edit', $Product);
         $form = $builder->getForm();
-        $ProductType = $app['eccube.repository.master.product_type']->find(1);
-        $ProductClass->setStockUnlimited(true);
+        $ProductClass->setStockUnlimited(false);
 
         $form['class']->setData($ProductClass);
 
@@ -504,7 +413,7 @@ class FarmerController extends AbstractController
             $Product = $form->getData();
             $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_SHOW);
             $Product->setStatus($Disp);
-            // error creator;
+            // set farmer
             $Product->setCreator($Customer);
 
             /** @var EntityManager $em */
@@ -512,6 +421,7 @@ class FarmerController extends AbstractController
 
             /** @var ProductClass $ProductClass */
             $ProductClass = $form['class']->getData();
+            $ProductType = $app['eccube.repository.master.product_type']->find(1);
             $ProductClass->setProductType($ProductType);
 
             // 個別消費税
@@ -522,7 +432,6 @@ class FarmerController extends AbstractController
                         if ($ProductClass->getTaxRule()->getDelFlg() == Constant::ENABLED) {
                             $ProductClass->getTaxRule()->setDelFlg(Constant::DISABLED);
                         }
-
                         $ProductClass->getTaxRule()->setTaxRate($ProductClass->getTaxRate());
                     } else {
                         $taxrule = $app['eccube.repository.tax_rule']->newTaxRule();
@@ -539,14 +448,7 @@ class FarmerController extends AbstractController
                 }
             }
             $em->persist($ProductClass);
-
-            // 在庫情報を作成
-            if (!$ProductClass->getStockUnlimited()) {
-                $ProductStock->setStock($ProductClass->getStock());
-            } else {
-                // 在庫無制限時はnullを設定
-                $ProductStock->setStock(null);
-            }
+            $ProductStock->setStock($ProductClass->getStock());
             $em->persist($ProductStock);
 
             /* @var $Product \Eccube\Entity\Product */
@@ -554,36 +456,50 @@ class FarmerController extends AbstractController
                 $Product->removeProductCategory($ProductCategory);
                 $em->remove($ProductCategory);
             }
+            // Remove Receiptable date
+            $ProductRDs = $Product->getProductReceiptableDates();
+            foreach ($ProductRDs as $productRD) {
+                $Product->removeProductReceiptableDate($productRD);
+                $em->remove($productRD);
+            }
+
             $em->persist($Product);
             $em->flush();
 
             $Category = $form->get('Category')->getData();
             $productCate = $this->createProductCategory($Product, $Category);
             $em->persist($productCate);
-            $em->flush();
 
-            // Update
             /** @var ReceiptableDate[] $ReceiptableDates*/
             $ReceiptableDates = $form->get('ReceiptableDate')->getData();
-
-            $ProductRDs = $Product->getProductReceiptableDates();
-            foreach ($ProductRDs as $productRD) {
-                $Product->removeProductReceiptableDate($productRD);
-                $em->remove($productRD);
+            // Loop step
+            $interval = \DateInterval::createFromDateString('1 day');
+            $dateEnd = clone $ProductClass->getProductionEndDate();
+            $dateStart = $ProductClass->getProductionStartDate();
+            $now = new \DateTime();
+            if ($dateStart->getTimestamp() < $now) {
+                $dateStart = new \DateTime($now->format('Y/m/d'));
             }
-            $em->flush();
-
+            $period = new \DatePeriod($dateStart, $interval, $dateEnd->modify('+1 day'));
+            $arrDateId = array();
             foreach ($ReceiptableDates as $receiptableDate) {
-                $productRD = new ProductReceiptableDate();
-                $productRD->setProduct($Product);
-                $productRD->setProductId($Product->getId());
-                $productRD->setReceiptableDate($receiptableDate);
-                $productRD->setDateId($receiptableDate->getId());
-                $productRD->setMaxQuantity(1);
-                $Product->addProductReceiptableDate($productRD);
-                $em->persist($productRD);
+                $arrDateId[$receiptableDate->getId()] = $receiptableDate;
             }
-            $em->persist($Product);
+            foreach ($period as $date) {
+                $dateId = $date->format('N');
+                if (in_array($dateId, array_keys($arrDateId))) {
+                    $productRD = new ProductReceiptableDate();
+                    $productRD->setProduct($Product);
+                    $productRD->setProductId($Product->getId());
+                    $productRD->setDate($date);
+                    $productRD->setReceiptableDate($arrDateId[$dateId]);
+                    $productRD->setDateId($dateId);
+                    $productRD->setMaxQuantity($ProductClass->getStock());
+                    $Product->addProductReceiptableDate($productRD);
+                    $em->persist($productRD);
+                }
+            }
+
             $em->flush();
 
             // 画像の登録
@@ -597,7 +513,6 @@ class FarmerController extends AbstractController
                     ->setCreator($Customer);
                 $Product->addProductImage($ProductImage);
                 $em->persist($ProductImage);
-
                 // 移動
                 $file = new File($app['config']['image_temp_realdir'].'/'.$add_image);
                 $file->move($app['config']['image_save_realdir']);
@@ -608,21 +523,18 @@ class FarmerController extends AbstractController
             foreach ($delete_images as $delete_image) {
                 $ProductImage = $app['eccube.repository.product_image']
                     ->findOneBy(array('file_name' => $delete_image));
-
                 // 追加してすぐに削除した画像は、Entityに追加されない
                 if ($ProductImage instanceof \Eccube\Entity\ProductImage) {
                     $Product->removeProductImage($ProductImage);
                     $em->remove($ProductImage);
-
                 }
-                $em->persist($Product);
-
                 // 削除
                 if (!empty($delete_image)) {
                     $fs = new Filesystem();
                     $fs->remove($app['config']['image_save_realdir'].'/'.$delete_image);
                 }
             }
+
             $em->persist($Product);
             $em->flush();
 
@@ -674,6 +586,7 @@ class FarmerController extends AbstractController
      * @param Request $request
      * @param $id
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws Application\AuthenticationCredentialsNotFoundException
      */
     public function detail(Application $app, Request $request, $id)
     {
@@ -685,8 +598,6 @@ class FarmerController extends AbstractController
         if (!$Product) {
             throw new NotFoundHttpException();
         }
-        $TargetCustomer = $Product->getCreator();
-        $Customer = $app->user();
 
         $voice = new CustomerVoice();
         /** @var FormBuilder $builder */
@@ -701,14 +612,18 @@ class FarmerController extends AbstractController
         $cartForm = $builderCart->getForm();
 
         $mode = $request->get('mode');
-
         switch ($mode) {
             case 'add_cart':
                 $cartForm->handleRequest($request);
                 if ($cartForm->isSubmitted() && $cartForm->isValid()) {
                     $addCartData = $cartForm->getData();
+                    $arrQuantity = array_filter($addCartData['quantity'], function ($item) {
+                        return $item > 0;
+                    });
+                    /** @var CartService $cartService */
+                    $cartService = $app['eccube.service.cart'];
                     try {
-                        $app['eccube.service.cart']->addProduct($addCartData['product_class_id'], $addCartData['quantity'])->save();
+                        $cartService->addProduct($addCartData['product_class_id'], $arrQuantity)->save();
                     } catch (CartException $e) {
                         $app->addRequestError($e->getMessage());
                     }
@@ -719,9 +634,12 @@ class FarmerController extends AbstractController
             case 'add_voice':
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
-                    if (!($Customer instanceof Customer)) {
+                    if (!$app->isGranted("IS_AUTHENTICATED_FULLY")) {
                         return $app->redirect($app->url('mypage_login'));
                     }
+                    $Customer = $app->user();
+                    $TargetCustomer = $Product->getCreator();
+
                     /** @var UploadedFile $image */
                     $image = $form['file_name']->getData();
                     if ($image) {
@@ -735,6 +653,10 @@ class FarmerController extends AbstractController
                     $voice->setProduct($Product);
                     $app['orm.em']->persist($voice);
                     $app['orm.em']->flush();
+                    if ($TargetCustomer->getId() != $Customer->getId()) {
+                        $app['eccube.repository.notification']
+                            ->insertNotice($Customer, $TargetCustomer, Notification::TYPE_PRODUCT, $Product->getId(), $Product->getName());
+                    }
                 }
                 break;
             default:
@@ -758,107 +680,7 @@ class FarmerController extends AbstractController
         ));
     }
 
-    public function history(Application $app, Request $request)
-    {
-        if (!$app->isGranted('ROLE_FARMER')) {
-            throw new NotFoundHttpException();
-        }
-        $Customer = $app->user();
 
-        /** @var ProductRepository $productRepository */
-        $productRepository = $app['eccube.repository.product'];
-        $queryBuilder = $productRepository->getProductQueryBuilderForHistory($Customer);
-        $history = $queryBuilder->getQuery()->getResult();
-
-        return $app->render('Farm/history.twig', array(
-            'history' => $history
-        ));
-    }
-
-    public function historyDetail(Application $app, Request $request, $id)
-    {
-        if (!$app->isGranted('ROLE_FARMER')) {
-            throw new NotFoundHttpException();
-        }
-        /** @var ProductRepository $productRepository */
-        $productRepository = $app['eccube.repository.product'];
-        $Product = $productRepository->find($id);
-        if (!$Product) {
-            throw new NotFoundHttpException();
-        }
-
-        if ($request->getMethod() == 'PUT') {
-            $this->isTokenValid($app);
-
-            $CopyProduct = clone $Product;
-            $CopyProduct->copy();
-            $Disp = $app['eccube.repository.master.disp']->find(\Eccube\Entity\Master\Disp::DISPLAY_HIDE);
-            $CopyProduct->setStatus($Disp);
-
-            $CopyProductCategories = $CopyProduct->getProductCategories();
-            /** @var EntityManager $em */
-            $em = $app['orm.em'];
-            foreach ($CopyProductCategories as $Category) {
-                $em->persist($Category);
-            }
-
-            // 規格あり商品の場合は, デフォルトの商品規格を取得し登録する.
-            if ($CopyProduct->hasProductClass()) {
-                $softDeleteFilter = $em->getFilters()->getFilter('soft_delete');
-                $softDeleteFilter->setExcludes(array(
-                    'Eccube\Entity\ProductClass'
-                ));
-                $dummyClass = $app['eccube.repository.product_class']->findOneBy(array(
-                    'del_flg' => \Eccube\Common\Constant::ENABLED,
-                    'ClassCategory1' => null,
-                    'ClassCategory2' => null,
-                    'Product' => $Product,
-                ));
-                $dummyClass = clone $dummyClass;
-                $dummyClass->setProduct($CopyProduct);
-                $CopyProduct->addProductClass($dummyClass);
-                $softDeleteFilter->setExcludes(array());
-            }
-
-            $CopyProductClasses = $CopyProduct->getProductClasses();
-            foreach ($CopyProductClasses as $Class) {
-                $Stock = $Class->getProductStock();
-                $CopyStock = clone $Stock;
-                $CopyStock->setProductClass($Class);
-                $em->persist($CopyStock);
-
-                $em->persist($Class);
-            }
-            $Images = $CopyProduct->getProductImage();
-            foreach ($Images as $Image) {
-                // 画像ファイルを新規作成
-                $extension = pathinfo($Image->getFileName(), PATHINFO_EXTENSION);
-                $filename = date('mdHis').uniqid('_').'.'.$extension;
-                try {
-                    $fs = new Filesystem();
-                    $fs->copy($app['config']['image_save_realdir'].'/'.$Image->getFileName(), $app['config']['image_save_realdir'].'/'.$filename);
-                } catch (\Exception $e) {
-                    // エラーが発生しても無視する
-                }
-                $Image->setFileName($filename);
-
-                $em->persist($Image);
-            }
-            $Tags = $CopyProduct->getProductTag();
-            foreach ($Tags as $Tag) {
-                $em->persist($Tag);
-            }
-
-            $em->persist($CopyProduct);
-
-            $em->flush($CopyProduct);
-            return $app->redirect($app->url('farm_item_edit', array('id' => $CopyProduct->getId())));
-        }
-
-        return $app->render('Farm/history_detail.twig', array(
-            'Product' => $Product
-        ));
-    }
 
     /*
      * ProductCategory作成
@@ -876,5 +698,117 @@ class FarmerController extends AbstractController
         $ProductCategory->setRank($count);
 
         return $ProductCategory;
+    }
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws Application\AuthenticationCredentialsNotFoundException
+     */
+    public function countLike(Application $app, Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) {
+            throw new BadRequestHttpException('リクエストが不正です');
+        }
+
+        if (!$app->isGranted(CustomerRole::RECIPIENT)) {
+            throw new NotFoundHttpException();
+        }
+
+        $id = $request->get('product_id');
+        $type = $request->get('type');
+        /** @var Product $Product */
+        $Product = $app['eccube.repository.product']->find($id);
+        if ($Product) {
+            /**@var $ProductRate ProductRate*/
+            $ProductRate = $Product->getProductRate();
+            if ($ProductRate instanceof ProductRate) {
+                switch ($type) {
+                    case 'like_count' :
+                        $count = $ProductRate->getLikeCount() + 1;
+                        $ProductRate->setLikeCount($count);
+                        break;
+                    case 'delicious_count' :
+                        $count = $ProductRate->getDeliciousCount() + 1;
+                        $ProductRate->setDeliciousCount($count);
+                        break;
+                    case 'fresh_count' :
+                        $count = $ProductRate->getFreshCount() + 1;
+                        $ProductRate->setFreshCount($count);
+                        break;
+                    case 'vivid_count' :
+                        $count = $ProductRate->getVividCount() + 1;
+                        $ProductRate->setVividCount($count);
+                        break;
+                    default:
+                        $count = $ProductRate->getAromaCount() + 1;
+                        $ProductRate->setAromaCount($count);
+                        break;
+                }
+            } else {
+                $ProductRate = new ProductRate();
+                $ProductRate->setProduct($Product);
+                switch ($type) {
+                    case 'like_count' :
+                        $ProductRate->setLikeCount(1);
+                        break;
+                    case 'delicious_count' :
+                        $ProductRate->setDeliciousCount(1);
+                        break;
+                    case 'fresh_count' :
+                        $ProductRate->setFreshCount(1);
+                        break;
+                    case 'vivid_count' :
+                        $ProductRate->setVividCount(1);
+                        break;
+                    default:
+                        $ProductRate->setAromaCount(1);
+                        break;
+                }
+                $Product->setProductRate($ProductRate);
+            }
+
+            $app['orm.em']->persist($ProductRate);
+            $app['orm.em']->flush();
+        }
+
+        return $app->json(array('success' => true), 200);
+    }
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @throws Application\AuthenticationCredentialsNotFoundException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function follow(Application $app, Request $request, $id)
+    {
+        $this->isTokenValid($app);
+        if (!$app->isGranted(CustomerRole::RECIPIENT)) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var CustomerRepository $customerRepo */
+        $customerRepo = $app['eccube.repository.customer'];
+        $TargetCustomer = $customerRepo->find($id);
+        if (!$TargetCustomer) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+
+        $follow = new Follow();
+        $follow->setTargetCustomer($TargetCustomer);
+        $follow->setCustomer($Customer);
+        $Customer->addFollow($follow);
+        /** @var EntityManager $em */
+        $em = $app['orm.em'];
+        $em->persist($follow);
+        $em->flush();
+
+        return $app->redirect($app->url('farm_profile', array('id' => $id)));
     }
 }

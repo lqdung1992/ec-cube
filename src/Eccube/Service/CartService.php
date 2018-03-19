@@ -208,29 +208,18 @@ class CartService
 
     /**
      * @param $productClassId
-     * @param int $quantity
-     * @param array $dates array date_id [1->7]
+     * @param array $arrQuantity
      * @return $this
      * @throws CartException
      */
-    public function addProduct($productClassId, $quantity = 1, array $dates = array())
+    public function addProduct($productClassId, array $arrQuantity)
     {
-        if ($dates) {
-            $productReceptionDates = $dates;
-        } else {
-            /** @var ProductClassRepository $productClassRepo */
-            $productClassRepo = $this->app['eccube.repository.product_class'];
-            /** @var ProductClass $ProductClass */
-            $ProductClass = $productClassRepo->find($productClassId);
-            $productReceptionDates = $ProductClass->getProduct()->getProductReceiptableDates();
-        }
-        foreach ($productReceptionDates as $productReceptionDate) {
-            $quantity_tmp = $quantity;
-            $dateId = $productReceptionDate;
-            if ($productReceptionDate instanceof ProductReceiptableDate) {
-                $dateId = $productReceptionDate->getDateId();
+        foreach ($arrQuantity as $date => $quantity) {
+            if ($quantity < 1) {
+                continue;
             }
-            $date = DateUtil::getDay($dateId);
+            $date = new \DateTime($date);
+            $quantity_tmp = $quantity;
             $quantity_tmp += $this->getProductQuantity($productClassId, $date);
             $this->setProductQuantity($productClassId, $quantity_tmp, $date);
         }
@@ -243,7 +232,7 @@ class CartService
      * @param \DateTime|null $date
      * @return integer
      */
-    public function getProductQuantity($productClassId, $date = null)
+    public function getProductQuantity($productClassId, \DateTime $date = null)
     {
         $CartItem = $this->cart->getCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId, $date);
         if ($CartItem) {
@@ -260,7 +249,7 @@ class CartService
      * @return \Eccube\Service\CartService
      * @throws CartException
      */
-    public function setProductQuantity($ProductClass, $quantity, $date = null)
+    public function setProductQuantity($ProductClass, $quantity, \DateTime $date = null)
     {
         if (!$ProductClass instanceof ProductClass) {
             $ProductClass = $this->entityManager
@@ -325,7 +314,7 @@ class CartService
         }
 
         // 制限数チェック(在庫不足の場合は、処理の中でカート内商品を削除している)
-        $quantity = $this->setProductLimit($ProductClass, $productName, $tmp_quantity);
+        $quantity = $this->setProductLimit($ProductClass, $productName, $tmp_quantity, $date);
 		// 新しい数量でカート内商品を登録する
         if (0 < $quantity) {
             $CartItem = new CartItem();
@@ -455,15 +444,14 @@ class CartService
 
             if ($ProductClass->getDelFlg() == Constant::DISABLED) {
                 // 商品情報が有効
-
                 if (!$this->isProductDisplay($ProductClass)) {
                     $this->setError('cart.product.not.status');
                 } else {
 
                     $productName = $this->getProductName($ProductClass);
-
+                    $date = $CartItem->getReceptionDate();
                     // 制限数チェック(在庫不足の場合は、処理の中でカート内商品を削除している)
-                    $quantity = $this->setProductLimit($ProductClass, $productName, $CartItem->getQuantity());
+                    $quantity = $this->setProductLimit($ProductClass, $productName, $CartItem->getQuantity(), $date);
 
                     /// 個数が異なれば、新しい数量でカート内商品を更新する
                     if ((0 < $quantity) && ($CartItem->getQuantity() != $quantity)) {
@@ -490,6 +478,7 @@ class CartService
      * @todo Remove new cart from old cart
      * @param \DateTime $date
      * @return \Eccube\Entity\Cart New cart
+     * @throws CartException
      */
     public function getCartByDate($date)
     {
@@ -504,7 +493,6 @@ class CartService
             $ProductClass = $CartItem->getObject();
             if (!$ProductClass) {
                 $this->loadProductClassFromCartItem($CartItem);
-
                 $ProductClass = $CartItem->getObject();
             }
 
@@ -523,6 +511,11 @@ class CartService
                 $this->removeProduct($ProductClass->getId());
             }
         }
+
+        if (count($CartNew->getCartItems()) == 0) {
+            throw new CartException('cart.receiptable_date.notfound');
+        }
+
         $CartNew->setLock(true)
             ->setPreOrderId(null);
         return $CartNew;
@@ -533,7 +526,7 @@ class CartService
      * @param \DateTime $date
      * @return \Eccube\Service\CartService
      */
-    public function removeProduct($productClassId, $date = null)
+    public function removeProduct($productClassId, \DateTime $date = null)
     {
         $this->cart->removeCartItemByIdentifier('Eccube\Entity\ProductClass', (string)$productClassId, $date);
 
@@ -731,9 +724,10 @@ class CartService
      * @param ProductClass $ProductClass
      * @param $productName
      * @param $quantity
+     * @param \DateTime $date
      * @return int チェック後に更新した個数
      */
-    private function setProductLimit(ProductClass $ProductClass, $productName, $quantity)
+    private function setProductLimit(ProductClass $ProductClass, $productName, $quantity, \DateTime $date)
     {
 
         /**
@@ -742,7 +736,17 @@ class CartService
          */
 
         // 在庫数(在庫無制限の場合、null)
-        $stock = $ProductClass->getStock();
+//        $stock = $ProductClass->getStock();
+        $stock = 0;
+        $productRDs = $ProductClass->getProduct()->getProductReceiptableDates();
+        $date = $date->format('Y/m/d');
+        foreach ($productRDs as $productRD) {
+            $receiptDate = $productRD->getDate()->format('Y/m/d');
+            if ($date == $receiptDate) {
+                $stock = $productRD->getMaxQuantity();
+            }
+        }
+
         // 在庫無制限(在庫無制限の場合、1)
         $stockUnlimited = $ProductClass->getStockUnlimited();
 

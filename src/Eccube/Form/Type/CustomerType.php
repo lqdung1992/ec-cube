@@ -126,7 +126,17 @@ class CustomerType extends AbstractType
             ->add('note', 'textarea', array(
                 'required' => false,
             ))
-            ->add('save', 'submit', array('label' => 'この内容で登録する'));
+            ->add('save', 'submit', array('label' => 'この内容で登録する'))
+            ->add('bus_stop', 'entity', array(
+                'required' => false,
+                'class' => 'Eccube\Entity\BusStop',
+                'empty_value' => '----------',
+                'property' => 'name',
+                'label' => 'バス停',
+                'constraints' => array(
+//                    new Assert\NotBlank(),
+                )
+            ));
     }
 
     /**

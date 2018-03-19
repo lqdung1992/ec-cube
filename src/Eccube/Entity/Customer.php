@@ -27,6 +27,8 @@ namespace Eccube\Entity;
 use Eccube\Common\Constant;
 use Eccube\Entity\Master\ApprovalStatus;
 use Eccube\Entity\Master\CustomerRole;
+use Eccube\Entity\Master\ReceiverContainerType;
+use Eccube\Entity\Master\ReceiverGetTime;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -253,6 +255,13 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      */
     private $CustomerImage;
 
+
+    /* @var ReceiverContainerType $ReceiverContainerTyp　*/
+    private $ReceiverContainerType;
+
+    /* @var ReceiverGetTime $ReceiverGetTime　*/
+    private $ReceiverGetTime;
+
     /**
      * Constructor
      */
@@ -262,6 +271,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->CustomerAddresses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->Orders = new \Doctrine\Common\Collections\ArrayCollection();
         $this->CustomerImage = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->Follows = new \Doctrine\Common\Collections\ArrayCollection();
 
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
@@ -1355,4 +1365,85 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->CustomerImage->removeElement($customerImage);
         return $this;
     }
+
+    /** @var Follow[] */
+    private $Follows;
+
+    /**
+     * @return Follow[]
+     */
+    public function getFollows()
+    {
+        return $this->Follows;
+    }
+
+    /**
+     * @param Follow $follow
+     * @return $this
+     */
+    public function addFollow(Follow $follow)
+    {
+        $this->Follows->add($follow);
+
+        return $this;
+    }
+
+    /**
+     * @param Follow $follow
+     * @return $this
+     */
+    public function removeFollow(Follow $follow)
+    {
+        $this->Follows->removeElement($follow);
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function isFollow($id)
+    {
+        $follows = $this->getFollows();
+        foreach ($follows as $follow) {
+            if ($follow->getTargetCustomer()->getId() == $id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return ReceiverContainerType
+     */
+    public function getReceiverContainerType()
+    {
+        return $this->ReceiverContainerType;
+    }
+
+    /**
+     * @param ReceiverContainerType $ReceiverContainerType
+     */
+    public function setReceiverContainerType($ReceiverContainerType)
+    {
+        $this->ReceiverContainerType = $ReceiverContainerType;
+    }
+
+    /**
+     * @return ReceiverGetTime
+     */
+    public function getReceiverGetTime()
+    {
+        return $this->ReceiverGetTime;
+    }
+
+    /**
+     * @param ReceiverGetTime $ReceiverGetTime
+     */
+    public function setReceiverGetTime($ReceiverGetTime)
+    {
+        $this->ReceiverGetTime = $ReceiverGetTime;
+    }
+
+
 }

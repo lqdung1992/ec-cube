@@ -94,37 +94,6 @@
     <script type="text/javascript">
         var max_image = 5;
         $(function () {
-            var openModal = function (review_class, caption) {
-                var modal = document.getElementById('myModal');
-                var modalImg = document.getElementById("model-image");
-                // review image
-                var img = document.getElementsByClassName(review_class);
-                var captionText = document.getElementById("caption");
-
-                var text = '';
-                if (caption) {
-                    text = document.getElementsByClassName(caption);
-                }
-
-                // review image
-                $(img).each(function(index, item) {
-                    item.onclick = function() {
-                        modal.style.display = "block";
-                        modalImg.src = this.src;
-                        if (text[index]) {
-                            captionText.innerHTML = text[index].value;
-                        } else {
-                            captionText.innerHTML = '';
-                        }
-                    };
-                });
-
-                var span = document.getElementsByClassName("close")[0];
-                span.onclick = function() {
-                    modal.style.display = "none";
-                };
-            };
-            openModal('image-review');
 
             var hideSvg = function () {
                 var  length = $("#thumb li").length;
@@ -201,7 +170,6 @@
                             $new_img.val(file);
                             $child = $img.append($new_img);
                             $('#thumb').prepend($child);
-                            openModal('image-review');
                             count_add++;
                         }
                     });
@@ -345,13 +313,15 @@
             <div id="item-info">
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        <label class="display-block">品目<span class="badge wait-approve">必須</span></label>
+                        {{ form_label(form.Category) }}
+                        {#<label class="display-block">品目<span class="badge wait-approve">必須</span></label>#}
                         {{ form_errors(form.Category) }}
                         {{ form_widget(form.Category, {'attr': {'class': 'select'}}) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
-                    <label class="display-block">栽培方法<span class="badge wait-approve">必須</span></label>
+                    {{ form_label(form.class.cultivation_method) }}
+                    {#<label class="display-block">栽培方法<span class="badge wait-approve">必須</span></label>#}
                     <div class="form-group form-inline">
                         {{ form_widget(form.class.cultivation_method, {'attr': {'class': 'hidden'}}) }}
                     </div>
@@ -372,25 +342,25 @@
 
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        <label class="display-block">1点あたりの価格<span class="badge wait-approve">必須</span></label>
-                        {#{{ form_label(form.class.price02) }}#}
+                        {#<label class="display-block">1点あたりの価格<span class="badge wait-approve">必須</span></label>#}
+                        {{ form_label(form.class.price02) }}
                         {{ form_errors(form.class.price02) }}
                         {{ form_widget(form.class.price02) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        <label class="display-block">段ボール・折りたたみコンテナ1つに入る点数<span class="badge wait-approve">必須</span></label>
-                        {#{{ form_label(form.class.amount_per_container) }}#}
+                        {#<label class="display-block">段ボール・折りたたみコンテナ1つに入る点数<span class="badge wait-approve">必須</span></label>#}
+                        {{ form_label(form.class.amount_per_container) }}
                         {{ form_errors(form.class.amount_per_container) }}
                         {{ form_widget(form.class.amount_per_container) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        {{ form_label(form.class.sale_limit) }}
-                        {{ form_errors(form.class.sale_limit) }}
-                        {{ form_widget(form.class.sale_limit) }}
+                        {{ form_label(form.class.stock) }}
+                        {{ form_errors(form.class.stock) }}
+                        {{ form_widget(form.class.stock) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
@@ -404,8 +374,8 @@
 
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group form-inline" id="date_group">
-                        <label class="display-block">発送可能日<span class="badge wait-approve">必須</span></label>
-                        {#{{ form_label(form.ReceiptableDate) }}#}
+                        {#<label class="display-block">発送可能日<span class="badge wait-approve">必須</span></label>#}
+                        {{ form_label(form.ReceiptableDate) }}
                         {{ form_errors(form.ReceiptableDate) }}
                         {{ form_widget(form.ReceiptableDate, {'attr': {'class': 'hidden'}}) }}
                     </div>
@@ -413,16 +383,16 @@
 
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        <label class="display-block">タイトル<span class="badge wait-approve">必須</span></label>
-                        {#{{ form_label(form.name) }}#}
+                        {#<label class="display-block">タイトル<span class="badge wait-approve">必須</span></label>#}
+                        {{ form_label(form.name) }}
                         {{ form_errors(form.name) }}
                         {{ form_widget(form.name) }}
                     </div>
                 </div>
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group">
-                        <label class="display-block">商品説明<span class="badge wait-approve">必須</span></label>
-                        {#{{ form_label(form.description_detail) }}#}
+                        {#<label class="display-block">商品説明<span class="badge wait-approve">必須</span></label>#}
+                        {{ form_label(form.description_detail) }}
                         {{ form_errors(form.description_detail) }}
                         {{ form_widget(form.description_detail, {'attr': {'class': 'height120'}}) }}
                     </div>
@@ -430,7 +400,8 @@
 
                 <div class="col-sm-12 col-xs-12">
                     <div class="form-group form-inline" id="tag-group">
-                        <label class="display-block">タグ</label>
+                        {{ form_label(form.Tag) }}
+                        {#<label class="display-block">タグ</label>#}
                         {{ form_errors(form.Tag) }}
                         {{ form_widget(form.Tag, {'attr': {'class': 'hidden'}}) }}
                     </div>
@@ -447,12 +418,5 @@
                 </div>
             </div>
         </form>
-    </div>
-
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="model-image"/>
-        <div id="caption"></div>
     </div>
 {% endblock %}

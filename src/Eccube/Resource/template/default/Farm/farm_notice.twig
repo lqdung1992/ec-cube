@@ -1,0 +1,84 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/10/2018
+ # Time: 10:26 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        .list-group-item:hover {
+            background-color: #f7f7f7 !important;
+        }
+
+        .notice-section, .news-section {
+            min-height: 600px;
+        }
+    </style>
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $(".exhibition li").click(function () {
+                var $class = $(this).data('text');
+                $(this).parent().find('li').each(function (index, value) {
+                    $(value).removeClass('enable').addClass('disable');
+                    $('.'+$(value).data('text')).hide();
+                });
+                $(this).addClass('enable').removeClass('disable');
+                $('.'+$class).show();
+            });
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div class="wrapper" id="receiver-notice">
+        <div class="exhibition">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <ul class="list-inline">
+                        <li class="col-sm-6 col-xs-6 text-alight-center enable " id="notice-section" data-text="notice-section">お知らせ</li>
+                        <li class="col-sm-6 col-xs-6 text-alight-center disable" id="news-section" data-text="news-section">運営からのお知らせ</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="notice-section">
+            {% if Notices|length > 0 %}
+            <ul class="list-group">
+                {% for Notice in Notices %}
+                <li class="list-group-item no-top-border">
+                    <a href="{{ url('farm_notice_view', {'id': Notice.id}) }}" {{ csrf_token_for_anchor() }} data-method="put" data-confirm="false" class="notice-redirect">
+                    <img src="{{ app.config.image_save_urlpath }}/{{ Notice.Customer.profile_image|no_image_product }}" class="img-circle profile50">
+                    <span class="profile-name-medium color222">{{ Notice.notice }}</span>
+                    <span class="color888 float-right title12 notice-time">{{ Notice.create_date|date('m月d日 H:i') }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="news-section">
+            {% if News|length > 0 %}
+            <ul class="list-group">
+                {% for New in News %}
+                <li class="list-group-item no-top-border">
+                    {% if New.url %}
+                        <a href="{{ New.url }}" {% if New.link_method == '1' %}target="_blank"{% endif %}>
+                    {% endif %}
+                        <span class="profile-name-medium color222">{{ New.title }}</span>
+                        <span class="color888">{{ New.comment }}</span>
+                        <span class="color888 float-right title12 notice-time">{{ New.date|date('m月d日 H:i') }}</span>
+                    {% if New.url %}
+                    </a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock main %}

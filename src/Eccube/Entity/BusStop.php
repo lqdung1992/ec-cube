@@ -2,6 +2,7 @@
 
 namespace Eccube\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -53,6 +54,73 @@ class BusStop extends \Eccube\Entity\AbstractEntity
      * @var \Eccube\Entity\Master\BusStatus
      */
     private $BusStatus;
+
+    /** @var Customer[] */
+    private $Customers;
+
+    /** @var RouteDetail[] */
+    private $RouteDetails;
+
+    public function __construct()
+    {
+        $this->Customers = new ArrayCollection();
+        $this->RouteDetails = new ArrayCollection();
+    }
+
+    /**
+     * @return Customer[]
+     */
+    public function getCustomers()
+    {
+        return $this->Customers;
+    }
+
+    /**
+     * @return $this
+     */
+    public function addCustomer(Customer $customer)
+    {
+        $this->Customers->add($customer);
+        return $this;
+    }
+
+    /**
+     * @param Customer $customer
+     * @return $this
+     */
+    public function removeCustomer(Customer $customer)
+    {
+        $this->Customers->removeElement($customer);
+        return $this;
+    }
+
+    /**
+     * @return RouteDetail[]
+     */
+    public function getRouteDetails()
+    {
+        return $this->RouteDetails;
+    }
+
+    /**
+     * @param RouteDetail $detail
+     * @return $this
+     */
+    public function addRouteDetail(RouteDetail $detail)
+    {
+        $this->RouteDetails->add($detail);
+        return $this;
+    }
+
+    /**
+     * @param RouteDetail $detail
+     * @return $this
+     */
+    public function removeRouteDetail(RouteDetail $detail)
+    {
+        $this->RouteDetails->removeElement($detail);
+        return $this;
+    }
 
     /**
      * @return integer

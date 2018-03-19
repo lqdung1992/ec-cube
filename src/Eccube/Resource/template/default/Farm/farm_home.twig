@@ -11,12 +11,16 @@
     <style type="text/css">
 
         /******************************
-            Media Query for tablet, PC...
-        *******************************/
+           Media Query for tablet, PC...
+       *******************************/
         @media only screen and (min-width: 768px) {
             .thumbnail {
                 border: 1px solid #ddd !important;
                 height: 420px;
+            }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 290px;
             }
         }
         /******************************
@@ -27,6 +31,14 @@
                 border: 1px solid #ddd !important;
                 height: 350px;
             }
+            .thumbnail .main-img {
+                width: 345px;
+                height: 200px;
+            }
+        }
+
+        .complete-detail {
+            height: 141px !important;
         }
 
         .product-section, .transaction-section, .delivery-section, .complete-section {
@@ -108,7 +120,7 @@
                     {% if Products|length > 0 %}
                         {% for Product in Products %}
                             <div class="col-sm-3 col-xs-6 thumbnail">
-                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}" alt="no image"></a>
+                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img class="main-img" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}" alt="no image"></a>
                                 <div class="caption">
                                     <h5 class="font-weight mg10">{{ Product.name }}</h5>
                                     <div class="row mg20">
@@ -200,10 +212,12 @@
                                         <div class="order-detail-profile float-left">
                                             <p class="title15 width120">
                                                 {{ Order.name01 }}{{ Order.name02 }}
-                                                {% if Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::ORDER_PREPARE') %}
-                                                    <label class="badge float-right wait-order">{{ Order.OrderStatus.name }}</label>
+                                                {% if Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::ORDER_PICKUP') %}
+                                                    <label class="badge float-right pick-up">{{ Order.OrderStatus.name }}</label>
+                                                {% elseif Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::PICKUP_DONE') %}
+                                                    <label class="badge float-right pick-up-done">{{ Order.OrderStatus.name }}</label>
                                                 {% else %}
-                                                    <label class="badge float-right delivery-now">{{ Order.OrderStatus.name }}</label>
+                                                    <label class="badge float-right delivery-done">{{ Order.OrderStatus.name }}</label>
                                                 {% endif %}
                                                 <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/box-min.svg" class="float-right margin-left20">
                                             </p>
@@ -211,7 +225,7 @@
                                                 {% set Product = OrderDetail.Product %}
                                                 <img class="image-review order-profile" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}">
                                             {% endfor %}
-                                        </div>
+                                        </div>　
                                         <div class="float-right arrow-right">
                                             <a href="{{ url('order', {'id': Order.id}) }}">
                                                 <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">
@@ -243,7 +257,7 @@
 
                     {% if OrderComplete|length > 0 %}
                         {% for Order in OrderComplete %}
-                            <div class="complete-detail clearfix height141">
+                            <div class="complete-detail clearfix">
                                 <div class="clearfix">
                                     <div class="order-detail-profile float-left">
                                         <p class="title15 width120">
@@ -260,15 +274,15 @@
                                         </a>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="order-detail-info">
-                                <div class="float-left">
-                                    <p>
-                                        <span class="color888 margin-right10">出荷日</span>
-                                        <span>{{ Order.commit_date|date_format }}</span>
-                                        <span class="color888 margin-right10 margin-left60">合計</span>
-                                        <span>{{ Order.total|price }}</span>
-                                    </p>
+                                <div class="order-detail-info">
+                                    <div class="float-left">
+                                        <p>
+                                            <span class="color888 margin-right10">出荷日</span>
+                                            <span>{{ Order.commit_date|date_format }}</span>
+                                            <span class="color888 margin-right10 margin-left60">合計</span>
+                                            <span>{{ Order.total|price }}</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}

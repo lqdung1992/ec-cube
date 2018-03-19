@@ -173,7 +173,7 @@ class FarmServiceController
                 $session->remove('customer_id');
             }
 
-            return $app->redirect($app->url('farm_profile', array('id' => $Customer->getId())));
+            return $app->redirect($app->url('mypage_login'));
         }
 
         return $app->render('Farm/service_profile.twig', array(
@@ -202,8 +202,7 @@ class FarmServiceController
         $builder = $app['form.factory']->createBuilder('farmer_regist', $Customer);
         $builder->remove('customer_role')
             ->remove('password')
-            ->remove('email')
-            ->remove('bus_stop');
+            ->remove('email');
         $form = $builder->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

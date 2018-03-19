@@ -1,0 +1,61 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/4/2018
+ # Time: 7:45 PM
+ #}
+
+{% if is_granted("ROLE_FARMER") %}
+    <div class="farmer-new-header">
+        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+        <a href="{{ url('farm_home') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-home.svg" class="nav-home"></a>
+        <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+                    <li class="list-group-item li-profile">
+                        <img src="{{ app.config.image_save_urlpath }}/{{ app.user.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                        <span class="profile-name">{{ app.user.__toString }}</span>
+                        <span class="button-x">X</span>
+                    </li>
+                    <li class="list-group-item"><a href="{{ url('farm_profile', {'id': app.user.id}) }}">プロフィール</a></li>
+                    <li class="list-group-item"><a href="{{ url('farm_history') }}">過去の出品</a></li>
+                    <li class="list-group-item"><a href="{{ url('farm_notice') }}"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
+                    <li class="list-group-item" id="setting"><a href="{{ url('farm_service_profile_setting') }}">設定</a></li>
+                {% endif %}
+                <li class="list-group-item"><a href="{{ url('contact') }}">お問い合わせ</a></li>
+                <li class="list-group-item"><a href="{{ url('help_guide') }}">ガイド</a></li>
+            </ul>
+        </div>
+    </div>
+{% else %}
+    <div class="farmer-new-header">
+        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+        <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+        <a href="{{ url('receiver_search') }}" class="float-right"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-search.svg" class="nav-search"></a>
+        <a href="{{ url('cart') }}" class="float-right"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-cart.svg" class="nav-cart"></a>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+                    <li class="list-group-item li-profile">
+                        <img src="{{ app.config.image_save_urlpath }}/{{ app.user.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                        <span class="profile-name">{{ app.user.__toString }}</span>
+                        <span class="button-x">X</span>
+                    </li>
+                    <li class="list-group-item"><a href="{{ url('receiver_home') }}">ホーム</a></li>
+                    <li class="list-group-item"><a href="{{ url('receiver_transaction') }}">取引中の商品</a></li>
+                    <li class="list-group-item"><a href="{{ url('farm_notice') }}"><span>お知らせ</span><span class="li-active">&#x25CF;</span></a></li>
+                    <li class="list-group-item" id="setting"><a href="{{ url('farm_service_profile_setting') }}">設定</a></li>
+                {% endif %}
+                <li class="list-group-item"><a href="{{ url('contact') }}">お問い合わせ</a></li>
+                <li class="list-group-item"><a href="{{ url('help_guide') }}">ガイド</a></li>
+            </ul>
+        </div>
+    </div>
+{% endif %}

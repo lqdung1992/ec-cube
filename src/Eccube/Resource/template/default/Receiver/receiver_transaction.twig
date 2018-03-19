@@ -1,0 +1,183 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/18/2018
+ # Time: 2:57 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        .transaction-section {
+            display: block;
+            min-height: 600px !important;
+        }
+
+    </style>
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            var openModal = function (review_class, caption) {
+                var modal = document.getElementById('myModal');
+                var modalImg = document.getElementById("model-image");
+                // review image
+                var img = document.getElementsByClassName(review_class);
+                var captionText = document.getElementById("caption");
+
+                var text = '';
+                if (caption) {
+                    text = document.getElementsByClassName(caption);
+                }
+
+                // review image
+                $(img).each(function(index, item) {
+                    item.onclick = function() {
+                        modal.style.display = "block";
+                        modalImg.src = this.src;
+                        if (text[index]) {
+                            captionText.innerHTML = text[index].value;
+                        } else {
+                            captionText.innerHTML = '';
+                        }
+                    };
+                });
+
+                var span = document.getElementsByClassName("close")[0];
+                span.onclick = function() {
+                    modal.style.display = "none";
+                };
+            };
+            openModal('image-review');
+
+            $(".exhibition li").click(function () {
+                var $class = $(this).data('text');
+                $(this).parent().find('li').each(function (index, value) {
+                    $(value).removeClass('enable').addClass('disable');
+                    $('.'+$(value).data('text')).hide();
+                });
+                $(this).addClass('enable').removeClass('disable');
+                $('.'+$class).show();
+            });
+
+            var is_complete = '{{ app.request.get('complete') }}';
+            if (is_complete) {
+                $('#complete-section').click();
+            }
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper">
+        <div class="exhibition">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <ul class="list-inline">
+                        <li class="col-sm-6 col-xs-6 text-alight-center enable" id="transaction-section" data-text="transaction-section">取引中</li>
+                        <li class="col-sm-6 col-xs-6 text-alight-center disable" id="complete-section" data-text="complete-section">取引終了</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="transaction-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    {% if OrderTransaction|length > 0 %}
+                        {% for Order in OrderTransaction %}
+                            {% set badge = 'delivery-now' %}
+                            {% if Order.OrderStatus.id == constant('Eccube\\Entity\\Master\\OrderStatus::DELIVERY_DONE') %}
+                                {% set badge = 'wait-approve' %}
+                            {% endif %}
+                            <div class="trans-detail clearfix">
+                                <div class="clearfix">
+                                    <div class="order-detail-profile float-left">
+                                        <p class="title15 width120">
+                                            {{ Order.name01 }}{{ Order.name02 }}
+                                            <label class="badge float-right {{ badge }}">{{ Order.OrderStatus.name }}</label>
+                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/box-min.svg" class="float-right margin-left20">
+                                        </p>
+                                        {% for OrderDetail in Order.OrderDetails %}
+                                            {% set Product = OrderDetail.Product %}
+                                            <img class="image-review order-profile" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}">
+                                        {% endfor %}
+                                    </div>
+                                    <div class="float-right arrow-right">
+                                        <a href="{{ url('order', {'id': Order.id}) }}">
+                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="order-detail-info">
+                                    <div class="float-left">
+                                        <p><span class="fix-length1">配達日</span>
+                                            {% set order_date = Order.commit_date|default(Order.receiptable_date) %}
+                                            <span>{{ order_date|date_format }}({{ days[order_date|date('N')].name }})</span>
+                                            <span class="margin-left60">{{ Order.payment_total|price }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty"><p><span class="title12 display-block">取引中がありません。</span></p></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="complete-section">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <form name="form1" id="form1" method="get" action="?">
+                        <input type="hidden" name="complete" value="1">
+                        {{ form_widget(formOrderBy.order_by, {attr: {'class': 'select margin-bottom15', 'onchange': 'javascript:this.form.submit();'}}) }}
+                    </form>
+
+                    {% if OrderComplete|length > 0 %}
+                        {% for Order in OrderComplete %}
+                            <div class="complete-detail clearfix">
+                                <div class="clearfix">
+                                    <div class="order-detail-profile float-left">
+                                        <p class="title15 width120">
+                                            {{ Order.name01 }}{{ Order.name02 }}
+                                        </p>
+                                        {% for OrderDetail in Order.OrderDetails %}
+                                            {% set Product = OrderDetail.Product %}
+                                            <img class="image-review order-profile" src="{{ app.config.image_save_urlpath }}/{{ Product.main_list_image|no_image_product }}">
+                                        {% endfor %}
+                                    </div>
+                                    <div class="float-right arrow-right">
+                                        <a href="{{ url('order', {'id': Order.id}) }}">
+                                            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" class="margin-top30">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="order-detail-info">
+                                    <div class="float-left">
+                                        <p>
+                                            <span class="color888 margin-right10">出荷日</span>
+                                            <span>{{ Order.commit_date|date_format }}</span>
+                                            <span class="color888 margin-right10 margin-left60">合計</span>
+                                            <span>{{ Order.payment_total|price }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="fav-empty"><p><span class="title12 display-block">取引終了がありません。</span></p></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="model-image"/>
+        <div id="caption"></div>
+    </div>
+{% endblock main %}

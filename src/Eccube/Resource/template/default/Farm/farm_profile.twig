@@ -146,9 +146,15 @@
 
             <div id="receiver-profile" class="clearfix">
                 <div class="col-sm-12 col-xs-12">
-                    {% if is_granted("IS_AUTHENTICATED_FULLY") and app.user.id == TargetCustomer.id %}
-                    <a href="{{ url('farm_profile_edit') }}"><button class="btn btn-success float-right farmer-follow-btn">編集</button></a>
+                    {% if is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::FARMER')) and app.user.id == TargetCustomer.id %}
+                        <a href="{{ url('farm_profile_edit') }}"><button class="btn btn-success float-right farmer-follow-btn">編集</button></a>
+                    {% elseif is_granted(constant('Eccube\\Entity\\Master\\CustomerRole::RECIPIENT')) %}
+                        {% if app.user.isFollow(TargetCustomer.id) %}
+                            <button class="btn btn-success float-right farmer-follow-btn">フォロー中</button>
+                        {% else %}
+                            <a class="btn btn-success float-right farmer-follow-btn" href="{{ url('farm_profile_follow', {id: TargetCustomer.id}) }}" {{ csrf_token_for_anchor() }} data-method="put" data-confirm="false">フォロー</a>
                         {% endif %}
+                    {% endif %}
                     {% set img = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
                     {% if TargetCustomer.profile_image %}
                         {% set img = app.config.image_save_urlpath ~'/'~ TargetCustomer.profile_image %}
@@ -182,7 +188,9 @@
                         {% for Product in Products %}
                         <div class="col-sm-4 col-xs-6">
                             <div class="thumbnail">
-                                <a href="{{ url('farm_item_detail', {'id': Product.id} ) }}"><img src="{{ app.config.image_save_urlpath }}/{{ Product.MainListImage|no_image_product }}" alt="..."></a>
+                                <a href="{{ url('farm_item_detail', {'id': Product.id}) }}">
+                                <img src="{{ app.config.image_save_urlpath }}/{{ Product.MainListImage|no_image_product }}" alt="...">
+                                </a>
                                 <div class="caption">
                                     <h5 class="font-weight mg10">{{ Product.name }}</h5>
                                     <h5 class="font-weight mg20">{{ Product.getPrice02IncTaxMin|price }} &nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp {{ Product.getAmountFollowPrice02Min }}{{ Product.getAmountUnitTypeFollowPrice02Min.name }}</h5>
@@ -223,7 +231,7 @@
 
                 {% set other_customer = app.config.front_urlpath ~ '/yasai-bus/img/camera.PNG' %}
                 {% for Voice in CustomerVoice %}
-                    <div class="div-comment-profile clearfix">
+                    <div class="div-comment-profile clearfix" id="comment">
                         <div class="row">
                             <div class="col-sm-12 col-xs-12">
                                 {% if Voice.Customer.id == TargetCustomer.id %}

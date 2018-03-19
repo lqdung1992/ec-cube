@@ -40,5 +40,9 @@
                 </div>
             </div>
         </div>
+    {% else %}
+        <div id="list_box" class="box-body no-padding">
+            <div id="list_box__not_find_Bus" class="data-empty"><svg class="cb cb-inbox"> <use xlink:href="#cb-inbox" /></svg><p class="text-center" style="text-align: center">データはありません</p></div>
+        </div><!-- /.box-body -->
     {% endif %}
 {% endblock main %}

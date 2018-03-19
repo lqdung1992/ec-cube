@@ -1,0 +1,193 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        #reicever-wrapper {
+            min-height: 600px;
+        }
+
+        .check-active-icon {
+            padding: 6px;
+        }
+
+        .list-inline span {
+            display: block;
+            padding-left: 13px;
+        }
+
+        .text-indent999 {
+            text-indent: -9999px;
+        }
+
+        .wrapper {
+            min-height: 600px;
+        }
+
+        @media only screen and (min-width: 768px) {
+            .pickup {
+                padding-left: 20%;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #c3c3c3;
+            }
+
+            #cart-done-button {
+                width: 96% !important;
+                margin: 25px;
+            }
+        }
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            .pickup {
+                padding-left: 8%;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #c3c3c3;
+            }
+
+            #cart-done-button {
+                width: 96% !important;
+                margin: 25px 2px;
+            }
+        }
+    </style>
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $('.check-active-icon').click(function () {
+                $(this).parent().addClass('hidden');
+                var id = $(this).attr('container-id');
+                if ($(this).hasClass('active')) {
+                    $('#inactive'+id).parent().removeClass('hidden');
+                } else {
+                    $('#active'+id).parent().removeClass('hidden');
+                }
+            });
+        })
+    </script>
+{% endblock javascript %}
+
+
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper">
+        <div class="farmer-new-header">
+            <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/nav-menu.svg" class="hambuger-menu-reicever">
+            <a href="{{ url('top') }}"><img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/logo.svg" class="logo-svg"></a>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-xs-12 wrapper" id="driver-wrapper">
+                <div class="header-bottom">
+                    <div class="ml39">
+                        <span class="layer-big">{{ BusStop.name }}</span>
+                    </div>
+                </div>
+
+                <div class="exhibition">
+                    <div class="row">
+                        <div class="col-sm-12 col-xs-12">
+                            <ul class="list-inline">
+                                <a href="{{ url('driver_detail_cargo', {'id': BusStop.id}) }}">
+                                    <li class="col-sm-6 col-xs-6 text-alight-center disable" id="haika">配荷</li>
+                                </a>
+                                <a href="#">
+                                    <li class="col-sm-6 col-xs-6 text-alight-center enable" id="syuka">集荷</li>
+                                </a>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {% if results|length > 0 %}
+                    {% set index = 0 %}
+                    {% for result in results %}
+                        <div class="pickup">
+                            <p class="section-title color888">{{ result.name1 }} {{ result.name2 }}</p>
+                            <div class="body-item form-inline">
+                            <span class="section-name">
+                                <span class="title16">注文番号 : {{ result.order_id }}</span>
+                                <span class="color888">(積み替え)</span>
+                                <span class="color888 float-right margin-right15">配達先 : {{ result.user_bus_stop_name }}</span>
+                            </span>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="check-item">
+                                <ul class="list-inline">
+                                    <li>
+                                        <div class="checkbox">
+                                            <ul class="list-inline">
+                                                <li>
+                                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/container-large.svg"
+                                                         class="container-icon">
+                                                    <span class="text-indent999">01</span>
+                                                </li>
+                                                {% for i in 1..result.total_amount %}
+                                                    {% set index = index + 1 %}
+                                                    <li>
+                                                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-inactive.svg"
+                                                             class="check-active-icon" id="inactive{{ index }}" container-id="{{ index }}">
+                                                        <span>0{{ i }}</span>
+                                                    </li>
+                                                    <li class="hidden">
+                                                        <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/check-active.svg"
+                                                             class="check-active-icon active" id="active{{ index }}" container-id="{{ index }}">
+                                                        <span>0{{ i }}</span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div>
+                        <p>
+                            <a href="{{ url('contact') }}" class="float-right margin-right15">コンテナや商品に不備があった場合</a>
+                        </p>
+                        <form method="post" action="" enctype="multipart/form-data">
+                            <button type="submit" value="pick_up" class="btn btn-success" id="cart-done-button" name="pick_up">集荷を完了する</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div id="list_box" class="box-body no-padding">
+                        <div id="list_box__not_find_Bus" class="data-empty">
+                            <svg class="cb cb-inbox">
+                                <use xlink:href="#cb-inbox"/>
+                            </svg>
+                            <p class="text-center" style="text-align: center">データはありません</p></div>
+                    </div><!-- /.box-body -->
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <div id="reicever-menu-wrapper" class="menu-wrapper hidden">
+        <div class="Rectangle">
+            <ul class="list-group" id="main-menu">
+                {% if is_granted("IS_AUTHENTICATED_FULLY") %}
+                    <li class="list-group-item li-profile">
+                        <img id="upload-image" src="{{ app.config.image_save_urlpath }}/{{ app.user.profile_image|no_image_product }}" alt="profile" class="img-circle small-profile">
+                        <span class="profile-name">{{ app.user.__toString }}</span>
+                        <span class="button-x">X</span>
+                    </li>
+                {% endif %}
+                <li class="list-group-item"><a href="{{ url('driver_home') }}">今日の運行スケジュール</a></li>
+                <li class="list-group-item"><a href="{{ url('contact') }}">お問い合わせ</a></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

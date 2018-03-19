@@ -1,0 +1,19 @@
+Eccube\Entity\Master\ReceiverContainerType:
+    type: entity
+    table: mtb_receiver_container_type
+    repositoryClass: Eccube\Repository\Master\ReceiverContainerTypeRepository
+    id:
+        id:
+            type: smallint
+            nullable: false
+            unsigned: false
+            id: true
+    fields:
+        name:
+            type: text
+            nullable: true
+        rank:
+            type: smallint
+            nullable: false
+            unsigned: false
+    lifecycleCallbacks: {  }
