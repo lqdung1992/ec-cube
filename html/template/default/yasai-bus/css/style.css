@@ -2517,7 +2517,7 @@ span.required {
     background-color: #c94242 !important;
     margin-left: 5px;
 }
-.news-section, .recommend-section, .quick-section, .favorite-section {
+.news-section, .recommend-section, .quick-section, .favorite-section, .history-section {
     display: none;
 }
 
