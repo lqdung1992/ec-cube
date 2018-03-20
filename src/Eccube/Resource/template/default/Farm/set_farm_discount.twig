@@ -39,7 +39,7 @@
 
         #sale-number button.submit {
             width: 100%;
-            margin: 20px 0;
+            margin: 10px 0 5px 0;
             height: 45px;
         }
 
@@ -64,11 +64,15 @@
 {% block javascript %}
     <script type="text/javascript">
         $(function () {
+            var discount = {{ discount }};
+            $("#discount" + discount).removeClass('btn-default').addClass('btn-success');
+            $("#discount_number").val(discount);
             $('#button-group .btn').click(function () {
                 var element = $(this);
                 if (!element.hasClass('disabled')) {
                     $('#button-group .btn-success').removeClass('btn-success').addClass('btn-default');
                     element.addClass('btn-success').removeClass('btn-default');
+                    $("#discount_number").val(element.val());
                 }
             });
         });
@@ -84,13 +88,17 @@
                 <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
             </div>
             <div class="clearfix" id="button-group">
-                <button class="btn btn-default normal">5%</button>
-                <button class="btn btn-default normal">10%</button>
-                <button class="btn btn-default normal">15%</button>
-                <button class="btn btn-default normal">20%</button>
+                <button class="btn btn-default normal" value="5" id="discount5">5%</button>
+                <button class="btn btn-default normal" value="10" id="discount10">10%</button>
+                <button class="btn btn-default normal" value="15" id="discount15">15%</button>
+                <button class="btn btn-default normal" value="20" id="discount20">20%</button>
             </div>
-            <form action="" method="post" name="search-form" id="search-form">
-                <button class="btn btn-success submit" type="submit">割引率を適用する</button>
+            <form action="?" method="post" name="search-form" id="search-form">
+                <input type="hidden" id="discount_number" name="discount_number">
+                <button class="btn btn-success submit" type="submit" value="discount" name="discount">割引率を適用する</button>
+                {% if discount %}
+                    <button class="btn btn-danger submit" type="submit" value="discount_remove" name="discount_remove">割引率を削除する</button>
+                {% endif %}
             </form>
         </div>
     </div>

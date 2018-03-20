@@ -1385,9 +1385,9 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      * @param FarmerDiscount $discount
      * @return $this
      */
-    public function addFarmerDiscounts(FarmerDiscount $discount)
+    public function addFarmerDiscount(FarmerDiscount $discount)
     {
-        $this->Follows->add($discount);
+        $this->FarmerDiscounts->add($discount);
 
         return $this;
     }
@@ -1396,9 +1396,9 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
      * @param FarmerDiscount $discount
      * @return $this
      */
-    public function removeFarmerDiscounts(FarmerDiscount $discount)
+    public function removeFarmerDiscount(FarmerDiscount $discount)
     {
-        $this->Follows->removeElement($discount);
+        $this->FarmerDiscounts->removeElement($discount);
         return $this;
     }
 

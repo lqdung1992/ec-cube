@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\FarmerDiscount;
 use Eccube\Entity\Master\CustomerRole;
 use Eccube\Entity\Notification;
 use Eccube\Repository\NewsRepository;
@@ -22,6 +23,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FarmSaleController extends AbstractController
 {
+    const DISCOUNT = 'discount';
+    const DISCOUNT_REMOVE = 'discount_remove';
+
     /**
      * @param Application $app
      * @param Request $request
@@ -63,7 +67,7 @@ class FarmSaleController extends AbstractController
      * @throws
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function setDiscount(Application $app, $id)
+    public function setDiscount(Application $app, $id, Request $request)
     {
         if (!$app->isGranted(CustomerRole::FARMER)) {
             return $app->redirect($app->url('mypage_login'));
@@ -72,10 +76,43 @@ class FarmSaleController extends AbstractController
         if ($id == null) {
             throw new NotFoundHttpException();
         }
-
         $Customer = $app['eccube.repository.customer']->find($id);
+        $Farmer = $app->user();
+        $discount = $request->get('discount');
+        $discountNumber = $request->get('discount_number');
+        $discountRemove = $request->get('discount_remove');
+        /* @var \Eccube\Entity\FarmerDiscount $FarmerDiscount */
+        $FarmerDiscount = $app['eccube.repository.farmer_discount']->findOneBy(array('Farmer' => $Farmer, 'Customer' => $Customer));
+        $em = $app['orm.em'];
+        $discountValue = 0;
+        if ($FarmerDiscount != null) {
+            $discountValue = $FarmerDiscount->getDiscount();
+        }
+        if ($discount == self::DISCOUNT) {
+            if ($FarmerDiscount == null) {
+                $FarmerDiscount = new FarmerDiscount();
+                $FarmerDiscount->setDiscount($discountNumber);
+                $FarmerDiscount->setFarmer($Farmer);
+                $FarmerDiscount->setCustomer($Customer);
+            } else {
+                $FarmerDiscount->setDiscount($discountNumber);
+            }
 
-        return $app->render('Farm/set_farm_discount.twig', array('TargetCustomer' => $Customer));
+            $Farmer->addFarmerDiscount($FarmerDiscount);
+            $em->persist($FarmerDiscount);
+            $em->flush();
+
+            return $app->redirect($app->url('farm_discount'));
+        }
+
+        if ($discountRemove == self::DISCOUNT_REMOVE) {
+            $em->remove($FarmerDiscount);
+            $em->flush();
+
+            return $app->redirect($app->url('farm_discount'));
+        }
+
+        return $app->render('Farm/set_farm_discount.twig', array('TargetCustomer' => $Customer, 'discount' => $discountValue));
     }
 
     public function getCustomer(Application $app, Request $request)
