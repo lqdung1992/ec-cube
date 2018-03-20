@@ -605,7 +605,7 @@ class OrderRepository extends EntityRepository
         return $results;
     }
 
-    public function getSaleByMonth ($farmer_id) {
+    public function getSaleByMonth ($farmer_id, $year) {
         //need move to my sql
         $sql =  'SELECT SUM(payment_total) as total, MONTH(order_date) as month '.
                 'FROM dtb_order '.
@@ -615,7 +615,7 @@ class OrderRepository extends EntityRepository
         $rsm->addScalarResult('total', 'total');
         $rsm->addScalarResult('month', 'month');
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
-        $query->setParameter(1, date('Y%'));
+        $query->setParameter(1, $year.'%');
         $query->setParameter(2, $farmer_id);
         $results = $query->getResult();
 

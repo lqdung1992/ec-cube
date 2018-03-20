@@ -220,4 +220,7 @@ Eccube\Entity\Customer:
         Follows:
             targetEntity: Eccube\Entity\Follow
             mappedBy: Customer
+        FarmerDiscounts:
+            targetEntity: Eccube\Entity\FarmerDiscount
+            mappedBy: Customer
     lifecycleCallbacks: {  }

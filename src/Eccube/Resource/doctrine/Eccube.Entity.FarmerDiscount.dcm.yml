@@ -1,0 +1,35 @@
+Eccube\Entity\FarmerDiscount:
+    type: entity
+    table: dtb_farmer_discount
+    repositoryClass: Eccube\Repository\FarmerDiscountRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: id
+            generator:
+                strategy: AUTO
+    fields:
+        discount:
+            type: integer
+            nullable: false
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+    manyToOne:
+        Farmer:
+            targetEntity: Eccube\Entity\Customer
+            joinColumn:
+                name: farmer_id
+                referencedColumnName: customer_id
+        Customer:
+            targetEntity: Eccube\Entity\Customer
+            joinColumn:
+                name: customer_id
+                referencedColumnName: customer_id
+    lifecycleCallbacks: {  }

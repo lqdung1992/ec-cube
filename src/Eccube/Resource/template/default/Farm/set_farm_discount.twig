@@ -1,0 +1,97 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 02/13/2018
+ # Time: 10:00
+ #}
+
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            #sale-number {
+                padding: 10px 35% 30px 35.5%;
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+        }
+
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 630px;
+        }
+
+        .sale-title {
+            margin: 20px 0;
+            font-size: 24px;
+            text-align: center;
+            border-bottom: 3px solid #000000;
+        }
+
+        #sale-number button.submit {
+            width: 100%;
+            margin: 20px 0;
+            height: 45px;
+        }
+
+        #sale-number button.normal {
+            width: 24%;
+            margin: 20px 0;
+            height: 45px;
+        }
+
+        .profile-name-medium {
+            color: #000000 !important;
+        }
+
+        #customer {
+            margin: 15px 0;
+        }
+
+
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $('#button-group .btn').click(function () {
+                var element = $(this);
+                if (!element.hasClass('disabled')) {
+                    $('#button-group .btn-success').removeClass('btn-success').addClass('btn-default');
+                    element.addClass('btn-success').removeClass('btn-default');
+                }
+            });
+        });
+    </script>
+{% endblock %}
+{% block main %}
+    <div id="reicever-wrapper" class="wrapper">
+        <div id="sale-number">
+            <p class="sale-title">割引率の設定</p>
+            <div class="clearfix" id="customer">
+                <img src="{{ app.config.image_save_urlpath }}/{{ TargetCustomer.profile_image|no_image_product }}" class="img-circle profile50">
+                <span class="profile-name-medium">{{ TargetCustomer.__toString }}</span>
+                <span class="profile-address-medium">{{ TargetCustomer.Pref.name }}{{ TargetCustomer.addr01 }}{{ TargetCustomer.addr02 }}</span>
+            </div>
+            <div class="clearfix" id="button-group">
+                <button class="btn btn-default normal">5%</button>
+                <button class="btn btn-default normal">10%</button>
+                <button class="btn btn-default normal">15%</button>
+                <button class="btn btn-default normal">20%</button>
+            </div>
+            <form action="" method="post" name="search-form" id="search-form">
+                <button class="btn btn-success submit" type="submit">割引率を適用する</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

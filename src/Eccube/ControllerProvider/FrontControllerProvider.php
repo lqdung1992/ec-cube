@@ -125,7 +125,8 @@ class FrontControllerProvider implements ControllerProviderInterface
 
         //Farm sale and discount
         $c->match('/farm/sale', '\Eccube\Controller\Farm\FarmSaleController::sale')->bind('farm_sale');
-
+        $c->match('/farm/discount', '\Eccube\Controller\Farm\FarmSaleController::discount')->bind('farm_discount');
+        $c->match('/farm/set_farm_discount/{id}', '\Eccube\Controller\Farm\FarmSaleController::setDiscount')->bind('set_farm_discount')->assert('id', '\d+');
 
         // farm - profile
         $c->match('/farm/profile', '\Eccube\Controller\Farm\FarmerController::index')->bind('farm_profile_own');
@@ -136,6 +137,7 @@ class FrontControllerProvider implements ControllerProviderInterface
         // Add image ajax
         $c->post('/farm/image/upload', '\Eccube\Controller\Farm\FarmerController::addImage')->bind('farm_image_upload');
         $c->post('/farm/like_count', '\Eccube\Controller\Farm\FarmerController::countLike')->bind('farm_count_like');
+        $c->post('/farm/get_customer', '\Eccube\Controller\Farm\FarmSaleController::getCustomer')->bind('farm_discount_get_customer');
 
         // farm - home
         $c->match('/farm/home', '\Eccube\Controller\Farm\FarmHomeController::index')->bind('farm_home');

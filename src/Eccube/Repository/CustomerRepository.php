@@ -532,4 +532,29 @@ class CustomerRepository extends EntityRepository implements UserProviderInterfa
 
         return $qb;
     }
+
+    /**
+     * @param $searchData
+     * @return
+     */
+    public function getReceiverByName($name)
+    {
+        // find farmer
+        $qb = $this->createQueryBuilder('c')
+            ->select('c')
+            ->andWhere('c.del_flg = 0')
+            ->andWhere('c.CustomerRole = 3');
+
+        if (isset($name) && Str::isNotBlank($name)) {
+            $clean_key_multi = preg_replace('/\s+|[　]+/u', '', $name);
+            $qb
+                ->andWhere('CONCAT(c.name01, c.name02) LIKE :name')
+                ->setParameter('name', '%' . $clean_key_multi . '%');
+        }
+
+        // Order By
+        $query = $qb->addOrderBy('c.update_date', 'DESC')->getQuery();
+
+        return $query->getResult();
+    }
 }
