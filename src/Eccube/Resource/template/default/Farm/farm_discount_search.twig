@@ -1,0 +1,104 @@
+{#
+ # Created by PhpStorm.
+ # User: lqdung1992@gmail.com
+ # Date: 3/15/2018
+ # Time: 8:03 PM
+ #}
+{% extends 'default_frame.twig' %}
+{% set body_class = ' ' %}
+{% block stylesheet %}
+    <style type="text/css">
+        .wrapper {
+            background-color: #f7f7f7 !important;
+            min-height: 620px;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+
+        #discount-p, #no-data {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        #search_button {
+            height: 45px;
+            margin-bottom: 5px;
+        }
+
+        /******************************
+            Media Query for tablet, PC...
+        *******************************/
+        @media only screen and (min-width: 768px) {
+            .wrapper {
+                padding: 20px 20% 0 20%;
+            }
+            .search-input {
+                margin: 15px 0 !important;
+                height: 45px !important;
+                width: 90% !important;
+                display: inline-block;
+            }
+        }
+
+        /******************************
+            Media Query for smart phone
+        *******************************/
+        @media only screen and (max-width: 767px) {
+            .search-input {
+                margin: 15px 5px !important;
+                height: 45px !important;
+                width: 75% !important;
+                display: inline-block;
+            }
+        }
+    </style>
+{% endblock stylesheet %}
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $("#search_result").on("click", "li.list-group-item", function () {
+                if (!$(this).hasClass('disabled')) {
+                    window.location = $(this).find('input').val();
+                }
+            });
+
+            $('#search_button').click(function () {
+                var name = $("#search_type").val();
+                $.ajax({
+                    url: '{{ url('farm_discount_get_customer') }}',
+                    type: 'POST',
+                    dataType: 'html',
+                    data: {
+                        'name' : name
+                    }
+                }).done(function(data) {
+                    if (data === "") {
+                        data = "<p id='no-data'>データがありません</p>";
+                    }
+                    $("#search_result").html(data);
+                    $("#discount-p").hide();
+                }).fail(function() {
+                    console.log('fail');
+                    $("#discount-p").show();
+                });
+            });
+
+        });
+    </script>
+{% endblock javascript %}
+{% block main %}
+    <div class="wrapper">
+        <input type="text" id="search_type" name="search_type" value="" placeholder="名前を入力して探す" class="search-input form-control">
+        <button class="btn btn-success" id="search_button">🔎検索</button>
+        <div id="discount-p">
+            <p>特定の購入者に対して割引率を設定することで</p>
+            <p>その人にだけ出品している商品を割引価格で</p>
+            <p>提供することができるようになります</p>
+        </div>
+
+        <div id="search_result"></div>
+    </div>
+{% endblock main %}

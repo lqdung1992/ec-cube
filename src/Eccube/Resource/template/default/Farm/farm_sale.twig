@@ -15,7 +15,7 @@
         *******************************/
         @media only screen and (min-width: 768px) {
             #button-group {
-                padding: 80px 35% 30px 35%;
+                padding: 40px 35% 30px 35%;
             }
 
             #sale-number {
@@ -56,6 +56,11 @@
             }
         }
 
+        .sale-next {
+            float: right;
+            margin-right: 10px;
+        }
+
         .wrapper {
             background-color: #f7f7f7 !important;
             min-height: 630px;
@@ -80,6 +85,12 @@
             height: 45px;
         }
 
+        #year {
+            font-size: 24px;
+            text-align: center;
+            padding-top:40px;
+        }
+
     </style>
 {% endblock stylesheet %}
 
@@ -89,7 +100,7 @@
             var month = $('#month').val();
             $('.sale-total').hide();
             $('.month' + month).show();
-            $('.btn').click(function () {
+            $('#button-group .btn').click(function () {
                 var element = $(this);
                 if (!element.hasClass('disabled')) {
                     var mm = element.attr('month');
@@ -105,14 +116,19 @@
 {% endblock %}
 {% block main %}
     <div id="reicever-wrapper" class="wrapper">
+        <p id="year">{{ year }}年</p>
         <div id="button-group">
             {% set month = 'now'|date('m') %}
+            {% set last_year = year - 1 %}
+            {% set next_year = year + 1 %}
+            {% set current_year = 'now'|date('Y') %}
+
             {% for i in 1..12 %}
                 {% if month == i %}
                     <button class="btn btn-success btn-month{{ i }}" month="{{ i }}">{{ i }}月</button>
                     <input value="{{ i }}" id="month" type="hidden">
                 {% else %}
-                    {% if month < i %}
+                    {% if month < i  and year == current_year %}
                         <button class="btn btn-default disabled">{{ i }}月</button>
                     {% else %}
                         <button class="btn btn-default btn-month{{ i }}" month="{{ i }}">{{ i }}月</button>
@@ -122,12 +138,15 @@
         </div>
 
         <div id="sale-number">
-            <a href="#" class="display-block color888 sale-pass">2017年</a>
+            <a href="{{ url('farm_sale') }}?year={{ last_year }}" class="color888 sale-pass">{{ last_year }}年</a>
+            {% if year < current_year %}
+                <a href="{{ url('farm_sale') }}?year={{ next_year }}" class="display-block color888 sale-next">{{ next_year }}年</a>
+            {% endif %}
             <p class="sale-title">売上</p>
             {% for result in results %}
                 <p class="sale-total month{{ result.month }}">{{ result.total|price }}</p>
             {% endfor %}
-            <button class="btn btn-success">承認済み</button>
+            <button class="btn btn-success" type="button">承認済み</button>
             <a class="display-block color888 sale-contact" href="{{ url('contact') }}">売上金額が違う場合</a>
         </div>
     </div>

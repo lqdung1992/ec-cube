@@ -272,6 +272,7 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->Orders = new \Doctrine\Common\Collections\ArrayCollection();
         $this->CustomerImage = new \Doctrine\Common\Collections\ArrayCollection();
         $this->Follows = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->FarmerDiscounts = new \Doctrine\Common\Collections\ArrayCollection();
 
         $this->setBuyTimes(0);
         $this->setBuyTotal(0);
@@ -1368,6 +1369,53 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
 
     /** @var Follow[] */
     private $Follows;
+
+    /** @var FarmerDiscount[] */
+    private $FarmerDiscounts;
+
+    /**
+     * @return FarmerDiscount[]
+     */
+    public function getFarmerDiscounts()
+    {
+        return $this->FarmerDiscounts;
+    }
+
+    /**
+     * @param FarmerDiscount $discount
+     * @return $this
+     */
+    public function addFarmerDiscount(FarmerDiscount $discount)
+    {
+        $this->FarmerDiscounts->add($discount);
+
+        return $this;
+    }
+
+    /**
+     * @param FarmerDiscount $discount
+     * @return $this
+     */
+    public function removeFarmerDiscount(FarmerDiscount $discount)
+    {
+        $this->FarmerDiscounts->removeElement($discount);
+        return $this;
+    }
+
+    /**
+     * @param int $id
+     * @return
+     */
+    public function displayDiscount($id)
+    {
+        $discounts = $this->getFarmerDiscounts();
+        foreach ($discounts as $discount) {
+            if ($discount->getCustomer()->getId() == $id) {
+                return $discount->getDiscount();
+            }
+        }
+        return null;
+    }
 
     /**
      * @return Follow[]
