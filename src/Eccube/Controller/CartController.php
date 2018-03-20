@@ -30,13 +30,18 @@ use Eccube\Entity\Cart;
 use Eccube\Entity\CartItem;
 use Eccube\Entity\Customer;
 use Eccube\Entity\Master\CustomerRole;
+use Eccube\Entity\Master\OrderStatus;
 use Eccube\Entity\Notification;
+use Eccube\Entity\Order;
+use Eccube\Entity\Product;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Exception\CartException;
 use Eccube\Exception\ShoppingException;
+use Eccube\Repository\ProductRepository;
 use Eccube\Service\CartService;
 use Eccube\Service\ShoppingService;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -54,7 +59,10 @@ class CartController extends AbstractController
      */
     public function index(Application $app, Request $request)
     {
-        /** @var CartService $cartService */
+        if (!$app->isGranted(CustomerRole::RECIPIENT)) {
+            return $app->redirect($app->url('mypage_login'));
+        }
+            /** @var CartService $cartService */
         $cartService = $app['eccube.service.cart'];
         $Cart = $cartService->getCart();
 
@@ -194,12 +202,84 @@ class CartController extends AbstractController
             return $event->getResponse();
         }
 
+        /** @var FormBuilder $builder */
+        $builder = $app['form.factory']->createNamedBuilder('', 'home_complete');
+        if ($request->getMethod() === 'GET') {
+            $builder->setMethod('GET');
+        }
+
+        $formOrderBy = $builder->getForm();
+        $formOrderBy->handleRequest($request);
+        $orderStatuses = array(
+            $app['config']['order_new'],
+            OrderStatus::ORDER_PICKUP,
+            OrderStatus::PICKUP_DONE,
+            OrderStatus::DELIVERY_DONE,
+        );
+        /** @var Customer $Customer */
+        $Customer = $app->user();
+        /** @var ProductRepository $productRepository */
+        $productRepository = $app['eccube.repository.product'];
+        $queryBuilder = $productRepository->getQBProductCountByReceiver($Customer, $orderStatuses);
+        $queryBuilder->resetDQLPart('orderBy');
+        $data = $formOrderBy->getData();
+        $orderBy = isset($data['order_by']) ? $data['order_by'] : Order::SORT_BY_NEW;
+        switch ($orderBy) {
+            case Order::SORT_BY_TOTAL:
+                $queryBuilder->orderBy('o.total', 'DESC');
+                break;
+            case Order::SORT_BY_NEW:
+            default:
+                $queryBuilder->orderBy('o.update_date', 'DESC');
+                break;
+
+        }
+
+        $arrOrderHistory = $queryBuilder->getQuery()->getResult();
+
+        $mode = $request->get('mode');
+        $forms = array();
+        foreach ($arrOrderHistory as $item) {
+            /** @var Product $Product */
+            $Product = $item['product'];
+            /* @var $builder \Symfony\Component\Form\FormBuilderInterface */
+            $builder = $app['form.factory']->createNamedBuilder('', 'add_cart', null, array(
+                'product' => $Product,
+                'allow_extra_fields' => true,
+            ));
+            $addCartForm = $builder->getForm();
+            switch ($mode) {
+                case 'add_cart':
+                    $addCartForm->handleRequest($request);
+                    if ((string)$Product->getId() === $request->get('product_id') && $addCartForm->isSubmitted() && $addCartForm->isValid()) {
+                        $addCartData = $addCartForm->getData();
+                        $arrQuantity = array_filter($addCartData['quantity'], function ($item) {
+                            return $item > 0;
+                        });
+                        /** @var CartService $cartService */
+                        $cartService = $app['eccube.service.cart'];
+                        try {
+                            $cartService->addProduct($addCartData['product_class_id'], $arrQuantity)->save();
+                        } catch (CartException $e) {
+                            $app->addRequestError($e->getMessage());
+                        }
+
+                        return $app->redirect($app->url('cart'));
+                    }
+                    break;
+            }
+            $forms[$Product->getId()] = $addCartForm->createView();
+        }
+
         return $app->render(
             'Cart/index.twig',
             array(
                 'Cart' => $Cart,
                 'reception_dates' => $receptionDate,
-                'master_date' => $masterDate
+                'master_date' => $masterDate,
+                'form_order_by' => $formOrderBy->createView(),
+                'order_history' => $arrOrderHistory,
+                'forms' => $forms,
             )
         );
     }
