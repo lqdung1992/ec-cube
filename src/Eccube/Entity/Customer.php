@@ -1493,5 +1493,11 @@ class Customer extends \Eccube\Entity\AbstractEntity implements UserInterface
         $this->ReceiverGetTime = $ReceiverGetTime;
     }
 
-
+    /**
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->Pref->getName() . $this->addr01 . $this->addr02;
+    }
 }

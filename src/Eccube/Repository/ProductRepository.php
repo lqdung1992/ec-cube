@@ -27,6 +27,7 @@ namespace Eccube\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Eccube\Application;
 use Eccube\Common\Constant;
 use Eccube\Entity\Customer;
@@ -444,6 +445,32 @@ class ProductRepository extends EntityRepository
         // XXX Paginater を使用した場合に PostgreSQL で正しくソートできない
         $qb->orderBy('p.create_date', 'DESC');
         $qb->groupBy('p.id');
+
+        return $qb;
+    }
+
+    /**
+     * @param Customer $Customer
+     * @param array $OrderStatuses
+     * @return QueryBuilder
+     */
+    public function getQBProductCountByReceiver(Customer $Customer, array $OrderStatuses = array())
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select("p as product, count(o) as order_time, max(o.order_date) as order_date")
+            ->innerJoin('Eccube\\Entity\\OrderDetail', 'od', 'WITH', 'od.Product = p')
+            ->innerJoin('Eccube\\Entity\\Order', 'o', 'WITH', 'od.Order = o')
+            ->where('o.Customer = :Customer')
+            ->setParameter('Customer', $Customer)
+            ->groupBy('p');
+
+        if (count($OrderStatuses) > 0) {
+            $qb->andWhere('o.OrderStatus in (:OrderStatuses)')
+                ->setParameter('OrderStatuses', $OrderStatuses);
+        }
+
+        // Order By
+        $qb->addOrderBy('o.receiptable_date', 'ASC');
 
         return $qb;
     }

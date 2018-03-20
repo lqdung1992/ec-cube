@@ -1,24 +1,3 @@
-{#
-This file is part of EC-CUBE
-
-Copyright(c) 2000-2015 LOCKON CO.,LTD. All Rights Reserved.
-
-http://www.lockon.co.jp/
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#}
 {% extends 'default_frame.twig' %}
 
 {% set body_class = 'cart_page' %}
@@ -39,38 +18,45 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 {% endblock stylesheet %}
 
 {% block javascript %}
-    <script
-            type="text/javascript">
+    <script type="text/javascript">
         $(function() {
             $(".plus").on("click", function() {
                 var $button = $(this);
-                var oldValue = $button.parent().find("input").val();
+                var oldValue = $button.parent().find("input[type=number]").val();
                 var newVal = parseInt(oldValue) + 1;
-                var max = $button.parent().find("input").attr('max');
+                var max = $button.parent().find("input[type=number]").attr('max');
                 if (newVal > max) {
                     return false;
                 }
                 var priceSpan = $button.parent().parent().find(".count-price").find("span");
-                var priceOld = parseInt(priceSpan.text());
-                var priceNew = priceOld / oldValue * newVal;
+                if ($(this).data('text') == 'history') {
+                    var priceOld = parseInt($button.parent().parent().find(".old-price").val());
+                    var priceNew = priceOld * newVal;
+                } else {
+                    var priceOld = parseInt(priceSpan.text());
+                    var priceNew = priceOld / oldValue * newVal;
+                }
                 priceSpan.text(priceNew);
-                $button.parent().find("input").val(newVal);
+                $button.parent().find("input[type=number]").val(newVal);
             });
 
             $(".minus").on("click", function() {
                 var $button = $(this);
-                var oldValue = $button.parent().find("input").val();
-
-                if (oldValue > 1) {
+                var oldValue = $button.parent().find("input[type=number]").val();
+                var priceSpan = $button.parent().parent().find(".count-price").find("span");
+                var min = $button.parent().find("input[type=number]").attr('min');
+                if (oldValue > min) {
                     var newVal = parseInt(oldValue) - 1;
                 } else return false;
-
-                var priceSpan = $button.parent().parent().find(".count-price").find("span");
-                var priceOld = parseInt(priceSpan.text());
-                var priceNew = priceOld / oldValue * newVal;
+                if ($(this).data('text') == 'history') {
+                    var priceOld = parseInt($button.parent().parent().find(".old-price").val());
+                    var priceNew = priceOld * newVal;
+                } else {
+                    var priceOld = parseInt(priceSpan.text());
+                    var priceNew = priceOld / oldValue * newVal;
+                }
                 priceSpan.text(priceNew);
-
-                $button.parent().find("input").val(newVal);
+                $button.parent().find("input[type=number]").val(newVal);
             });
 
             // reset modal
@@ -81,7 +67,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                     $(this).parent().find('.count-price').find('span').text(old_price);
                 });
             });
-        })
+
+            $(".exhibition li").click(function () {
+                var $class = $(this).data('text');
+                $(this).parent().find('li').each(function (index, value) {
+                    $(value).removeClass('enable').addClass('disable');
+                    $('.'+$(value).data('text')).hide();
+                });
+                $(this).addClass('enable').removeClass('disable');
+                $('.'+$class).show();
+            });
+
+            var section = '{{ app.request.get('section', '') }}';
+            if (section) {
+                $('#'+section+'-section').trigger('click');
+            }
+        });
     </script>
 {% endblock javascript %}
 
@@ -92,8 +93,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 <div class="row">
                     <div class="col-sm-12 col-xs-12">
                         <ul class="list-inline">
-                            <li class="left_enable list-2item">注文票</li>
-                            <li class="right_disable list-2item">注文履歴</li>
+                            <li class="col-sm-6 col-xs-6 text-alight-center enable" id="cart-section" data-text="cart-section">注文票</li>
+                            <li class="col-sm-6 col-xs-6 text-alight-center disable" id="history-section" data-text="history-section">注文履歴</li>
                         </ul>
                     </div>
                 </div>
@@ -199,6 +200,86 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
                 </div>
             {% endif %}
 
+            <div class="history-section">
+                <div class="row">
+                    <div class="col-sm-12 col-xs-12">
+                        <form name="form1" id="form1" method="get" action="?">
+                            <input type="hidden" name="section" value="history">
+                            {{ form_widget(form_order_by.order_by, {attr: {'onchange': 'javascript:this.form.submit();'}}) }}
+                        </form>
+            {% if order_history|length > 0 %}
+                {% for row in order_history %}
+                    {% set Product = row.product %}
+                        <div class="receiver-order-detail clearfix">
+                            <div class="clearfix">
+                                <div class="order-detail-profile float-left">
+                                    <img src="{{ app.config.image_save_urlpath }}/{{ Product.MainListImage|no_image_product }}" alt="profile" class="order-profile">
+                                    <span class="profile-name-medium">{{ Product.name }}</span>
+                                    <span class="profile-address-medium">{{ Product.Creator.__toString }}</span>
+                                </div>
+                                <div class="float-right arrow-right">
+                                    <img src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/arrow.png" >
+                                </div>
+                            </div>
+                            <div class="order-detail-info">
+                                <div class="float-left">
+                                    <p><span class="fix-length1">最終注文日</span><span>{{ row.order_date|date("Y年m月d日") }}</span></p>
+                                    <p><span class="fix-length1">注文合計</span><span>{{ row.order_time }}回</span></p>
+                                </div>
+                                <div class="float-right link-success">
+                                    <a href="#" data-toggle="modal" data-target="#product-modal-{{ Product.id }}">再注文する</a>
+                                    <div class="modal fade" id="product-modal-{{ Product.id }}" tabindex="-1" data-backdrop="static" data-keyboard="false" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                {% set cartForm = forms[Product.id] %}
+                                                <form name="add-cart-form" id="add-cart-form-{{ Product.id }}" method="post" action="?">
+                                                    <input type="hidden" name="mode" value="add_cart"/>
+                                                    {{ form_widget(cartForm._token) }}
+                                                    {{ form_widget(cartForm.product_id) }}
+                                                    {{ form_widget(cartForm.product_class_id) }}
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="cartModalLabel">配送日をお選びください</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ form_errors(cartForm.quantity) }}
+                                                        {% set ProductRDs = Product.ProductReceiptableDates %}
+                                                        {% for ProductRD in ProductRDs %}
+                                                            <div class="row">
+                                                                <div class="col-sm-12 col-xs-12 count-modal">
+                                                                    <div class="col-sm-8 col-xs-8 float-left">
+                                                                        <span class="count-date">{{ ProductRD.date|date('m月d日') }}({{ ProductRD.ReceiptableDate.name }})</span>
+                                                                        <label class="count-quality ">残り{{ ProductRD.max_quantity }}点</label>
+                                                                        <input type="hidden" class="old-price" value="{{ Product.Price02IncTaxMin }}">
+                                                                        <p class="count-price">小計：<span class="modal-price">0</span>円</p>
+                                                                    </div>
+                                                                    <div class="col-sm-4 col-xs-4 float-right count-right">
+                                                                        <img class="minus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-minus-inactive.svg" data-text="history">
+                                                                        <input type="number" min="0" step="1" max="{{ ProductRD.max_quantity }}" pattern="[0-9]*" class="count-number"
+                                                                               name="quantity[{{ ProductRD.date|date('Y/m/d') }}]" value="0">
+                                                                        <img class="plus" src="{{ app.config.front_urlpath }}/yasai-bus/img/icon/count-plus-active.svg" data-text="history">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button id="order_button" class="btn btn-success" type="submit">注文票に追加する</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+            {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
